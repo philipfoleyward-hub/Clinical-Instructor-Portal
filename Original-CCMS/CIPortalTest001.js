@@ -199,10 +199,13 @@ function ciLink_commitTest001_(data) {
       throw Error('Invalid student review comments');
   if (review.status === 'reviewed' && !Number.isFinite(Date.parse(review.reviewedAt)))
     throw Error('Reviewed status requires a valid timestamp');
-  // Prevent test artifacts from landing in a similarly named but WRONG folder.
-  const expectedRoot = '1-Mia4Zq7OI1NLUfgwUC5okl584FAIg_H';
-  if (driveService_getClinicalEvaluationsRoot_().getId() !== expectedRoot)
-    throw Error('Official evaluation Drive root is not the approved cohort/student root');
+  // TEST-001 must use its dedicated QA tree, never the clinical production root.
+  const qaFolder = DriveApp.getFolderById('1lWav9VPbat6yj2K2Xx_gAWC6qAQy0BfZ');
+  if (qaFolder.getName() !== 'Evaluations') throw Error('Incorrect QA folder name');
+  const qaParent = qaFolder.getParents();
+  if (!qaParent.hasNext() ||
+      qaParent.next().getId() !== '1B3MD_gvDZZS338cfNMkDeOceGt3TXgFZ' ||
+      qaParent.hasNext()) throw Error('TEST-001 evaluation folder is outside approved QA tree');
   if (typeof gradeClinicalEvaluationFromPortalPayload !== 'function')
     throw Error('Native grading adapter missing');
   if (ciLink_prop_('CI_PORTAL_DOCUMENT_PAIR_MODE') !== 'test_only') {
@@ -429,8 +432,10 @@ function doPost(e) {
       result = ciLink_draftLoad_(data);
     } else if (a === 'draft_list') {
       result = ciLink_draftList_(data);
-    } else {
+    } else if (a === 'submit') {
       result = ciLink_productionEnabled_() ? ciLink_commitProduction_(data) : ciLink_commitTest001_(data);
+    } else {
+      throw Error('Unsupported gateway action');
     }
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
