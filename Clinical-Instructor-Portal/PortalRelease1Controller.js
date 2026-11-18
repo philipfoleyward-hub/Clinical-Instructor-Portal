@@ -46,6 +46,10 @@ function ciR1Home(token,dateOverride) {
 function ciPortalWorkbookId_() {
   const id=String(PropertiesService.getScriptProperties().getProperty('CCMS_WORKBOOK_ID')||'').trim();
   if(!/^[A-Za-z0-9_-]{20,}$/.test(id)) throw new Error('CCMS_WORKBOOK_ID not configured');
+  const submitMode=String(PropertiesService.getScriptProperties().getProperty('CI_PORTAL_EVALUATION_SUBMIT_MODE')||'disabled');
+  if(submitMode==='test_only'&&id!=='1QnKQEKFipHvDz7xitjOoVu1IhlHcBCI1Z_SBQUaJF6Y'){
+    throw new Error('TEST-001 Portal requires the approved sandbox CCMS workbook');
+  }
   return id;
 }
 /** Login form is returned in the existing Apps Script frame after logout. */
