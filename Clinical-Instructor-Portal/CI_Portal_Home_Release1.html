@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>CI Portal Home v5</title><style>
+*{box-sizing:border-box}:root{--nav:#062b4a;--blue:#0878e5;--ink:#10213c;--muted:#5e7288;--bg:#f8fbfe}html,body{margin:0;min-height:100%;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}button{font:inherit}.app{min-height:100vh;padding-left:210px;transition:.2s}.app.collapsed{padding-left:72px}.side{position:fixed;z-index:20;inset:0 auto 0 0;width:210px;background:linear-gradient(#062b4a,#082945);color:#fff;transition:.2s;overflow:hidden}.collapsed .side{width:72px}.menu{height:96px;width:100%;padding:0 23px;display:flex;align-items:center;background:none;border:0;border-bottom:1px solid #31516b;color:#fff;cursor:pointer}.nav{padding-top:6px}.nav a{height:53px;padding:0 22px;display:flex;align-items:center;gap:15px;color:#fff;text-decoration:none;white-space:nowrap;font-size:15px}.nav a.active{background:var(--blue)}.ni{width:24px;min-width:24px;display:grid;place-items:center}.collapsed .nt{opacity:0}main{min-width:0}.hero{height:145px;position:relative;color:#fff;background-image:linear-gradient(90deg,rgba(2,27,51,.96),rgba(2,29,53,.77) 38%,rgba(3,28,49,.14) 74%),none;background-size:cover;background-position:center 48%;overflow:hidden}.heroTop{height:101px;display:flex;align-items:center;padding:0 27px;position:relative;z-index:2}.logo{width:206px;height:auto;margin-right:23px}.divider{height:55px;width:1px;background:#ffffff40;margin-right:23px}.pt{font-size:24px;font-weight:750}.tag{font-size:14px;margin-top:7px;color:#e7eef5}.hr{margin-left:auto;display:flex;align-items:center;gap:21px}.ha{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:650}.bell{display:grid;place-items:center;width:35px;height:35px}.profile{display:flex;align-items:center;gap:10px}.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#e2edf5;color:#1e4a6d;font-weight:800;border:2px solid #ffffffb3}.pn{font-size:14px;font-weight:750}.pr{font-size:11px;color:#dce8f2;margin-top:2px}.assignment{position:absolute;z-index:2;left:27px;right:27px;bottom:0;height:44px;border-top:1px solid #ffffff38;display:flex;align-items:center;gap:11px}.al{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#bad0e1}.as{font-size:15px;font-weight:750}.ad{font-size:11px;color:#dce8f2}.change{display:flex;align-items:center;gap:5px;border:1px solid #ffffff85;background:#04223c73;color:#fff;border-radius:6px;padding:5px 9px;font-size:11px;font-weight:650}.content{padding:14px 23px 25px}.students{background:#fff;border:1px solid #cfe2f3;border-radius:9px;margin-bottom:13px}.sh{height:48px;display:flex;align-items:center;padding:0 15px;font-size:17px;font-weight:750}.lead{color:#0878e5;margin-right:9px;display:grid}.count{margin-left:8px;background:#e7f2ff;border-radius:999px;padding:3px 8px;font-size:12px}.headActions{margin-left:auto;display:flex;gap:8px}.outline{height:31px;border:1px solid #9fc8ed;background:#fff;color:#086cc9;border-radius:6px;padding:0 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 14px 13px}.card{border:1px solid #d8e6f1;border-radius:8px;padding:11px 12px 10px}.st{display:flex;align-items:center;gap:10px;min-height:54px}.sa{width:48px;height:48px;min-width:48px;border-radius:50%;display:grid;place-items:center;background:#e5f7eb;color:#19854b;font-weight:800}.sx{min-width:0;flex:1}.sn{font-size:15px;font-weight:750;margin-bottom:2px}.sm,.rot{font-size:12px;color:#5b7187}.rot{color:#36536d;margin-top:2px}.chev{color:#94a8ba}.ca{display:grid;grid-template-columns:1fr 1.04fr;gap:7px;margin-top:9px}.primary,.secondary{height:34px;border-radius:6px;font-size:11px;font-weight:750;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}.primary{border:1px solid var(--blue);background:var(--blue);color:#fff}.secondary{border:1px solid #9fc8ed;background:#fff;color:#086cc9}.status{background:#fff;border-radius:9px;margin-bottom:12px;overflow:hidden}.orange{border:1px solid #f0dfc8}.green{border:1px solid #d2ead9}.sth{height:44px;display:flex;align-items:center;padding:0 15px;font-size:16px;font-weight:750}.si{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;margin-right:9px}.orange .si{background:#fff2df;color:#ef8500}.green .si{background:#e7f8ed;color:#10a14c}.view{margin-left:auto;color:#0871d2;font-size:12px;font-weight:700}.empty{border-top:1px solid #edf2f6;margin:0 14px;padding:13px;text-align:center;color:#6a7d90;font-size:12px}@media(max-width:1150px){.cards{grid-template-columns:repeat(2,1fr)}.logo{width:175px}.pt{font-size:20px}}@media(max-width:820px){.app{padding-left:72px}.side{width:72px}.nt{opacity:0}.logo,.divider{display:none}.cards{grid-template-columns:1fr}}
+
+/* Home v5 student cards: a complete card for each authoritative roster entry. */
+.cards .card{min-width:0}
+.cards .st{cursor:default}
+.cards .student-detail{min-width:0;flex:1}
+.cards .student-meta{font-size:12px;color:#5b7187;line-height:1.4}
+.cards .student-rotation{font-size:12px;color:#36536d;margin-top:2px}
+.cards .student-actions button{cursor:pointer}
+.cards .student-actions button:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
+.cards .student-chevron{border:0;background:transparent;color:#94a8ba;font-size:22px;cursor:pointer;padding:6px}
+.cards .empty-roster{grid-column:1/-1;padding:16px;color:#61768a;font-size:13px}
+
+/* Students v3 integration: inner workspace only; Home v5 shell remains unchanged. */
+[hidden]{display:none!important}
+.ci-students-view{padding:16px 23px 28px;color:#102440}
+.ci-view-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.ci-view-top h2{margin:0;font-size:24px;color:#102440}
+.ci-scope{display:flex;gap:5px;border:1px solid #d4e2ef;border-radius:9px;padding:4px;background:#fff}
+.ci-scope button{border:0;background:transparent;color:#60738b;padding:9px 14px;border-radius:6px;font-weight:700;cursor:pointer}
+.ci-scope button.active{background:#0877dc;color:white}
+.ci-student-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.ci-student-card,.ci-workspace-card,.ci-student-profile{border:1px solid #d4e2ef;border-radius:11px;background:#fff;padding:17px}
+.ci-student-top{display:flex;align-items:center;gap:12px}
+.ci-student-avatar{height:50px;width:50px;flex:none;border-radius:50%;background:#e5f4ec;color:#16834d;display:grid;place-items:center;font-size:16px;font-weight:800}
+.ci-student-title{font-size:17px;font-weight:750}.ci-student-meta{color:#60738b;font-size:12px;margin-top:4px}
+.ci-term{margin-left:auto;border-radius:999px;background:#eaf4ff;color:#086bc9;font-size:12px;padding:5px 8px;white-space:nowrap}
+.ci-student-actions{display:flex;gap:8px;margin-top:15px}.ci-student-actions button{flex:1;cursor:pointer}
+.ci-student-footer{margin-top:13px;border-top:1px solid #e4ecf3;padding-top:12px}
+.ci-link{border:0;background:none;color:#086bc9;font-size:13px;font-weight:750;cursor:pointer;padding:4px}
+.ci-detail-back{border:0;background:transparent;color:#086bc9;font-weight:700;margin-bottom:11px;cursor:pointer}
+.ci-student-profile{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+.ci-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.ci-workspace-card h3{margin:0 0 6px;font-size:18px}.ci-sub{color:#60738b;font-size:13px;margin-bottom:12px}
+.ci-history-item{border-top:1px solid #e4ecf3;padding:11px 0}.ci-history-item strong{display:block}.ci-history-item small{color:#60738b;display:block;margin-top:4px}
+.ci-workspace-note{background:#f7fbff;border:1px solid #d4e2ef;border-radius:7px;padding:12px;color:#516b81;font-size:13px}
+.ci-dialog-search{display:block;width:100%;padding:10px;border:1px solid #9fc8ed;border-radius:7px;margin:12px 0}
+.ci-search-item{width:100%;text-align:left;border:1px solid #d4e2ef;background:white;border-radius:7px;padding:12px;margin-bottom:8px;cursor:pointer}
+.ci-search-item:hover,.ci-search-item:focus{background:#eaf4ff}
+.ci-temporary-label{color:#a15a00;font-size:11px;margin-top:3px}
+@media(max-width:920px){.ci-student-grid,.ci-detail-grid{grid-template-columns:1fr}.ci-view-top{align-items:flex-start;flex-direction:column}}
+
+/* Responsive corrections within frozen visual system: no rearrangement at desktop sizes. */
+@media(max-width:700px){
+ .hero{height:194px}.heroTop{height:145px;padding:12px 16px;align-items:flex-start}
+ .pt{font-size:20px;line-height:1.13;max-width:180px}.tag{font-size:11px;line-height:1.4;margin-top:7px}
+ .hr{gap:9px;align-items:center}.hr .ha{display:none}.profile .pn,.profile .pr{display:none}.profile .avatar{width:34px;height:34px}
+ .assignment{left:12px;right:12px;height:49px;gap:7px;flex-wrap:nowrap}
+ .assignment .al{max-width:78px;line-height:1.2}.assignment .as{font-size:12px;max-width:115px;line-height:1.2}
+ .assignment .ad{display:none}.assignment .change{margin-left:auto;flex:none;font-size:10px;padding:5px 7px}
+ .content{padding:12px}.students .sh{height:auto;min-height:55px;flex-wrap:wrap;padding:10px 12px;row-gap:8px;font-size:15px}
+ .students .headActions{width:100%;margin-left:0;display:grid;grid-template-columns:1fr 1fr}
+ .students .headActions .outline{width:100%;justify-content:center;white-space:nowrap;padding:0 6px}
+ .cards{padding:0 10px 12px}.ca{grid-template-columns:1fr 1fr}.ca button{white-space:normal;line-height:1.2;height:39px}
+ .ci-students-view{padding:12px}.ci-view-top h2{font-size:20px}.ci-scope button{font-size:12px;padding:8px 9px}
+}
+</style></head><body><div class="app" id="app"><aside class="side"><button class="menu" id="menu"><svg fill="none" height="27" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="27"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><nav class="nav"><a class="active" id="ci-nav-home" href="#home" onclick="ciGoHome();return false"><span class="ni"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20"><path d="M3 11.5 12 4l9 7.5M5 10.5V20h14v-9.5M9 20v-6h6v6"></path></svg></span><span class="nt">Home</span></a><a id="ci-nav-students" href="#students" onclick="ciGoStudents();return false"><span class="ni"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.9"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span><span class="nt">Students</span></a><a id="ci-nav-evaluations" href="#evaluations" onclick="ciGoEvaluations();return false"><span class="ni"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20"><rect height="17" rx="2" width="14" x="5" y="4"></rect><path d="M9 4V2h6v2m-6 9 2 2 4-4"></path></svg></span><span class="nt">Evaluations</span></a><a id="ci-nav-workspace" href="#ci-nav-workspace" onclick="ciGoWorkspace();return false"><span class="ni"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20"><rect height="16" rx="2" width="18" x="3" y="5"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></span><span class="nt">My CI Workspace</span></a><a id="ci-nav-resources" href="#ci-nav-resources" onclick="ciGoResources();return false"><span class="ni"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5zM4 6.5v13M8 8h8M8 11h6"></path></svg></span><span class="nt">Resources</span></a><a id="ci-nav-help" href="#ci-nav-help" onclick="ciGoHelp();return false"><span class="ni"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.6 2.6 0 1 1 4.6 1.6c-.9.8-2.1 1.3-2.1 2.9M12 17h.01"></path></svg></span><span class="nt">Help &amp; Support</span></a></nav></aside><main><header class="hero" data-asset-bg="HOME_BANNER"><div class="heroTop"><img class="logo" data-asset-img="PORTAL_LOGO" alt="SUNY Orange Radiologic Technology"/><div class="divider"></div><div><div class="pt">Clinical Instructor Portal</div><div class="tag">Evaluate  •  Support  •  Develop  •  Document</div></div><div class="hr"><div class="ha"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.6 2.6 0 1 1 4.6 1.6c-.9.8-2.1 1.3-2.1 2.9M12 17h.01"></path></svg> Help</div><div class="bell" title="Notifications"><svg fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="22"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"></path></svg></div><div class="profile" role="button" tabindex="0" aria-label="Open instructor menu" onclick="ciToggleProfileMenu()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();ciToggleProfileMenu()}"><div class="avatar"></div><div><div class="pn"></div><div class="pr">Clinical Instructor</div></div><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="m6 9 6 6 6-6"></path></svg></div></div></div><div class="assignment"><span class="al">Today's Clinical Site</span><span class="as">Loading assigned clinical site…</span><span class="ad">Clinical coverage today</span><button class="change" onclick="ciChangeSite()"><svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M9 18 3.5 20V6L9 4l6 2 5.5-2v14L15 20zM9 4v14M15 6v14"></path></svg> Change Site</button></div></header><div class="content"><section class="students"><div class="sh"><span class="lead"><svg fill="none" height="21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="21"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.9"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 3.1a4 4 0 0 1 0 7.8"></path></svg></span>Students With You Today <span class="count">0</span><div class="headActions"><button class="outline" onclick="ciAddStudent()"><svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M12 5v14M5 12h14"></path></svg> Add Student</button><button class="outline" onclick="ciViewSchedule()"><svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="16" rx="2" width="18" x="3" y="5"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg> View Schedule</button></div></div><div class="cards" id="ci-students-dynamic" aria-live="polite"></div></section><section class="status orange"><div class="sth"><span class="si"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>In Progress Evaluations<button type="button" class="view" id="ci-home-view-drafts" onclick="ciGoEvaluations()" style="border:0;background:transparent;cursor:pointer">View All</button></div><div class="empty" id="ci-home-drafts" aria-live="polite">Loading your saved evaluations…</div></section><section class="status green"><div class="sth"><span class="si"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg></span>Recently Completed<span class="view">View All</span></div><div class="empty">No evaluations completed through this portal yet.</div></section></div><section id="ci-students-view" hidden><?!= HtmlService.createHtmlOutputFromFile("CI_Portal_Students_v3_Inner").getContent(); ?></section><section id="ci-evaluations-view" hidden style="padding:0">
+  <div id="ci-evaluations-overview-view"><?!= HtmlService.createHtmlOutputFromFile("CI_Portal_Evaluations_v2_Inner").getContent(); ?></div>
+  <div id="ci-evaluations-form-view" hidden>
+    <iframe allow="microphone" id="ci-evaluation-frame" title="Approved Clinical Competency Evaluation" style="width:100%;height:1120px;min-height:75vh;border:0;background:#f7fbfe" referrerpolicy="no-referrer"></iframe>
+  </div>
+</section><?!= HtmlService.createHtmlOutputFromFile("CI_Portal_Secondary_Menus").getContent(); ?></main></div><script>document.getElementById('menu').onclick=()=>document.getElementById('app').classList.toggle('collapsed');</script><div id="ci-profile-menu" hidden style="position:fixed;right:15px;top:82px;z-index:50;background:white;border:1px solid #d4e2ef;padding:12px;border-radius:9px;box-shadow:0 5px 20px #10213c33"><button class="outline" onclick="ciLogout()" type="button">Sign out</button></div><div id="ci-dialog" style="display:none;position:fixed;inset:0;background:#10213c77;z-index:9999;align-items:center;justify-content:center;padding:16px"><div style="background:white;border-radius:14px;padding:22px;width:min(540px,100%);max-height:85vh;overflow:auto"><button aria-label="Close" onclick="ciClose()" style="float:right">✕</button><h2 id="ci-dialog-title">Select student</h2><div id="ci-dialog-content"></div></div></div><script>
+let ciToken=sessionStorage.getItem('ccmsCiToken')||'';
+let ciHome=null, ciSite='', ciTemporary=new Map(), ciSelected='',ciScope='with',ciPage='home',ciSites=[],ciSiteRoster=null,ciStudentDetails=new Map();
+const ciRun=(name,...args)=>new Promise((resolve,reject)=>{
+ if(!window.google?.script?.run){reject(new Error('Open the Apps Script portal deployment.'));return;}
+ const runner=google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
+ const calls={
+  ciR1Home:()=>runner.ciR1Home(...args),
+  ciR1SiteOptions:()=>runner.ciR1SiteOptions(...args),
+  ciR1SiteRoster:()=>runner.ciR1SiteRoster(...args),
+  ciR1StudentRequirements:()=>runner.ciR1StudentRequirements(...args),
+  ciR1StudentSearch:()=>runner.ciR1StudentSearch(...args),
+  ciR1ValidateTemp:()=>runner.ciR1ValidateTemp(...args),
+  ciR1StudentProfile:()=>runner.ciR1StudentProfile(...args),
+  ciR1EvaluationExamOptions:()=>runner.ciR1EvaluationExamOptions(...args),
+  ciR1EvaluationInitialize:()=>runner.ciR1EvaluationInitialize(...args),
+  ciR1NewEvaluationId:()=>runner.ciR1NewEvaluationId(...args),
+  ciR1EvaluationFormSchema:()=>runner.ciR1EvaluationFormSchema(...args),
+  ciR1ApprovedEvaluationInnerHtml:()=>runner.ciR1ApprovedEvaluationInnerHtml(...args),
+  ciR1EvaluationLoadDraft:()=>runner.ciR1EvaluationLoadDraft(...args),
+  ciR1EvaluationSaveDraft:()=>runner.ciR1EvaluationSaveDraft(...args),
+  ciR1EvaluationStop:()=>runner.ciR1EvaluationStop(...args),
+  ciR1EvaluationPreview:()=>runner.ciR1EvaluationPreview(...args),
+  ciR1EvaluationSubmit:()=>runner.ciR1EvaluationSubmit(...args),
+  ciR1EvaluationDraftList:()=>runner.ciR1EvaluationDraftList(...args),
+  ciR1EvaluationReleaseStatus:()=>runner.ciR1EvaluationReleaseStatus(...args),
+  ciR1Logout:()=>runner.ciR1Logout(...args),
+  ciR1LoginHtml:()=>runner.ciR1LoginHtml(...args)
+ };
+ if(!calls[name]){reject(new Error('Unsupported portal request'));return;}
+ calls[name]();
+});
+const ciEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ciSessionKey=()=> 'ccmsCiTemp_v2_'+ciToken;
+const ciSiteKey=()=> 'ccmsCiSite_v2_'+ciToken;
+function ciToggleProfileMenu(){const el=document.getElementById('ci-profile-menu');el.hidden=!el.hidden;}
+function ciSaveTemp(){sessionStorage.setItem(ciSessionKey(),JSON.stringify([...ciTemporary.values()]));}
+function ciDialog(title,html){document.getElementById('ci-dialog-title').textContent=title;document.getElementById('ci-dialog-content').innerHTML=html;document.getElementById('ci-dialog').style.display='flex';}
+function ciClose(){document.getElementById('ci-dialog').style.display='none';}
+function ciError(e){ciDialog('Unable to load',`<p>${ciEsc(e?.message||e)}</p><button onclick="ciClose()">Close</button>`);}
+function ciAssignments(){return ciHome?.assignments||[];}
+function ciCurrent(){return ciSiteRoster&&ciSiteRoster.siteId===ciSite?ciSiteRoster:null;}
+function ciRoster(){const students=new Map();(ciCurrent()?.students||[]).forEach(s=>students.set(String(s.studentId),s));ciTemporary.forEach((s,id)=>{if(!students.has(id))students.set(id,s);});return [...students.values()];}
+
+function ciInitials(name){return String(name||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(part=>part.charAt(0).toUpperCase()).join('')||'?';}
+function ciStudentName(student){return student.student||student.studentName||student.studentId||'Student';}
+function ciStudentSite(s){return s.temporary?s.siteId:ciSite;}
+function ciStudentSource(s){return ciTemporary.has(String(s.studentId))&&!(ciCurrent()?.students||[]).some(x=>String(x.studentId)===String(s.studentId));}
+function ciRender(){
+ const assignment=ciCurrent();
+ document.querySelector('.assignment .as').textContent=assignment?.site||'Select a clinical site';
+ const roster=ciRoster();
+ document.querySelector('.students .count').textContent=String(roster.length);
+ const dest=document.getElementById('ci-students-dynamic');dest.replaceChildren();
+ if(!roster.length){const empty=document.createElement('div');empty.className='empty-roster';empty.textContent='No current placements were found for the selected site. You may temporarily add any active student.';dest.append(empty);}
+ roster.forEach(student=>{
+  const id=String(student.studentId),name=ciStudentName(student);
+  const card=document.createElement('article');card.className='card';
+  const info=document.createElement('div');info.className='st';
+  const avatar=document.createElement('div');avatar.className='sa';avatar.textContent=ciInitials(name);
+  const detail=document.createElement('div');detail.className='student-detail';
+  const title=document.createElement('div');title.className='sn';title.textContent=name;
+  const meta=document.createElement('div');meta.className='student-meta';meta.textContent=[id,student.clinicalTerm].filter(Boolean).join(' | ');
+  const rotation=document.createElement('div');rotation.className='student-rotation';rotation.textContent=student.temporary?'Manually added — not an official placement':student.rotationArea||'Room rotation not listed';
+  detail.append(title,meta,rotation);
+  if(ciStudentSource(student)){const badge=document.createElement('div');badge.className='ci-temporary-label';badge.textContent='Temporarily added for this session';detail.append(badge);}
+  const expand=document.createElement('button');expand.className='student-chevron';expand.type='button';expand.textContent='›';expand.setAttribute('aria-label','Open '+name+' in Students');
+  expand.addEventListener('click',()=>ciSelectStudent(id));info.append(avatar,detail,expand);
+  const actions=document.createElement('div');actions.className='ca student-actions';
+  const start=document.createElement('button');start.className='primary';start.type='button';start.textContent='▷  Start Evaluation';start.addEventListener('click',()=>{ciSelected=id;ciStartEvaluation(id);});
+  const opp=document.createElement('button');opp.className='secondary';opp.type='button';opp.textContent='☷  Competency Opportunities';opp.addEventListener('click',()=>{ciSelected=id;ciOpportunities(id);});
+  actions.append(start,opp);card.append(info,actions);dest.append(card);
+ });
+ if(ciPage==='students')ciRenderStudents();
+}
+async function ciSetSite(siteId){
+ if(!ciSites.some(s=>s.siteId===siteId)){ciError(new Error('Unauthorized site selection'));return;}
+ try{
+  const next=await ciRun('ciR1SiteRoster',ciToken,siteId,ciHome.date);
+  ciSite=siteId;ciSiteRoster=next;sessionStorage.setItem(ciSiteKey(),ciSite);ciClose();ciBackToStudents();ciRender();
+ }catch(e){ciError(e);}
+}
+async function ciChangeSite(){
+ try{
+  const data=await ciRun('ciR1SiteOptions',ciToken,ciHome.date);
+  ciSites=data.sites||[];
+  if(!ciSites.length){ciDialog('Change Site','<p>No authorized clinical site is available.</p>');return;}
+  ciDialog('Change Site','<div id="ci-site-choices"></div>');
+  const list=document.getElementById('ci-site-choices');
+  ciSites.forEach(site=>{const b=document.createElement('button');b.className='ci-search-item';b.type='button';b.textContent=site.site+(site.siteId===ciSite?' ✓':'');b.onclick=()=>ciSetSite(site.siteId);list.append(b);});
+ }catch(e){ciError(e);}
+}
+
+async function ciAddStudent(){
+ if(!ciSite){ciDialog('Add Student','<p>Select a clinical site before adding a student.</p>');return;}
+ ciDialog('Add Student','<label for="ci-student-search">Search any active student in the CCMS program</label><input id="ci-student-search" class="ci-dialog-search" type="search" placeholder="Student name or ID" autocomplete="off"/><div id="ci-student-results" aria-live="polite">Loading program students…</div>');
+ const search=document.getElementById('ci-student-search');let generation=0;
+ async function load(){const g=++generation;try{
+  const r=await ciRun('ciR1StudentSearch',ciToken,ciSite,ciHome.date,search.value);
+  if(g!==generation||!document.getElementById('ci-student-results'))return;
+  const dest=document.getElementById('ci-student-results');dest.replaceChildren();
+  if(!r.students.length){dest.textContent='No active students match this search.';return;}
+  r.students.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='ci-search-item';
+   b.textContent=ciStudentName(s)+' · '+s.studentId+' · '+(s.clinicalTerm||'Clinical term unavailable')+(ciRoster().some(x=>x.studentId===s.studentId)?' (already listed)':'');
+   b.disabled=ciRoster().some(x=>x.studentId===s.studentId);
+   b.onclick=()=>{ciTemporary.set(String(s.studentId),s);ciSaveTemp();ciClose();ciRender();};dest.append(b);});
+  if(r.total>100){const t=document.createElement('p');t.textContent='Showing the first 100 results. Refine your search.';dest.append(t);}
+ }catch(e){if(g===generation)ciError(e);}}
+ search.addEventListener('input',load);await load();search.focus();
+}
+async function ciRestoreTemp(){
+ let rows=[];try{rows=JSON.parse(sessionStorage.getItem(ciSessionKey())||'[]');if(!Array.isArray(rows))rows=[];}catch(e){rows=[];}
+ ciTemporary.clear();
+ const ids=[...new Set(rows.slice(0,100).filter(s=>s&&s.studentId).map(s=>String(s.studentId)))];
+ if(ids.length&&ciSite){
+  try{const result=await ciRun('ciR1ValidateTemp',ciToken,ciSite,ciHome.date,ids);result.students.forEach(s=>ciTemporary.set(String(s.studentId),s));}
+  catch(e){console.warn('Temporary selections could not be reauthorized:',e);}
+ }
+ ciSaveTemp();
+}
+
+function ciShowPage(page){
+ // Leaving an active editor requires a confirmed server-side draft save.
+ // On failure, remain in the editor instead of falsely marking it saved.
+ if(ciPage==='evaluation-form'&&page!=='evaluation-form'&&ciEvalContext){
+   const frame=document.getElementById('ci-evaluation-frame');
+   if(!frame?.contentWindow){ciDialog('Save required','Evaluation editor is unavailable; no draft save was confirmed.');return;}
+   frame.contentWindow.postMessage({source:'ci-eval-parent',type:'save_and_leave',payload:{target:page}},'*');return;
+ }
+ ciPage=page;
+ document.querySelector('main>.content').hidden=page!=='home';document.getElementById('ci-students-view').hidden=page!=='students';document.getElementById('ci-evaluations-view').hidden=!['evaluations','evaluation-form'].includes(page);document.getElementById('ci-evaluations-overview-view').hidden=page!=='evaluations';document.getElementById('ci-evaluations-form-view').hidden=page!=='evaluation-form';document.getElementById('ci-workspace-view').hidden=page!=='workspace';document.getElementById('ci-resources-view').hidden=page!=='resources';
+ document.getElementById('ci-nav-home').classList.toggle('active',page==='home');document.getElementById('ci-nav-students').classList.toggle('active',page==='students');document.getElementById('ci-nav-evaluations').classList.toggle('active',page==='evaluations'||page==='evaluation-form');['workspace','resources'].forEach(p=>document.getElementById('ci-nav-'+p).classList.toggle('active',page===p));
+ if(page==='students')ciRenderStudents();
+}
+/** Evaluator-owned saved evaluations; latest first, with stable-ID resume.
+ * No completed-record claims until the authoritative submission ledger is wired. */
+let ciRecentGeneration=0;
+async function ciRefreshInProgress_(){
+ if(!ciToken)return;
+ const home=document.getElementById('ci-home-drafts');
+ const generation=++ciRecentGeneration;
+ if(home)home.textContent='Loading saved evaluations…';
+ try{
+  const response=await ciRun('ciR1EvaluationDraftList',ciToken);
+  if(generation!==ciRecentGeneration)return;
+  const drafts=Array.isArray(response?.drafts)?response.drafts:[];
+  const render=container=>{
+   if(!container)return;
+   container.replaceChildren();container.style.textAlign='left';
+   if(!drafts.length){container.textContent='No evaluations currently in progress.';container.style.textAlign='center';return;}
+   drafts.slice(0,container===home?5:20).forEach((draft,index)=>{
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 3px;border-bottom:1px solid #e4edf4';
+    const info=document.createElement('div');info.style.minWidth='0';
+    const title=document.createElement('strong');title.style.cssText='font-size:13px;color:#173653;display:block';
+    title.textContent=(draft.student||draft.studentId||'Student')+' · '+(draft.examination||draft.examinationId||'Competency Evaluation');
+    const meta=document.createElement('small');meta.style.cssText='display:block;margin-top:4px;color:#6f8498;font-size:11px';
+    const timestamp=Date.parse(draft.savedAt||'');
+    meta.textContent=[draft.date,Number.isFinite(timestamp)?'Saved '+new Date(timestamp).toLocaleString():'Save time unavailable','In Progress'].filter(Boolean).join(' · ');
+    info.append(title,meta);
+    const resume=document.createElement('button');resume.type='button';resume.className='outline';resume.textContent=index===0?'Resume Latest':'Resume';
+    resume.setAttribute('aria-label','Resume '+title.textContent);
+    resume.onclick=()=>ciResumeEvaluation(draft);
+    row.append(info,resume);container.append(row);
+   });
+  };
+  render(home);
+ }catch(err){
+  if(generation!==ciRecentGeneration)return;
+  const reason='Saved evaluations unavailable: '+String(err?.message||err);
+  if(home)home.textContent=reason;
+ }
+}
+function ciGoHome(){ciShowPage('home');if(ciPage==='home')ciRefreshInProgress_();}
+function ciGoStudents(){ciShowPage('students');}
+function ciGoEvaluations(){
+ ciShowPage('evaluations');
+ if(typeof ciEvalsV2Render==='function')ciEvalsV2Render();
+}
+function ciGoWorkspace(){if(String(ciHome?.evaluator?.evaluatorType||'').trim().toLowerCase()!=='college ci'){ciDialog('Restricted area','<p>My CI Workspace is available to college clinical instructors only.</p>');return;}ciShowPage('workspace');ciSecondaryBack('workspace');}
+function ciGoResources(){ciShowPage('resources');ciSecondaryBack('resources');}
+function ciGoHelp(){ciDialog('Help & Support','<p>The approved Help & Support workflow will be connected in a separate implementation pass. No support message has been sent.</p>');}
+function ciSetScope(scope){ciScope=scope;document.querySelectorAll('#ci-v3-root .scope-tab').forEach(b=>b.classList.toggle('active',b.dataset.scope===scope));ciBackToStudents();}
+function ciV3ProgressHtml(progress){return progress?`${ciEsc(progress.completed)} of ${ciEsc(progress.required)}`:'Not available';}
+function ciRenderStudents(){
+ if(document.getElementById('studentDetail').classList.contains('open'))return;
+ const dest=document.getElementById('ci-v3-cards');if(!dest)return;
+ dest.replaceChildren();
+ const students=ciScope==='with'?(ciCurrent()?.students||[]):ciRoster();
+ document.getElementById('ci-v3-scope-note').textContent=students.length+' student'+(students.length===1?'':'s')+(ciScope==='with'?' at this facility':' in your working roster');
+ if(!students.length){dest.textContent='No current students in this scope.';return;}
+ students.forEach(s=>{
+  const card=document.createElement('article');card.className='student-card-large';
+  const top=document.createElement('div');top.className='student-card-top';
+  const avatar=document.createElement('div');avatar.className='student-photo';avatar.textContent=ciInitials(ciStudentName(s));
+  const identity=document.createElement('div');
+  const title=document.createElement('div');title.className='student-name';title.textContent=ciStudentName(s);
+  const meta=document.createElement('div');meta.className='student-meta';meta.textContent=(ciCurrent()?.site||'Clinical site')+' · '+(s.temporary?'Manually added to session':s.rotationArea||'Current site placement')+' · '+s.studentId;
+  identity.append(title,meta);
+  const term=document.createElement('div');term.className='term-pill';term.textContent=s.clinicalTerm||'Clinical term unavailable';top.append(avatar,identity,term);
+  const progress=document.createElement('div');progress.className='progress-row';
+  const head=document.createElement('div');head.className='progress-head';
+  const label=document.createElement('span');label.textContent='Program Requirements';const value=document.createElement('span');value.textContent='Loading…';head.append(label,value);
+  const bar=document.createElement('div');bar.className='progress-track';const fill=document.createElement('div');fill.className='progress-fill';fill.style.width='0%';bar.append(fill);progress.append(head,bar);
+  ciRun('ciR1StudentRequirements',ciToken,ciSite,ciHome.date,s.studentId).then(r=>{if(!card.isConnected)return;value.textContent=ciV3ProgressHtml(r.programProgress);const p=r.programProgress;fill.style.width=p&&p.required>0?Math.min(100,Math.max(0,100*p.completed/p.required))+'%':'0%';}).catch(()=>{value.textContent='Unavailable';});
+  const buttons=document.createElement('div');buttons.className='student-actions';
+  const evaluate=document.createElement('button');evaluate.className='primary-action';evaluate.textContent='Start Evaluation';evaluate.onclick=()=>ciStartEvaluation(s.studentId);
+  const opportunities=document.createElement('button');opportunities.className='secondary-action';opportunities.textContent='Competency Opportunities';opportunities.onclick=()=>ciOpportunities(s.studentId);buttons.append(evaluate,opportunities);
+  const foot=document.createElement('div');foot.className='student-card-footer';
+  for(const [title,fn] of [['Open Student →',()=>ciSelectStudent(s.studentId)],['Clinical Documentation →',()=>ciUnavailable('Student Clinical Documentation')],['Recent Activity →',()=>ciSelectStudent(s.studentId)]]){
+   const b=document.createElement('button');b.textContent=title;b.onclick=fn;foot.append(b);
+  }
+  card.append(top,progress,buttons,foot);dest.append(card);
+ });
+}
+async function ciSelectStudent(studentId){
+ const student=ciRoster().find(s=>String(s.studentId)===String(studentId));if(!student)return;
+ ciSelected=String(student.studentId);ciGoStudents();
+ document.getElementById('studentsLanding').style.display='none';document.getElementById('studentDetail').classList.add('open');
+ document.getElementById('detailInitials').textContent=ciInitials(ciStudentName(student));
+ document.getElementById('detailName').textContent=ciStudentName(student);
+ document.getElementById('ci-v3-detail-id').textContent=student.studentId;
+ document.getElementById('ci-v3-detail-meta').textContent=[student.clinicalTerm,ciCurrent()?.site,student.temporary?'Temporary selection':student.rotationArea].filter(Boolean).join(' · ');
+ document.getElementById('ci-v3-progress-number').textContent='Loading…';
+ document.getElementById('ci-v3-opportunities').textContent='Loading authoritative recommendations…';
+ document.getElementById('ci-v3-history').textContent='Loading history…';
+ try{
+  const result=await ciRun('ciR1StudentProfile',ciToken,ciSite,ciHome.date,student.studentId);
+  if(ciSelected!==studentId)return;
+  document.getElementById('ci-v3-progress-number').textContent=ciV3ProgressHtml(result.programProgress);
+  document.getElementById('ci-v3-opportunities').replaceChildren();
+  if(!result.opportunities.length)document.getElementById('ci-v3-opportunities').textContent='No outstanding program requirements returned.';
+  for(const o of result.opportunities.slice(0,25)){
+   const item=document.createElement('div');item.className='opportunity';const info=document.createElement('div');
+   const name=document.createElement('strong');name.textContent=o.name;const sub=document.createElement('small');sub.textContent=[o.type,o.timing,'Remaining '+o.remaining].filter(Boolean).join(' · ');info.append(name,sub);item.append(info);document.getElementById('ci-v3-opportunities').append(item);
+  }
+  const dest=document.getElementById('ci-v3-history');dest.replaceChildren();
+  if(!result.evaluations.length)dest.textContent=result.historyNote;
+  for(const e of result.evaluations){const row=document.createElement('div');row.className='activity-item';const title=document.createElement('strong');title.textContent=[e.examination,e.evaluationType,e.result].filter(Boolean).join(' · ');const meta=document.createElement('small');meta.textContent=[e.date,e.site,e.reviewStatus].filter(Boolean).join(' · ');row.append(title,meta);dest.append(row);}
+  const note=document.createElement('div');note.className='sub';note.textContent=result.revisionStatus;dest.append(note);
+  document.getElementById('ci-v3-context').textContent='Viewing '+(ciCurrent()?.site||'selected site')+' on '+ciHome.date+'. Temporary student selections do not change official placement or historical evaluation provenance.';
+ }catch(e){document.getElementById('ci-v3-history').textContent=e.message||'Student history unavailable.';}
+}
+function ciBackToStudents(){document.getElementById('studentDetail').classList.remove('open');document.getElementById('studentsLanding').style.display='';ciRenderStudents();}
+function ciUnavailable(feature){ciDialog(feature,'<p>This approved workflow needs its source-specific integration. No data has been written.</p>');}
+
+function ciViewSchedule(){const a=ciAssignments();ciDialog('Today’s clinical schedule',a.length?a.map(x=>`<p><b>${ciEsc(x.site)}</b> — ${ciEsc(x.startTime)} ${ciEsc(x.endTime)}</p>`).join(''):'No assignment today.');}
+async function ciStartEvaluation(studentId){
+ const student=ciRoster().find(x=>String(x.studentId)===String(studentId||ciSelected));
+ if(!student){ciDialog('Start Evaluation','Select a student first.');return;}
+ ciDialog('Select examination','<p role="status">Checking student-specific competency opportunities…</p>');
+ try{
+  const info=await ciRun('ciR1EvaluationExamOptions',ciToken,ciSite,ciHome.date,student.studentId);
+  ciDialog('Select examination',`<p>Student: <b>${ciEsc(ciStudentName(student))}</b></p><input class="ci-dialog-search" id="ci-exam-search" placeholder="Search examinations from CCMS" aria-label="Search examination"/><p style="font-size:12px;color:#5f7487">Eligibility is based only on confirmed student-specific requirement IDs. Unverified examinations remain available for instructor review.</p><div id="ci-exam-options" role="list"></div>`);
+  const search=document.getElementById('ci-exam-search'),dest=document.getElementById('ci-exam-options');
+  const choices=info.examinations||[];
+  const labels={eligible:'Eligible Now',review:'Eligibility Needs Review',prerequisite:'Prerequisite / Review',future:'Future Requirement',completed:'Previously Completed'};
+  const order=['eligible','review','prerequisite','future','completed'];
+  const render=()=>{
+   dest.replaceChildren();const q=search.value.trim().toLowerCase();
+   let count=0;
+   for(const status of order){
+    const group=choices.filter(x=>x.eligibility===status&&x.examination.toLowerCase().includes(q));
+    if(!group.length)continue;
+    const heading=document.createElement('h3');heading.textContent=labels[status]+' ('+group.length+')';heading.style.cssText='font-size:13px;color:#183d60;margin:15px 0 6px';dest.append(heading);
+    for(const exam of group.slice(0,30)){
+     const btn=document.createElement('button');btn.className='ci-search-item';btn.type='button';
+     const title=document.createElement('strong');title.textContent=exam.examination;
+     const detail=document.createElement('small');detail.style.cssText='display:block;color:#667b90;margin-top:3px;line-height:1.4';
+     detail.textContent=[exam.type,exam.reason].filter(Boolean).join(' · ');
+     btn.append(title,detail);btn.onclick=()=>ciEvalOpen(student,exam);dest.append(btn);count++;
+    }
+   }
+   if(!count)dest.textContent='No matching authorized examinations.';
+  };search.addEventListener('input',render);render();search.focus();
+ }catch(e){ciError(e);}
+}
+async function ciEvalOpen(student,examination,resumeDraft){
+ // Keep the progress indicator exactly where the instructor clicked.
+ ciDialog('Opening Evaluation',`<p role="status" aria-live="polite">Preparing <strong>${ciEsc(examination.examination)}</strong> for ${ciEsc(ciStudentName(student))}…</p><p style="color:#59738b;font-size:12px">Checking authorization, retrieving the official evaluation definition and starting a private draft. This may take longer the first time.</p>`);
+ const begun=performance.now();
+ try{
+  const siteId=resumeDraft?String(resumeDraft.siteId):ciSite;
+  const evalDate=resumeDraft?String(resumeDraft.date):ciHome.date;
+  const req={siteId,date:evalDate,studentId:student.studentId,examinationId:examination.examinationId,
+   submissionId:resumeDraft?String(resumeDraft.submissionId):'',answers:{}};
+  const init=await ciRun('ciR1EvaluationInitialize',ciToken,req);
+  if(!init||!init.submissionId||!Array.isArray(init.formItems)||!init.html)throw new Error('The authorized evaluation startup response is incomplete.');
+  const context={...req,submissionId:init.submissionId,student:ciStudentName(student),
+    site:ciSites.find(x=>x.siteId===siteId)?.site||siteId,
+    evaluator:ciHome.evaluator?.evaluatorName||'',examination:examination.examination};
+  ciEvalContext={context,formItems:init.formItems,viewOptions:init.views||[],initialDraft:init.initialDraft||{success:false,error:'Draft save was not confirmed'}};
+  const frame=document.getElementById('ci-evaluation-frame');
+  frame.onload=()=>{
+   ciClose();frame.contentWindow.postMessage({source:'ci-eval-parent',type:'init',payload:ciEvalContext},'*');
+   console.info('CI evaluation editor loaded in',Math.round(performance.now()-begun),'ms');
+  };
+  // Display immediately and allow the instructor to see that navigation is working.
+  ciShowPage('evaluation-form');frame.srcdoc=init.html;
+ }catch(e){ciEvalContext=null;ciError(e);console.warn('CI evaluation start failed after',Math.round(performance.now()-begun),'ms',e);}
+}
+/** Resume only an existing draft belonging to the signed-in evaluator.
+ * No new submission ID and no alternative student ID is manufactured. */
+async function ciResumeEvaluation(draft){
+ try{
+  if(!draft||!/^CI-PORTAL-[a-f0-9-]{36}$/i.test(String(draft.submissionId||'')))throw new Error('Invalid saved draft');
+  let student=ciRoster().find(x=>String(x.studentId)===String(draft.studentId));
+  if(!student){
+   // Reauthorize the original draft site, date and stable student ID. A
+   // current-page roster is not proof that an older legitimate draft is gone.
+   const validated=await ciRun('ciR1ValidateTemp',ciToken,draft.siteId,draft.date,[draft.studentId]);
+   student=(validated.students||[]).find(x=>String(x.studentId)===String(draft.studentId));
+   if(!student)throw new Error('The saved student is no longer authorized for evaluation');
+   ciTemporary.set(String(student.studentId),student);ciSaveTemp();ciRender();
+  }
+  const opts=await ciRun('ciR1EvaluationExamOptions',ciToken,draft.siteId,draft.date,draft.studentId);
+  const examination=(opts.examinations||[]).find(x=>String(x.examinationId)===String(draft.examinationId));
+  if(!examination)throw new Error('Examination no longer available to your authenticated clinical instructor account');
+  return ciEvalOpen(student,examination,draft);
+ }catch(err){ciDialog('Unable to resume evaluation','<p>'+ciEsc(err?.message||err)+'</p>');}
+}
+let ciEvalContext=null;
+window.addEventListener('message',async event=>{
+ const frame=document.getElementById('ci-evaluation-frame');
+ if(!frame||event.source!==frame.contentWindow||event.data?.source!=='ci-eval-inner')return;
+ const msg=event.data,context=ciEvalContext?.context;
+ if(!context)return;
+ const send=(type,payload)=>frame.contentWindow.postMessage({source:'ci-eval-parent',type,payload},'*');
+ if(msg.type==='blocking_error'){ciDialog('Evaluation integration paused',ciEsc(msg.payload?.message||'Official Form schema mismatch'));return;}
+ if(msg.type==='autofail_open'){ciShowPortalAutoFail_(msg.payload||{},send);return;}
+ if(msg.type==='review_open'){ciShowPortalStudentReview_(msg.payload||{},send);return;}
+ if(msg.type==='scoring_guide_open'){ciShowPortalScoringGuide_();return;}
+ if(msg.type==='draft_print_open'){ciShowPortalDraftPrint_(msg.payload||{});return;}
+ if(msg.type==='exit'){
+   ciEvalContext=null;frame.srcdoc='';const target=String(msg.payload?.target||'evaluations');
+   if(target==='home')ciGoHome();else if(target==='students')ciGoStudents();else if(target==='workspace')ciGoWorkspace();else if(target==='resources')ciGoResources();else ciGoEvaluations();
+   return;
+ }
+ const requested={...context,answers:msg.payload.answers||{},currentSection:msg.payload.currentSection||0,
+  reviewPending:msg.payload.reviewPending||false,uiState:msg.payload.uiState||null};
+ try{
+  if(msg.type==='draft_save'||msg.type==='draft_stop'){
+   const x=await ciRun(msg.type==='draft_stop'?'ciR1EvaluationStop':'ciR1EvaluationSaveDraft',ciToken,requested);
+   send('save_result',{...x,stopping:msg.type==='draft_stop'});
+  }
+  if(msg.type==='draft_load')send('draft_loaded',await ciRun('ciR1EvaluationLoadDraft',ciToken,requested));
+  if(msg.type==='preview'){
+   const x=await ciRun('ciR1EvaluationPreview',ciToken,requested);send('preview_result',x.grade);
+  }
+  if(msg.type==='release_status'){
+   const status=await ciRun('ciR1EvaluationReleaseStatus',ciToken,context.studentId);
+   send('release_status',status);
+  }
+  if(msg.type==='submit'){
+   // Sender is the exact evaluation iframe. The server independently
+   // reauthorizes session, site, student, evaluator and submit release.
+   try{
+     const x=await ciRun('ciR1EvaluationSubmit',ciToken,requested);
+     send('submit_result',x);
+   }catch(err){send('submit_error',{message:String(err?.message||err)});}
+  }
+ }catch(e){send('error',{action:msg.type,message:e?.message||String(e)})}
+});
+/** Review & Feedback must remain in the visible Portal viewport. The
+ * instructor supplies all judgments; the modal does not generate feedback. */
+/** Compact explanation of the approved scales; not a substitute for policy. */
+function ciShowPortalScoringGuide_(){
+ const html='<p>Use the official competency criteria and institutional rules. This panel is a reference, not a grade calculator.</p>'+
+ '<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>'+
+ '<tr><th style="text-align:left;padding:6px">Rating</th><th style="text-align:left">Definition</th></tr>'+
+ '<tr><td style="padding:6px">0</td><td>Gross Error</td></tr><tr><td style="padding:6px">1</td><td>Minor Error</td></tr>'+
+ '<tr><td style="padding:6px">2</td><td>Satisfactory</td></tr><tr><td style="padding:6px">3</td><td>Optimal</td></tr>'+
+ '<tr><td style="padding:6px">N/A</td><td>Not Applicable, where permitted</td></tr></tbody></table>'+
+ '<p>Image deductions: 5 points for zero in view; 5 for missing/wrong marker; 3 for illegible/poorly placed marker.</p>'+
+ '<p>Pass requires performance ≥ 2.00 and image ≥ 2.00, with no automatic failure. The server determines the official result.</p>';
+ ciDialog('Clinical Competency Scoring Guide',html);
+}
+/** Browser-printable local draft. It does not create an official CCMS record. */
+function ciShowPortalDraftPrint_(payload){
+ const overlay=document.createElement('section');overlay.id='ci-portal-print-preview';
+ overlay.style.cssText='position:fixed;inset:0;background:#152a4388;z-index:10012;display:grid;place-items:center;padding:16px';
+ const panel=document.createElement('div');panel.style.cssText='width:min(850px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border-radius:12px;padding:20px;color:#183653';
+ const actions=document.createElement('div');actions.id='ci-print-actions';actions.style.cssText='display:flex;gap:10px;justify-content:flex-end;margin-bottom:12px';
+ const close=document.createElement('button');close.type='button';close.textContent='Close';close.onclick=()=>overlay.remove();
+ const print=document.createElement('button');print.type='button';print.textContent='Print / Save as PDF';
+ print.onclick=()=>window.print();actions.append(close,print);
+ const title=document.createElement('h2');title.textContent='CLINICAL COMPETENCY — DRAFT REVIEW';
+ const warning=document.createElement('p');warning.textContent='UNSUBMITTED DRAFT — NOT AN OFFICIAL EVALUATION DOCUMENT';warning.style.cssText='color:#a13221;font-weight:800';
+ const detail=document.createElement('p');detail.textContent=[payload.student||'Student',payload.studentId||'',payload.examination||'',payload.date||'',payload.savedStatus||''].filter(Boolean).join(' · ');
+ panel.append(actions,title,warning,detail);
+ if(payload.grade){const grade=document.createElement('p');grade.textContent='Server preview: '+String(payload.grade.result)+' · '+String(payload.grade.finalScore)+' / 3.00';panel.append(grade);}
+ const header=document.createElement('h3');header.textContent='Performance Criteria';panel.append(header);
+ const table=document.createElement('table');table.style.cssText='border-collapse:collapse;width:100%;font-size:11px';
+ for(const r of (Array.isArray(payload.rows)?payload.rows:[])){
+  const tr=document.createElement('tr');for(const value of [r.section,r.criterion,r.rating]){
+   const td=document.createElement('td');td.textContent=String(value||'');td.style.cssText='border-bottom:1px solid #dce5ef;padding:6px 8px;vertical-align:top';tr.append(td);
+  }table.append(tr);
+ }panel.append(table);
+ const images=Array.isArray(payload.images)?payload.images:[];
+ if(images.length){const head=document.createElement('h3');head.textContent='Image Views';panel.append(head);
+  images.forEach(v=>{const p=document.createElement('p');p.textContent=[v.name,JSON.stringify(v.scores||{}),v.markerPresent,v.markerSide,v.markerQuality,v.comment].filter(Boolean).join(' · ');panel.append(p);});}
+ const comments=document.createElement('h3');comments.textContent='Evaluator Comments';panel.append(comments);
+ Object.entries(payload.comments||{}).filter(([k,v])=>String(v||'').trim()).forEach(([k,v])=>{const p=document.createElement('p');p.textContent='Section '+k+': '+String(v);panel.append(p);});
+ overlay.append(panel);document.body.append(overlay);
+ const style=document.createElement('style');style.id='ci-portal-print-style';
+ style.textContent='@media print{body>*:not(#ci-portal-print-preview){display:none!important}#ci-portal-print-preview{position:static!important;display:block!important;padding:0!important;background:#fff!important}#ci-portal-print-preview>div{max-height:none!important;overflow:visible!important;width:100%!important;padding:0!important}#ci-print-actions{display:none!important}#ci-portal-print-preview tr{break-inside:avoid}}';
+ document.head.append(style);
+ close.onclick=()=>{style.remove();overlay.remove();};
+}
+function ciShowPortalStudentReview_(data,send){
+ const prior=document.getElementById('ci-review-portal-overlay');if(prior)prior.remove();
+ const state={strengths:String(data?.review?.strengths||''),improvements:String(data?.review?.improvements||''),
+   discussion:String(data?.review?.discussion||''),status:String(data?.review?.status||'pending'),reviewedAt:data?.review?.reviewedAt||null};
+ const overlay=document.createElement('div');overlay.id='ci-review-portal-overlay';
+ overlay.style.cssText='position:fixed;inset:0;z-index:10010;display:grid;place-items:center;padding:16px;background:#10213c99;font-family:Arial,sans-serif';
+ const modal=document.createElement('section');modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','ci-portal-review-title');modal.tabIndex=-1;
+ modal.style.cssText='box-sizing:border-box;background:#fff;border:1px solid #c7d9e9;border-radius:13px;width:min(770px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:20px;box-shadow:0 14px 48px #1236';
+ const heading=document.createElement('h2');heading.id='ci-portal-review-title';heading.textContent='Student Review & Feedback';modal.append(heading);
+ const help=document.createElement('p');help.textContent="Record the instructor’s observations and any discussion with the student. No feedback is generated automatically.";help.style.cssText='color:#5b7187;font-size:13px';modal.append(help);
+ const fields=[['strengths','Strengths Demonstrated'],['improvements','Areas for Improvement'],['discussion','Review Discussion / Comments']];
+ let first=null;
+ fields.forEach(([key,title])=>{
+   const label=document.createElement('label');label.style.cssText='display:block;margin-top:12px;font-weight:700;font-size:13px;color:#173653';label.textContent=title;
+   const textarea=document.createElement('textarea');textarea.rows=3;textarea.value=state[key];textarea.setAttribute('aria-label',title);
+   textarea.style.cssText='display:block;box-sizing:border-box;width:100%;padding:10px;margin:7px 0;border:1px solid #bdcedd;border-radius:8px;font:13px Arial;resize:vertical';
+   textarea.oninput=()=>{state[key]=textarea.value;state.status='pending';state.reviewedAt=null;refreshStatus();};
+   if(!first)first=textarea;label.append(textarea);modal.append(label);
+ });
+ const status=document.createElement('div');status.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:12px';modal.append(status);
+ const statuses=[['reviewed','✓ Reviewed with Student'],['pending','◯ Review Pending']];
+ statuses.forEach(([key,title])=>{
+   const btn=document.createElement('button');btn.type='button';btn.dataset.status=key;btn.textContent=title;
+   btn.style.cssText='border:1px solid #a7c5df;border-radius:8px;padding:10px 13px;background:#fff;color:#145b92;cursor:pointer';
+   btn.onclick=()=>{if(key==='reviewed'&&!fields.some(([k])=>state[k].trim())){alert('Enter review notes before marking Reviewed with Student.');return;}
+     state.status=key;state.reviewedAt=key==='reviewed'?new Date().toISOString():null;refreshStatus();};status.append(btn);
+ });
+ function refreshStatus(){status.querySelectorAll('button').forEach(b=>{const chosen=b.dataset.status===state.status;b.style.background=chosen?'#e5f3ff':'#fff';b.setAttribute('aria-pressed',String(chosen));});}
+ refreshStatus();
+ const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;justify-content:flex-end;margin-top:18px';
+ const close=document.createElement('button');close.type='button';close.textContent='Close';
+ const save=document.createElement('button');save.type='button';save.textContent='Save Review & Return';
+ for(const b of [close,save])b.style.cssText='border:1px solid #aac7df;background:#fff;border-radius:7px;padding:10px 14px;cursor:pointer';
+ save.style.background='#0877dc';save.style.color='#fff';save.style.borderColor='#0877dc';
+ const priorOverflow=document.body.style.overflow;
+ const finish=()=>{document.body.style.overflow=priorOverflow;overlay.remove();document.removeEventListener('keydown',key,true);};
+ const key=e=>{if(e.key==='Escape'){e.preventDefault();finish();}};
+ close.onclick=finish;save.onclick=()=>{send('review_result',{review:state});finish();};
+ actions.append(close,save);modal.append(actions);overlay.append(modal);document.body.append(overlay);
+ document.body.style.overflow='hidden';document.addEventListener('keydown',key,true);
+ first?.focus({preventScroll:true});
+}
+
+/** Host the approved Auto-Fail interaction in the Portal viewport, not in the
+ *  1120px-tall evaluation iframe. All reason choices still come from the
+ *  authoritative Form schema supplied by the evaluation; no grading rules here. */
+function ciShowPortalAutoFail_(data,send){
+ const existing=document.getElementById('ci-portal-autofail-overlay');if(existing)return;
+ const choices=Array.isArray(data.choices)?data.choices.filter(x=>typeof x==='string'&&x.trim()):[];
+ if(!choices.length)return;
+ const overlay=document.createElement('div');overlay.id='ci-portal-autofail-overlay';
+ overlay.style.cssText='position:fixed;inset:0;background:#10213c99;z-index:10001;display:grid;place-items:center;padding:16px;font-family:Arial,sans-serif;color:#102b4d';
+ const panel=document.createElement('div');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','ci-portal-autofail-title');
+ panel.tabIndex=-1;panel.style.cssText='box-sizing:border-box;background:#fff;border:1px solid #cfdeea;border-radius:12px;max-width:510px;width:100%;padding:20px;max-height:calc(100dvh - 32px);overflow-y:auto;box-shadow:0 15px 50px #062b4a55';
+ const title=document.createElement('h2');title.id='ci-portal-autofail-title';title.textContent='Automatic Failure';panel.append(title);
+ const instructions=document.createElement('p');instructions.textContent='Select the official failure reason(s) and provide an explanation. Previously completed scoring is preserved.';panel.append(instructions);
+ const boxes=[];
+ choices.forEach(reason=>{const label=document.createElement('label');label.style.cssText='display:block;margin:9px 0';
+  const check=document.createElement('input');check.type='checkbox';check.checked=Array.isArray(data.selected)&&data.selected.includes(reason);label.append(check,document.createTextNode(' '+reason));panel.append(label);boxes.push([check,reason]);});
+ const explanation=document.createElement('textarea');explanation.rows=4;explanation.setAttribute('aria-label','Required evaluator explanation');
+ explanation.style.cssText='box-sizing:border-box;width:100%;padding:10px;border:1px solid #b5cadc;border-radius:8px;margin:8px 0';
+ explanation.placeholder='Required evaluator explanation';explanation.value=String(data.comments||'');panel.append(explanation);
+ const problem=document.createElement('p');problem.style.cssText='color:#a42121;font-size:12px;margin:0 0 8px';problem.setAttribute('role','alert');panel.append(problem);
+ const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;justify-content:flex-end';
+ const previousOverflow=document.body.style.overflow;
+ const cleanup=()=>{overlay.remove();document.body.style.overflow=previousOverflow;document.removeEventListener('keydown',keyHandler,true);};
+ const keyHandler=e=>{if(e.key==='Escape'){e.preventDefault();cleanup();}};
+ const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.onclick=cleanup;
+ const confirm=document.createElement('button');confirm.type='button';confirm.textContent='Record Auto-Fail';
+ confirm.onclick=()=>{const selected=boxes.filter(x=>x[0].checked).map(x=>x[1]);const comments=explanation.value.trim();
+  if(!selected.length||!comments){problem.textContent='Select an official reason and enter an explanation.';return;}
+  send('autofail_result',{reasons:selected,comments});cleanup();};
+ actions.append(cancel,confirm);panel.append(actions);overlay.append(panel);document.body.append(overlay);
+ document.body.style.overflow='hidden';document.addEventListener('keydown',keyHandler,true);
+ try{panel.focus({preventScroll:true})}catch(_){panel.focus()}
+}
+
+async function ciOpportunities(studentId){
+ const s=ciRoster().find(x=>String(x.studentId)===String(studentId||ciSelected));
+ if(!s){ciDialog('Competency Opportunities','Select a student first.');return;}
+ ciDialog('Competency Opportunities','<p>Loading authoritative Student Requirement Status…</p>');
+ try{
+  const data=await ciRun('ciR1StudentRequirements',ciToken,ciSite,ciHome.date,s.studentId);
+  ciDialog('Competency Opportunities','<p><strong>'+ciEsc(ciStudentName(s))+'</strong></p><div id="ci-opportunity-list"></div>');
+  const dest=document.getElementById('ci-opportunity-list');dest.replaceChildren();
+  if(!data.opportunities.length)dest.textContent='No outstanding competencies found in Student Requirement Status.';
+  data.opportunities.forEach(o=>{const el=document.createElement('div');el.className='ci-search-item';const top=document.createElement('strong');top.textContent=o.name;const note=document.createElement('div');note.textContent=[o.type,o.timing,'Remaining '+o.remaining].join(' · ');el.append(top,note);dest.append(el);});
+ }catch(e){ciError(e);}
+}
+
+async function ciLogout(){try{
+ await ciRun('ciR1Logout',ciToken);
+ const old=ciToken;sessionStorage.removeItem('ccmsCiTemp_v2_'+old);sessionStorage.removeItem('ccmsCiSite_v2_'+old);sessionStorage.removeItem('ccmsCiToken');
+ ciTemporary.clear();ciToken='';ciHome=null;
+ const html=await ciRun('ciR1LoginHtml');document.open();document.write(html);document.close();
+ }catch(e){ciError(e);}}
+async function ciInit(){
+ if(!ciToken){ciDialog('Sign in required','<p>Please return to the portal login page.</p>');return;}
+ try{
+  ciHome=await ciRun('ciR1Home',ciToken,'');
+  const sites=await ciRun('ciR1SiteOptions',ciToken,ciHome.date);ciSites=sites.sites||[];
+  const storedSite=sessionStorage.getItem(ciSiteKey());
+  ciSite=ciSites.some(s=>s.siteId===storedSite)?storedSite:(ciSites.some(s=>s.siteId===ciAssignments()[0]?.siteId)?ciAssignments()[0].siteId:(ciSites[0]?.siteId||''));
+  if(ciSite){ciSiteRoster=await ciRun('ciR1SiteRoster',ciToken,ciSite,ciHome.date);}
+  await ciRestoreTemp();
+  const name=ciHome.evaluator?.evaluatorName||'';
+  if(String(ciHome.evaluator?.evaluatorType||'').trim().toLowerCase()!=='college ci')document.getElementById('ci-nav-workspace').hidden=true;
+  document.querySelector('.profile .pn').textContent=name;
+  document.querySelector('.profile .avatar').textContent=ciInitials(name);
+  // Bind actions within the exact approved Students v3 inner markup.
+  document.querySelectorAll('#ci-v3-root .scope-tab').forEach(b=>b.addEventListener('click',()=>ciSetScope(b.dataset.scope)));
+  const studentsBack=document.getElementById('ci-v3-back');if(studentsBack)studentsBack.addEventListener('click',ciBackToStudents);
+  document.querySelectorAll('#ci-v3-root [data-clinical-action]').forEach(b=>b.addEventListener('click',()=>ciUnavailable(b.dataset.clinicalAction)));
+  ciRender();
+  ciRefreshInProgress_();
+ }catch(e){ciError(e);}
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ciInit,{once:true});
+else ciInit();
+</script><script>
+(function(){
+  'use strict';
+  function applyPortalAssets_(assets){
+    assets=assets||{};
+    document.querySelectorAll('[data-asset-bg]').forEach(function(el){
+      var key=el.getAttribute('data-asset-bg');
+      if(!assets[key]) return;
+      // Preserve the approved dark gradient over the Home banner.
+      if(key==='HOME_BANNER'){
+        el.style.backgroundImage='linear-gradient(90deg,rgba(2,27,51,.96),rgba(2,29,53,.77) 38%,rgba(3,28,49,.14) 74%),url("'+assets[key]+'")';
+      }else{
+        el.style.backgroundImage='url("'+assets[key]+'")';
+      }
+    });
+    document.querySelectorAll('[data-asset-img]').forEach(function(el){
+      var key=el.getAttribute('data-asset-img');
+      if(assets[key]) el.src=assets[key];
+    });
+  }
+  function loadPortalAssets_(){
+    if(!(window.google&&google.script&&google.script.run))return;
+    google.script.run.withSuccessHandler(applyPortalAssets_)
+      .withFailureHandler(function(err){console.error('CI Portal image load failed:',err);})
+      .ciPortalGetAssets();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadPortalAssets_);
+  else loadPortalAssets_();
+})();
+</script>
+</body></html>

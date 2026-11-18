@@ -1,0 +1,48 @@
+<!-- Approved Workspace + Resources menu-only shell; no fabricated feature data. -->
+<style>
+.ci-secondary-panel{padding:16px 22px 30px;color:#173653;max-width:none;margin:0;min-height:380px;font-family:Inter,"Segoe UI",Arial,sans-serif}
+.ci-secondary-head{display:flex;align-items:center;gap:12px;margin:6px 0 24px;font-weight:800;letter-spacing:.04em;font-size:17px;color:#112944}
+.ci-secondary-back{border:0;background:none;color:#0878e5;font-size:26px;line-height:1;cursor:pointer;padding:3px}
+.ci-secondary-list{display:flex;flex-direction:column;gap:2px;max-width:350px}.ci-secondary-row{border:0;background:transparent;text-align:left;min-height:46px;padding:12px 14px;border-radius:10px;color:#214360;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:space-between;cursor:pointer;width:100%}
+.ci-secondary-row:hover,.ci-secondary-row:focus-visible{background:#f0f6fb;outline-offset:1px}.ci-secondary-row.primary{background:#f1f6fa;color:#0878e5}
+.ci-secondary-chevron{color:#0a6fc6;font-size:19px}.ci-secondary-tag{display:inline-block;color:#0878e5;background:#eaf3fc;border-radius:99px;min-width:22px;height:22px;text-align:center;font-size:13px;line-height:22px}
+.ci-secondary-label{font-size:12px;font-weight:800;letter-spacing:.045em;color:#7a91a6;padding:13px 14px 7px}
+.ci-secondary-detail{max-width:540px;border:1px solid #d7e5f0;border-radius:11px;background:white;padding:22px;color:#214360}.ci-secondary-detail p{line-height:1.6;font-size:14px;color:#5e7288}
+@media(max-width:600px){.ci-secondary-panel{padding:15px 12px}.ci-secondary-row{font-size:15px}}
+</style>
+<section id="ci-workspace-view" hidden class="ci-secondary-panel" aria-label="My CI Workspace">
+ <div class="ci-secondary-head"><button type="button" class="ci-secondary-back" onclick="ciGoHome()" aria-label="Back to Home">‹</button><span>MY CI WORKSPACE</span></div>
+ <div class="ci-secondary-list" id="ci-workspace-items">
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Notifications"><span>Notifications</span><span class="ci-secondary-chevron" aria-hidden="true">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="My Submissions"><span>My Submissions</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Mileage Submission"><span>Mileage Submission</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Program Requests"><span>Program Requests</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Survey Responses"><span>Survey Responses</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Email Coordinator / Program"><span>Email Coordinator / Program</span><span class="ci-secondary-chevron">›</span></button>
+ </div>
+ <div id="ci-workspace-detail" hidden></div>
+</section>
+<section id="ci-resources-view" hidden class="ci-secondary-panel" aria-label="Clinical Resources">
+ <div class="ci-secondary-head"><button type="button" class="ci-secondary-back" onclick="ciGoHome()" aria-label="Back to Home">‹</button><span>CLINICAL RESOURCES</span></div>
+ <div class="ci-secondary-list" id="ci-resources-items">
+  <button type="button" class="ci-secondary-row primary" data-ci-group="resources" data-ci-feature="Program Handbook"><span>Program Handbook</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Clinical Syllabus"><span>Clinical Syllabus</span><span class="ci-secondary-chevron">›</span></button>
+  <div class="ci-secondary-label">CLINICAL REFERENCES</div>
+  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Exposure Grading Scales"><span>Exposure Grading Scales</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Evaluation &amp; Scoring Guide"><span>Evaluation &amp; Scoring Guide</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Competency Reference"><span>Competency Reference</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Program Contacts"><span>Program Contacts</span><span class="ci-secondary-chevron">›</span></button>
+ </div>
+ <div id="ci-resources-detail" hidden></div>
+</section>
+<script>
+(function(){
+ const allowed={workspace:['Notifications','My Submissions','Mileage Submission','Program Requests','Survey Responses','Email Coordinator / Program'],resources:['Program Handbook','Clinical Syllabus','Exposure Grading Scales','Evaluation & Scoring Guide','Competency Reference','Program Contacts']};
+ window.ciSecondaryBack=function(group){const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(items&&detail){items.hidden=false;detail.hidden=true;detail.replaceChildren();}};
+ window.ciSecondaryOpen=function(group,feature){if(!allowed[group]?.includes(feature))return;const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(!items||!detail)return;
+  items.hidden=true;detail.hidden=false;detail.replaceChildren();const back=document.createElement('button');back.className='ci-secondary-back';back.type='button';back.textContent='‹';back.setAttribute('aria-label','Back to '+group);back.onclick=()=>ciSecondaryBack(group);
+  const box=document.createElement('div');box.className='ci-secondary-detail';const h=document.createElement('h2');h.textContent=feature;const p=document.createElement('p');p.textContent='This section is part of the approved portal navigation. Its data, permissions and actions will be connected in a dedicated implementation pass; no records or notifications are generated from this screen.';box.append(h,p);detail.append(back,box);
+ };
+ document.addEventListener('click',function(e){const b=e.target.closest('[data-ci-group][data-ci-feature]');if(!b)return;ciSecondaryOpen(b.dataset.ciGroup,b.dataset.ciFeature);});
+})();
+</script>

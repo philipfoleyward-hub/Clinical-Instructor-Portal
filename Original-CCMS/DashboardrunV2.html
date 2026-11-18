@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCMS Home Visual Study I — Soft Color Personality</title>
+<style>
+:root{
+ --navy:#082a50;--navy2:#0d3764;--blue:#2786ee;--ink:#102d52;--muted:#6b7b8e;
+ --bg:#f5f7fa;--line:#dce5ef;--red:#ef4148;--amber:#f6ad16;--green:#25a954;
+ --shadow:0 6px 18px rgba(21,45,76,.12)
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+button{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:205px 1fr}.sidebar{height:100vh;position:sticky;top:0;background:linear-gradient(#0b315b,#082746);color:#fff;padding:20px 8px;display:flex;flex-direction:column}
+.nav{display:grid;gap:7px}.nav button,.help{border:0;color:#fff;background:transparent;border-radius:9px;min-height:54px;display:flex;align-items:center;gap:14px;padding:0 17px;text-align:left;font-size:14px}.nav button.active,.nav button:hover,.help:hover{background:linear-gradient(90deg,#5aa7f5,#337dcc)}.icon{width:26px;height:26px;display:inline-grid;place-items:center;flex:0 0 26px}.icon svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round}.help{margin-top:auto}.shell{min-width:0}.topbar{height:72px;background:#fff;border-bottom:1px solid #e4e9ef;display:grid;grid-template-columns:360px minmax(300px,1fr) 285px;gap:20px;align-items:center;padding:0 24px}
+.brand{display:flex;align-items:center;gap:12px}.xray{width:66px;height:52px;border-radius:6px;background:#092e57;overflow:hidden;display:grid;place-items:center;box-shadow:0 1px 3px rgba(8,42,80,.16)}.xray svg{width:50px;height:50px}.brand strong{font-size:20px;display:block}.brand small{font-size:14px;color:#315477}.search{position:relative;max-width:570px;width:100%;justify-self:center}.search input{width:100%;background:#edf1f5;border:1px solid #d5dde6;border-radius:23px;padding:12px 18px 12px 46px;color:#30455e;outline:none}.search .icon{position:absolute;left:14px;top:9px;color:#687d93}.profile{justify-self:end;display:flex;align-items:center;gap:12px}.bell{position:relative}.bell .bubble{position:absolute;right:-7px;top:-8px;background:var(--red);color:#fff;border-radius:50%;font-size:10px;font-weight:800;padding:3px 5px}.avatar{width:43px;height:43px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 0 0 1px #d8e0e8}.pname{font-weight:800;font-size:14px}.prole{font-size:12px;color:#718196}
+.hero{height:155px;position:relative;background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");background-position:center;background-size:cover;overflow:visible}
+.hero:before{content:"";position:absolute;inset:0;background:transparent}
+.hero-copy{position:relative;z-index:2;padding:24px 31px;color:#0b315a;text-shadow:0 1px 0 rgba(255,255,255,.35)}.hero h1{font-size:38px;letter-spacing:-1px;margin:0 0 2px;font-weight:850}.hero h1 .sun{color:#f7a400}.hero p{font-size:20px;margin:0 0 10px 52px}.meta{margin-left:52px;display:flex;align-items:center;gap:13px;font-size:13px;font-weight:650}.meta .divider{height:18px;width:1px;background:rgba(25,62,94,.45)}.meta .mi{display:flex;align-items:center;gap:7px}.meta .mi svg{width:18px;height:18px;stroke-width:2}.motto{position:absolute;right:21%;top:27px;z-index:2;font-family:"Segoe Print","Comic Sans MS",cursive;font-size:21px;line-height:1.2;transform:rotate(-5deg);text-align:center;color:#163a5e}
+.status-grid{position:absolute;left:24px;right:24px;bottom:-145px;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.status{height:145px;border:1px solid #dbe3ec;border-radius:13px;background:#fff;overflow:hidden;position:relative;text-align:left;box-shadow:var(--shadow);padding:0}.status-img{height:78px;background-size:cover;background-position:center;position:relative}.status-img:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,40,73,.15),transparent)}.s1{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.s2{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.s3{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.s4{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.status .circle{display:none}.flag .circle{background:var(--red)}.wait .circle{background:var(--amber)}.done .circle{background:var(--green)}.sched .circle{background:#2583e8}.circle svg{width:23px;height:23px;stroke:#fff}.status-copy{padding:8px 18px 7px}.status-copy strong{font-size:17px;display:block;letter-spacing:-.15px}.status-copy span{font-size:12px;color:#4f6884}.status .arrow{position:absolute;right:17px;bottom:14px;font-size:25px;color:#45617d}.flag{background:linear-gradient(#fff,#fff0f1)}.wait{background:linear-gradient(#fff,#fff8e8)}.done{background:linear-gradient(#fff,#eff9f2)}.sched{background:linear-gradient(#fff,#eef7ff)}
+.content{padding:164px 23px 0}.grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(350px,1fr);gap:13px}.panel{background:#fff;border:1px solid #e0e6ed;border-radius:13px;box-shadow:0 3px 12px rgba(22,45,75,.06);overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;padding:13px 18px 8px}.panel-title{display:flex;align-items:center;gap:8px;font-size:19px;font-weight:850}.panel-title .icon{color:#294f77}.link{border:0;background:transparent;color:#0870dd}.chips{display:flex;gap:8px;padding:0 18px 10px}.chip{border:0;background:#eff4f9;border-radius:7px;padding:8px 13px;color:#36536f;font-size:11px}.chip.active{background:#2d85ee;color:#fff}.day{font-size:12px;font-weight:850;padding:0 18px 6px}.day span{font-weight:400;color:#718196;margin-left:18px}.rows{padding:0 14px 11px}.row{min-height:53px;border:1px solid #e1e7ee;border-radius:9px;margin:2px 0;display:grid;grid-template-columns:45px minmax(0,1fr) 95px;align-items:center;padding:5px 8px}.row .action{width:88px;justify-self:end;white-space:nowrap}.row.alert{background:#fffafa;border-color:#f4d6d8}.eventicon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff}.eventicon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.15}.r{background:#df6268}.y{background:#dca94d}.p{background:#9a69b7}.b{background:#5a91d2}.g{background:#58a873}.rmain{font-size:12px}.rmain strong{display:flex;align-items:center;gap:8px;font-size:13px}.received-time{font-size:10px;font-weight:600;color:#8996a6;white-space:nowrap}.rmeta{display:flex;gap:20px;flex-wrap:wrap;color:#62768d;margin-top:3px}.rmeta a{color:#086bd6;text-decoration:underline}.inline-meta-icon{display:inline-flex;align-items:center;gap:4px}.inline-meta-icon svg{width:13px;height:13px;stroke:#718196;fill:none;stroke-width:2}.action{border:0;border-radius:8px;background:#e9f4ff;color:#086bd6;padding:9px 10px;font-weight:700}.action.red{background:#ffe8ea;color:#dc3037}.action.green{background:#e9f8ee;color:#17873c;padding-left:7px;padding-right:7px;font-size:11px}
+.right{display:grid;gap:10px;align-content:start}.entry{padding:7px;background:#fffdfb}.entrytop{background:linear-gradient(135deg,#5799ec,#3779ce);color:#fff;border-radius:10px;padding:10px 17px}.entrytop strong{font-size:24px;display:flex;align-items:center;gap:8px}.entrytop span{font-size:12px}.entrygrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px}.entrybtn{min-height:45px;border:1px solid #e4e9ef;border-radius:7px;background:#fff;display:grid;grid-template-columns:30px 1fr 14px;gap:7px;align-items:center;text-align:left;padding:4px 7px;color:#14365e;font-size:10.5px;font-weight:800;box-shadow:0 1px 2px rgba(23,48,79,.035)}.entrybtn:nth-child(1){background:#fff7e8;border-color:#f1dfbd}
+.entrybtn:nth-child(2){background:#edf6ff;border-color:#d7e6f5}
+.entrybtn:nth-child(3){background:#f7effb;border-color:#e6d7ee}
+.entrybtn:nth-child(4){background:#edf6ff;border-color:#d7e6f5}
+.entrybtn:nth-child(5){background:#edf8f1;border-color:#d6e9dc}
+.entrybtn:nth-child(6){background:#fff0ef;border-color:#efd8d6}
+.entrybtn:nth-child(7){background:#fff0ef;border-color:#efd8d6}.eicon{width:29px;height:29px;border-radius:7px;display:grid;place-items:center;color:#fff}.eicon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.15}.eo{background:#e8a13b}.eb{background:#4c93d8}.ep{background:#a66ac5}.eg{background:#56ad72}.er{background:#df6b68}
+.snapshot{padding:12px 15px}.snapshot h3{font-size:18px;margin:0 0 6px;display:flex;gap:8px;align-items:center}.snaprow{display:grid;grid-template-columns:27px 28px 1fr 15px;align-items:center;min-height:27px;border-bottom:1px solid #edf1f5;font-size:12px}.snaprow:last-child{border:0}.snapico{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff}.snapico svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.2}.sg{background:#58ad73;color:#fff}.sb{background:#5792cf;color:#fff}.sy{background:#dfa847;color:#fff}
+.quick{margin:8px -23px 0;background:#fff;border-top:1px solid #dfe5ec;padding:10px 31px;display:grid;grid-template-columns:205px repeat(6,minmax(125px,1fr));gap:17px;align-items:center}.qintro{display:grid;grid-template-columns:42px 1fr;gap:8px}.qstar{font-size:34px;color:#183d68}.qintro strong{font-size:18px}.qintro span{display:block;color:#718196;font-size:11px;margin-top:3px}.qcard{height:116px;border:1px solid #dce3ea;border-radius:7px;background:#fff;overflow:hidden;text-align:left;padding:0;position:relative}.qphoto{height:58px;background-size:cover;background-position:center}.q1{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.q2{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.q3{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.q4{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.q5{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.q6{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.qcopy{padding:5px 9px}.qcopy{position:relative}.qcopy strong{font-size:11px;display:block;padding-right:13px}.qcopy strong:after{content:'›';position:absolute;right:9px;font-size:17px;color:#496986}.qcopy span{font-size:9px;color:#718196;display:block;margin-top:2px}.note{text-align:right;font-size:9px;color:#8b97a6;padding:5px 0}
+@media(max-width:1200px){.topbar{grid-template-columns:320px 1fr 230px}.quick{grid-template-columns:180px repeat(3,1fr)}.grid{grid-template-columns:1fr}.status-grid{grid-template-columns:repeat(2,1fr);bottom:-225px}.hero{margin-bottom:150px}}
+</style>
+</head>
+<body>
+<!-- Inline SVG symbol library: crisp UI icons, no emoji substitutions -->
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></symbol>
+ <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.5-4 2.7-6 6-6s5.5 2 6 6"/><path d="M15 15c3 0 5 1.7 5.5 5"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+ <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M4 21V5h16v16M8 21v-4h8v4"/><path d="M9 9h6M12 6v6"/></symbol>
+ <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
+ <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+ <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1A7 7 0 0 0 15 6l-.4-2.6h-4L10 6a7 7 0 0 0-1.5.9l-2.4-1-2 3.4L6.1 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1A7 7 0 0 0 10 18l.5 2.6h4L15 18a7 7 0 0 0 1.5-.9l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z"/></symbol>
+ <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 4.3 1.5c-1.2 1.1-2 1.5-2 3M12 17h.01"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+ <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 8H3c0-1 3-1 3-8M10 21h4"/></symbol>
+ <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+ <symbol id="i-cap" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11v5c3 3 9 3 12 0v-5M22 9v6"/></symbol>
+ <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 5c5-3 8 3 14 0v9c-6 3-9-3-14 0"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7"/></symbol>
+ <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M7 5H5v16h14V5h-2"/><rect x="8" y="3" width="8" height="4" rx="2"/><path d="M8 12h8M8 16h6"/></symbol>
+ <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20z"/><path d="M12 9v5M12 18h.01"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M7 3h4l2 5-3 2c1.5 3 3.5 5 6 6l2-3 4 2v4c0 1-1 2-2 2C10 21 3 14 3 5c0-1 1-2 2-2z"/></symbol><symbol id="i-xray" viewBox="0 0 24 24">
+<rect x="4" y="3" width="16" height="18" rx="2"/>
+<path d="M12 5v14"/>
+<path d="M11 8c-3-3-5 0-5 4s2 6 5 5M13 8c3-3 5 0 5 4s-2 6-5 5"/>
+</symbol></svg>
+
+<div class="app">
+<aside class="sidebar">
+ <nav class="nav">
+  <button class="active"><span class="icon"><svg><use href="#i-home"/></svg></span><span>Home</span></button>
+  <button><span class="icon"><svg><use href="#i-users"/></svg></span><span>Students</span></button>
+  <button><span class="icon"><svg><use href="#i-plus"/></svg></span><span>Clinical Instructors</span></button>
+  <button><span class="icon"><svg><use href="#i-hospital"/></svg></span><span>Clinical Sites</span></button>
+  <button><span class="icon"><svg><use href="#i-calendar"/></svg></span><span>Scheduling</span></button>
+  <button><span class="icon"><svg><use href="#i-file"/></svg></span><span>Reports & Paperwork</span></button>
+  <button><span class="icon"><svg><use href="#i-gear"/></svg></span><span>System & Setup</span></button>
+ </nav>
+ <button class="help"><span class="icon"><svg><use href="#i-help"/></svg></span><span>Help & Support</span></button>
+</aside>
+
+<section class="shell">
+<header class="topbar">
+ <div class="brand">
+  <div class="xray"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-asset-img="BRAND_XRAY" alt="Chest radiograph" style="width:100%;height:100%;object-fit:cover"></div><div><strong>Clinical Management System</strong><small>Radiologic Technology</small></div>
+ </div>
+ <div class="search"><span class="icon"><svg><use href="#i-search"/></svg></span><input placeholder="Search students, CIs, sites, or submissions..."></div>
+ <div class="profile"><div class="bell"><span class="icon"><svg><use href="#i-bell"/></svg></span><span class="bubble">3</span></div><img class="avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"><div><div class="pname">Michele</div><div class="prole">Clinical Coordinator</div></div><span>⌄</span></div>
+</header>
+
+<section class="hero" data-asset-bg="HOME_HERO">
+ <div class="hero-copy" style="display:none">
+  <h1><span class="sun">☀</span> Good morning, Michele</h1>
+  <p>Here’s what’s happening in your clinical program today.</p>
+  <div class="meta">
+   <span class="mi"><svg><use href="#i-calendar"/></svg>Thursday, September 24, 2026</span><span class="divider"></span>
+   <span class="mi"><svg><use href="#i-cap"/></svg>Clinical 3</span><span class="divider"></span>
+   <span class="mi"><svg><use href="#i-users"/></svg>32 Students Active</span>
+  </div>
+ </div>
+ <div class="motto" style="display:none">“Same Students.<br>Bigger Futures.”</div>
+ <div class="status-grid">
+  <button class="status flag"><div class="status-img s1" data-asset-bg="HOME_FLAGGED"></div><span class="circle">3</span><div class="status-copy"><strong>Flagged</strong><span>Needs your attention</span></div><span class="arrow">›</span></button>
+  <button class="status wait"><div class="status-img s2" data-asset-bg="HOME_WAITING_REVIEW"></div><span class="circle">4</span><div class="status-copy"><strong>Waiting for Review</strong><span>New submissions</span></div><span class="arrow">›</span></button>
+  <button class="status done"><div class="status-img s3" data-asset-bg="HOME_REVIEWED"></div><span class="circle">6</span><div class="status-copy"><strong>Reviewed</strong><span>Completed today</span></div><span class="arrow">›</span></button>
+  <button class="status sched"><div class="status-img s4" data-asset-bg="HOME_TODAYS_SCHEDULE"></div><span class="circle"><svg><use href="#i-calendar"/></svg></span><div class="status-copy"><strong>Today’s Schedule</strong><span>View site assignments</span></div><span class="arrow">›</span></button>
+ </div>
+</section>
+
+<main class="content">
+<div class="grid">
+ <section class="panel">
+  <div class="panel-head"><div class="panel-title"><span class="icon"><svg><use href="#i-clock"/></svg></span>Recent Activity</div><button class="link">View All →</button></div>
+  <div class="chips"><button class="chip active">All Activity</button><button class="chip">Competencies</button><button class="chip">Attendance</button><button class="chip">CI Availability</button><button class="chip">Tests & Quizzes</button><button class="chip">Other</button></div>
+  <div class="day">Today <span>Thu, Sep 24</span></div>
+  <div class="rows">
+   <div class="row alert"><div class="eventicon r"><svg><use href="#i-clipboard"/></svg></div><div class="rmain"><strong>Competency received<span class="received-time">9:42 AM</span></strong><div class="rmeta"><a>James Alfieri</a><span class="inline-meta-icon exam-meta"><svg><use href="#i-xray"/></svg>Chest</span><span>Vassar</span><span>Submitted by Amanda Rhinehart</span></div></div><button class="action red">Review ›</button></div>
+   <div class="row"><div class="eventicon y"><svg><use href="#i-calendar"/></svg></div><div class="rmain"><strong>CI availability received<span class="received-time">9:18 AM</span></strong><div class="rmeta"><a>Amanda Rhinehart</a><span class="inline-meta-icon"><svg><use href="#i-calendar"/></svg>October availability</span></div></div><button class="action">View ›</button></div>
+   <div class="row alert"><div class="eventicon p"><svg><use href="#i-phone"/></svg></div><div class="rmain"><strong>Attendance call-out<span class="received-time">8:07 AM</span></strong><div class="rmeta"><a>Allison Wanczyk</a><span>8 hours</span><span>Vassar</span></div></div><button class="action red">Review ›</button></div>
+   <div class="row"><div class="eventicon b"><svg><use href="#i-file"/></svg></div><div class="rmain"><strong>Clinical test submitted<span class="received-time">7:54 AM</span></strong><div class="rmeta"><a>Caleb Martin</a><span>Radiographic Positioning</span></div></div><button class="action red">Review ›</button></div>
+  </div>
+  <div class="day">Yesterday <span>Wed, Sep 23</span></div>
+  <div class="rows">
+   <div class="row"><div class="eventicon g"><svg><use href="#i-check"/></svg></div><div class="rmain"><strong>Competency reviewed<span class="received-time">3:36 PM</span></strong><div class="rmeta"><a>Maya Torres</a><span>Knee</span><span>MidHudson</span><span>Reviewed by Michele</span></div></div><button class="action green">Reviewed ›</button></div>
+   <div class="row"><div class="eventicon y"><svg><use href="#i-calendar"/></svg></div><div class="rmain"><strong>CI availability received<span class="received-time">2:14 PM</span></strong><div class="rmeta"><a>Ryan Stevens</a><span class="inline-meta-icon"><svg><use href="#i-calendar"/></svg>November availability</span></div></div><button class="action">View ›</button></div>
+  </div>
+ </section>
+
+ <aside class="right">
+  <section class="panel entry">
+   <div class="entrytop"><strong><span style="font-size:25px;line-height:1;color:#fff">✦</span>New Entry</strong><span>Add a new record to the clinical program.</span></div>
+   <div class="entrygrid">
+    <button class="entrybtn"><span class="eicon eo"><svg><use href="#i-clipboard"/></svg></span><span>Competency<br>Evaluation</span><span>›</span></button>
+    <button class="entrybtn"><span class="eicon eb"><svg><use href="#i-file"/></svg></span><span>Clinical<br>Test</span><span>›</span></button>
+    <button class="entrybtn"><span class="eicon ep"><svg><use href="#i-file"/></svg></span><span>Quiz</span><span>›</span></button>
+    <button class="entrybtn"><span class="eicon eb"><svg><use href="#i-clipboard"/></svg></span><span>Case<br>Presentation</span><span>›</span></button>
+    <button class="entrybtn"><span class="eicon eg"><svg><use href="#i-check"/></svg></span><span>Professional<br>Competency</span><span>›</span></button>
+    <button class="entrybtn"><span class="eicon er"><svg><use href="#i-alert"/></svg></span><span>Grade Points<br>Reduction</span><span>›</span></button>
+    <button class="entrybtn"><span class="eicon er"><svg><use href="#i-calendar"/></svg></span><span>Attendance<br>Event</span><span>›</span></button>
+   </div>
+  </section>
+  <section class="panel snapshot">
+   <h3><span class="icon"><svg><use href="#i-chart"/></svg></span>Program Snapshot</h3>
+   <div class="snaprow"><span class="snapico sg"><svg><use href="#i-users"/></svg></span><strong>32</strong><span>Active Students</span><span>›</span></div>
+   <div class="snaprow"><span class="snapico sb"><svg><use href="#i-calendar"/></svg></span><strong>5</strong><span>On Site Today</span><span>›</span></div>
+   <div class="snaprow"><span class="snapico sb"><svg><use href="#i-alert"/></svg></span><strong>3</strong><span>Attendance Concerns</span><span>›</span></div>
+   <div class="snaprow"><span class="snapico sy"><svg><use href="#i-clipboard"/></svg></span><strong>7</strong><span>Semester Requirements Outstanding</span><span>›</span></div>
+  </section>
+ </aside>
+</div>
+
+<section class="quick">
+ <div class="qintro"><div class="qstar">★</div><div><strong>Quick Access</strong><span>Jump to a section or view key information.</span></div></div>
+ <button class="qcard"><div class="qphoto q1" data-asset-bg="QUICK_STUDENTS"></div><div class="qcopy"><strong>Students</strong><span>View and manage student records</span></div></button>
+ <button class="qcard"><div class="qphoto q2" data-asset-bg="QUICK_INSTRUCTORS"></div><div class="qcopy"><strong>Clinical Instructors</strong><span>Manage CI information and availability</span></div></button>
+ <button class="qcard"><div class="qphoto q3" data-asset-bg="QUICK_SITES"></div><div class="qcopy"><strong>Clinical Sites</strong><span>Site details and placement information</span></div></button>
+ <button class="qcard"><div class="qphoto q4" data-asset-bg="QUICK_SCHEDULING"></div><div class="qcopy"><strong>Scheduling</strong><span>View rotations and assignments</span></div></button>
+ <button class="qcard"><div class="qphoto q5" data-asset-bg="QUICK_PAPERWORK"></div><div class="qcopy"><strong>Clinical Paperwork</strong><span>Generate and print forms and reports</span></div></button>
+ <button class="qcard"><div class="qphoto q6" data-asset-bg="QUICK_SYSTEM_SETUP"></div><div class="qcopy"><strong>System & Setup</strong><span>Manage program settings and data</span></div></button>
+</section>
+<div class="note">VISUAL STUDY I — SOFT COLOR PERSONALITY · sample data only · no CCMS production writes.</div>
+</main>
+</section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  function applyHomeAssets_(assets) {
+    assets = assets || {};
+    document.querySelectorAll('[data-asset-bg]').forEach(function (el) {
+      var key = el.getAttribute('data-asset-bg');
+      if (assets[key]) el.style.backgroundImage = 'url("' + assets[key] + '")';
+    });
+    document.querySelectorAll('[data-asset-img]').forEach(function (el) {
+      var key = el.getAttribute('data-asset-img');
+      if (assets[key]) el.src = assets[key];
+    });
+  }
+  function loadHomeAssets_() {
+    if (!(window.google && google.script && google.script.run)) return;
+    google.script.run
+      .withSuccessHandler(applyHomeAssets_)
+      .withFailureHandler(function (err) {
+        console.error('CCMS Home asset load failed.', err);
+      })
+      .dashboardHomeV2GetAssets();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadHomeAssets_);
+  } else {
+    loadHomeAssets_();
+  }
+})();
+</script>
+
+</body>
+</html>

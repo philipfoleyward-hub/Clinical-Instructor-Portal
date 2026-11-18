@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCMS Students — Study B</title>
+<style>
+:root{
+  --navy:#173454;--navy2:#102a47;--ink:#0e2341;--muted:#667389;--line:#e5e6e8;
+  --blue:#1474df;--blue-soft:#eaf3ff;--green:#1ca36f;--green-soft:#edf9f1;
+  --orange:#f37a2b;--orange-soft:#fff5ea;--purple:#7357d6;--purple-soft:#f1edff;
+  --cyan:#5eb6c8;--paper:#fbf9f5;--white:#fff;--shadow:0 2px 12px rgba(27,42,62,.07);
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+button,input,select{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:190px 1fr}.sidebar{background:linear-gradient(180deg,#193a60 0%,#102b49 100%);color:#fff;min-height:100vh;position:fixed;inset:0 auto 0 0;width:190px;display:flex;flex-direction:column;z-index:20}.brand{height:64px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);font-size:23px;font-weight:750;letter-spacing:.2px}.brand-mark{width:34px;height:28px;position:relative;margin-right:10px}.brand-mark:before,.brand-mark:after{content:"";position:absolute;top:6px;width:9px;height:24px;border-radius:2px;background:#ffa24c;transform-origin:top}.brand-mark:before{left:8px;transform:rotate(38deg)}.brand-mark:after{right:8px;transform:rotate(-38deg)}
+.nav{padding:14px 0}.nav-item{height:53px;padding:0 20px;display:flex;align-items:center;gap:14px;color:#f4f7fb;text-decoration:none;font-size:16px;border-left:3px solid transparent}.nav-item.active{background:linear-gradient(90deg,#285d98,#2e67a9);border-left-color:#ff9a45}.nav-icon{width:22px;text-align:center;font-size:20px;opacity:.95}.collapse{margin-top:auto;padding:0 18px 18px;display:flex;align-items:center;gap:10px;font-size:15px}.collapse .box{width:31px;height:31px;border-radius:8px;background:#234d7d;display:grid;place-items:center}
+.main{grid-column:2;min-width:0}.topbar{height:63px;background:rgba(255,255,255,.72);border-bottom:1px solid #e4e1db;box-shadow:0 1px 5px rgba(30,40,50,.06);display:flex;align-items:center;padding:0 30px 0 16px;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}.global-search{width:387px;height:40px;border:1px solid #d7dce3;border-radius:10px;background:#fbfcfe;display:flex;align-items:center;padding:0 14px;gap:11px;color:#8490a4}.global-search input{border:0;outline:0;background:transparent;width:100%;color:#536176}.top-actions{margin-left:auto;display:flex;align-items:center;gap:18px}.bell{font-size:20px}.divider{height:32px;width:1px;background:#e4e7ec}.profile{display:flex;align-items:center;gap:10px}.profile-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#143f73;color:white;font-size:14px}.profile-name{font-weight:650;color:#10213a}.chev{font-size:14px;color:#526077}
+.page{padding:16px 24px 28px 16px;max-width:1365px;margin:0 auto}.page-head{display:flex;align-items:flex-start;padding:0 24px 12px}.page-title h1{font-size:35px;line-height:1;margin:0 0 6px;letter-spacing:-.8px}.page-title p{margin:0;color:#33435a;font-size:16px}.cohort-select{margin-left:auto;margin-top:10px;height:43px;min-width:169px;border:1px solid #d6dce3;background:#fff;border-radius:10px;padding:0 15px;font-weight:650;color:#182943}
+.workspace{display:grid;grid-template-columns:284px minmax(0,1fr);gap:10px}.roster{background:#fff;border:1px solid #ecebe8;border-radius:14px;box-shadow:var(--shadow);padding:18px 22px 18px;height:853px;overflow:hidden}.roster-search{height:41px;border:1px solid #d9dee5;border-radius:10px;display:flex;align-items:center;padding:0 13px;color:#7b879a;margin-bottom:9px}.roster-search input{border:0;outline:0;width:100%;background:transparent;color:#4f5c70}.roster-search span{font-size:18px}.roster-meta{display:flex;justify-content:space-between;align-items:center;font-size:15px;padding:0 3px 7px;border-bottom:1px solid #eef0f2}.roster-meta strong{font-weight:760}.roster-meta span{color:#46546a}.student-row{height:58px;display:grid;grid-template-columns:43px 1fr;align-items:center;column-gap:11px;border-bottom:1px solid #eef0f2;position:relative;padding:0 3px}.student-row.selected{margin:0 -22px;padding:0 25px;background:#e9f2ff;border-bottom-color:transparent}.student-row.selected:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:0 4px 4px 0;background:#1976e8}.initials{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#edf0f4;color:#26384e;font-size:14px}.selected .initials{background:#d9e7fa}.student-name{font-size:14px;font-weight:600;color:#101b2b;margin-bottom:3px}.student-sub{font-size:12px;color:#55647a}
+.content{min-width:0}.summary{background:#fff;border:1px solid #ecebe8;border-radius:14px;box-shadow:var(--shadow);padding:17px 28px 20px}.identity{display:flex;align-items:center;min-height:82px}.hero-avatar{width:83px;height:83px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#eee8ff,#e6e0fa);color:#6542a5;font-size:25px;font-weight:760;margin-right:24px}.identity-main h2{font-size:30px;line-height:1;margin:0 0 11px;letter-spacing:-.6px}.identity-sub{font-size:16px;color:#59667b}.dotsep{padding:0 9px}.active-pill{margin-left:18px;margin-top:-28px;padding:8px 17px;border-radius:24px;background:#e9f8ec;color:#175d38;font-weight:700;font-size:14px}.active-pill:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:#1aa166;margin-right:9px}.new-entry{margin-left:auto;margin-top:-28px;height:46px;border:0;border-radius:10px;background:linear-gradient(180deg,#1978e7,#0d69d8);color:#fff;font-weight:700;font-size:16px;padding:0 20px;min-width:188px;box-shadow:0 2px 5px rgba(20,108,216,.18)}.new-entry .plus{font-size:24px;font-weight:300;margin-right:10px}.new-entry .down{margin-left:16px;font-size:12px}
+.state-grid{display:grid;grid-template-columns:1.12fr .91fr 1.04fr;gap:17px;margin-top:14px}.state-card{min-height:168px;border-radius:12px;padding:18px 20px;display:flex;gap:17px}.assignment{background:linear-gradient(135deg,#f2f8ff,#f8fbff)}.grade{background:linear-gradient(135deg,#f3fbf5,#f5fcf7)}.attendance{background:linear-gradient(135deg,#fff8ef,#fff9f3)}.state-icon{width:51px;height:51px;border-radius:50%;display:grid;place-items:center;font-size:27px;flex:0 0 auto}.assignment .state-icon{background:#d9ebff;color:#1b74d8}.grade .state-icon{background:#dff4e5;color:#18a26d}.attendance .state-icon{background:#ffe6ca;color:#f27b29}.state-copy{padding-top:2px}.state-label{font-size:14px;font-weight:700;margin-bottom:7px}.state-big{font-size:19px;font-weight:760;margin-bottom:4px}.state-line{font-size:15px;color:#2e3c51;margin:5px 0}.state-link{font-size:14px;color:#066bdb;margin-top:12px}.grade-number{font-size:35px;line-height:1;font-weight:780;letter-spacing:-.8px;margin:4px 0 7px;white-space:nowrap}.grade-number span{margin-left:26px}.attendance-number{font-size:34px;line-height:1;font-weight:760;margin:5px 0 10px}.attendance-number small{font-size:18px;font-weight:500;margin-left:8px}
+.progress-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #e2e4e7;margin-top:15px;padding-top:16px}.progress-block{display:grid;grid-template-columns:57px 1fr;gap:16px;padding-right:34px}.progress-block+ .progress-block{border-left:1px solid #e2e4e7;padding-left:24px;padding-right:0}.progress-icon{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:#ece8ff;color:#7654d5}.progress-block:last-child .progress-icon{background:#e1f4e7;color:#15956a}.progress-title{font-size:14px;font-weight:760;margin:1px 0 3px}.progress-copy{font-size:15px;color:#4b586d}.progress-copy strong{font-size:16px;color:#17243a}.barline{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin-top:10px}.bar{height:15px;background:#e9ecf1;border-radius:10px;overflow:hidden}.fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#5145b9,#6673db)}.program-fill{background:linear-gradient(90deg,#0e9569,#22aa78)}.remaining{font-size:14px;color:#526076;white-space:nowrap}
+.tabs{height:61px;display:flex;align-items:flex-end;gap:9px;padding-left:18px}.tab{border:0;background:transparent;padding:17px 15px 13px;font-size:16px;color:#334158;position:relative}.tab.active{background:#fff;border-radius:12px 12px 0 0;color:#0e2d58;font-weight:760}.tab.active:after{content:"";position:absolute;left:13px;right:13px;bottom:0;height:3px;border-radius:3px;background:#1477e7}.lower{background:#fff;border:1px solid #ecebe8;border-radius:0 14px 14px 14px;box-shadow:var(--shadow);padding:19px;display:grid;grid-template-columns:minmax(0,1.85fr) minmax(270px,.95fr);gap:12px}.panel{border:1px solid #dfe3e8;border-radius:12px;background:#fff;overflow:hidden}.panel-head{height:53px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #e5e7ea;font-weight:760;font-size:16px}.panel-head .head-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;margin-right:12px;background:#2f5fa9;color:#fff}.panel-head .viewall{margin-left:auto;font-size:13px;color:#066bdb;font-weight:500}.activity-row{min-height:59px;display:grid;grid-template-columns:48px minmax(180px,1fr) 150px 130px;align-items:center;padding:0 18px;border-bottom:1px solid #e8eaed}.activity-row:last-child{border-bottom:0}.activity-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;font-size:19px}.purple{background:#8b52dc}.green{background:#22a779}.orange{background:#ff7b25}.blue{background:#3989e9}.activity-title{font-size:14px;font-weight:650}.activity-sub{font-size:13px;color:#33445b;margin-top:2px}.activity-date{font-size:13px;color:#2e3b50}.activity-site{font-size:12px;color:#69768b;margin-top:2px}.activity-action{font-size:13px;color:#066bdb;text-align:right}.semester .panel-head .head-icon{background:#6eb8c8}.semester-body{padding:5px 19px 15px}.kv{display:grid;grid-template-columns:1fr auto;gap:14px;padding:10px 0;border-bottom:1px solid #e5e7ea;font-size:14px}.upcoming{font-size:14px;margin:10px 0 9px}.req{font-size:14px;color:#4e5b6f;margin:10px 0}.req:before{content:"";display:inline-block;width:10px;height:10px;border:3px solid #c5cbd5;border-radius:50%;margin-right:13px;vertical-align:-1px}
+@media(max-width:1100px){.app{grid-template-columns:80px 1fr}.sidebar{width:80px}.brand{font-size:0;padding:0 22px}.brand-mark{margin:0}.nav-item{padding:0 27px}.nav-item span:last-child,.collapse span:last-child{display:none}.workspace{grid-template-columns:245px 1fr}.state-grid{grid-template-columns:1fr}.lower{grid-template-columns:1fr}.summary{padding:18px}.page{padding-right:14px}.activity-row{grid-template-columns:48px 1fr 130px}.activity-action{display:none}}
+
+/* Study B.1 fidelity corrections */
+.svg-icon{display:inline-grid;place-items:center;line-height:0}
+.svg-icon svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.brand{font-size:19px;font-weight:720;letter-spacing:.1px}
+.brand-mark{display:none}
+.nav-icon{font-size:22px;display:grid;place-items:center}
+.nav-icon .svg-icon{font-size:22px}
+.nav-item.active .nav-icon,.nav-item.active{color:#fff}
+.global-search>span{display:grid;place-items:center}.global-search .svg-icon{font-size:19px}
+.bell{display:grid;place-items:center}.bell .svg-icon{font-size:23px}
+.state-icon,.progress-icon,.activity-icon,.head-icon{color:#fff!important}
+.state-icon .svg-icon{font-size:28px}.progress-icon .svg-icon{font-size:28px}
+.activity-icon .svg-icon{font-size:20px}.head-icon .svg-icon{font-size:20px}
+.assignment .state-icon{background:#58a8ef}.grade .state-icon{background:#42b981}.attendance .state-icon{background:#f79549}
+.progress-icon{background:#8a6be2}.progress-block:last-child .progress-icon{background:#46b983}
+.roster{position:relative;transition:width .22s ease,padding .22s ease,opacity .22s ease}
+.roster-toggle{position:absolute;right:-13px;top:74px;width:27px;height:40px;border:1px solid #dfe3e8;border-radius:8px;background:#fff;color:#607087;display:grid;place-items:center;cursor:pointer;z-index:4;box-shadow:0 2px 8px rgba(20,36,55,.08)}
+.roster-toggle .svg-icon{font-size:17px}
+.workspace{transition:grid-template-columns .22s ease}
+.workspace.roster-collapsed{grid-template-columns:38px minmax(0,1fr)}
+.workspace.roster-collapsed .roster{padding:0;width:38px;overflow:visible;background:transparent;border-color:transparent;box-shadow:none}
+.workspace.roster-collapsed .roster>*:not(.roster-toggle){display:none}
+.workspace.roster-collapsed .roster-toggle{right:4px;top:16px}
+.workspace.roster-collapsed .roster-toggle .collapse-svg{display:none}
+.workspace:not(.roster-collapsed) .roster-toggle .expand-svg{display:none}
+.page{background:#fbf9f5}
+.summary,.roster,.lower{box-shadow:0 2px 10px rgba(27,42,62,.055)}
+
+
+/* =====================================================================
+   STUDENTS V2 FUNCTIONAL CANDIDATE
+   Shared visual grammar remains inherited from approved Home Study I.
+   ===================================================================== */
+.loading-surface{min-height:420px;display:grid;place-items:center;color:var(--muted);font-size:15px}
+.error-surface{margin:18px;padding:18px;border:1px solid #f0c7c7;background:#fff6f6;border-radius:12px;color:#8b2525}
+.roster-list{overflow:auto;max-height:730px;margin-right:-8px;padding-right:8px}
+.student-row{cursor:pointer}
+.student-row:hover:not(.selected){background:#f7f9fc}
+.student-row[hidden]{display:none}
+.empty{padding:28px;color:var(--muted);text-align:center}
+.state-muted{color:var(--muted)}
+.state-note{font-size:12px;color:#7a8798;margin-top:8px;line-height:1.35}
+.activity-action button,.activity-action a{border:0;background:transparent;color:#066bdb;padding:0;cursor:pointer;text-decoration:none;font:inherit}
+.tab{cursor:pointer}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.lower.single{display:block;border-radius:14px}
+.req-section{padding:18px}
+.req-section h3{margin:0 0 10px;font-size:17px}
+.req-list{display:grid;gap:7px}
+.req-row{display:grid;grid-template-columns:minmax(0,1fr) 130px 95px;gap:12px;align-items:center;padding:11px 13px;border:1px solid #e5e8ed;border-radius:9px}
+.req-name{font-weight:650}.req-note{font-size:12px;color:var(--muted);margin-top:3px}
+.req-status{font-size:12px;color:#44546a}.req-count{text-align:right;font-weight:700}
+.record-list{padding:10px 14px 16px}
+.record-term{font-weight:800;padding:12px 4px 7px;color:#173454}
+.record-row{display:grid;grid-template-columns:105px minmax(0,1fr) 125px 100px;gap:12px;align-items:center;padding:11px 10px;border-top:1px solid #edf0f3;font-size:13px}
+.record-title{font-weight:650}.record-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.file-toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid #e7eaee}
+.file-toolbar button{border:1px solid #d7e0ea;background:#fff;border-radius:8px;padding:9px 12px;color:#164a82;cursor:pointer;font-weight:650}
+.file-list{padding:8px 14px 16px}
+.file-row{display:grid;grid-template-columns:minmax(0,1fr) 155px 115px;gap:12px;padding:12px 8px;border-bottom:1px solid #edf0f3;align-items:center}
+.file-row a{color:#066bdb;text-decoration:none;font-weight:650}
+.file-meta{font-size:12px;color:var(--muted)}
+.new-entry-wrap{margin-left:auto;position:relative;margin-top:-28px}
+.new-entry-wrap .new-entry{margin:0}
+.entry-menu{display:none;position:absolute;right:0;top:52px;width:245px;background:#fff;border:1px solid #dfe5ec;border-radius:11px;box-shadow:0 10px 28px rgba(22,45,75,.18);padding:7px;z-index:40}
+.entry-menu.open{display:block}
+.entry-menu button{width:100%;border:0;background:#fff;border-radius:8px;text-align:left;padding:10px 11px;cursor:pointer;color:#18324f}
+.entry-menu button:hover{background:#f0f6fd}
+.entry-menu button[disabled]{color:#98a2af;cursor:not-allowed;background:#fafafa}
+.entry-menu small{display:block;color:#8995a5;margin-top:2px}
+.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;background:#edf3fa;color:#36536f}
+.badge.pending{background:#fff3d8;color:#8b5b00}.badge.rejected{background:#ffe8e8;color:#a12d2d}
+.clickable{cursor:pointer}
+@media(max-width:1100px){.state-grid{grid-template-columns:1fr}.progress-grid{grid-template-columns:1fr}.progress-block+.progress-block{border-left:0;border-top:1px solid #e2e4e7;padding:18px 34px 0 0;margin-top:16px}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span>Clinical Management System</span></div>
+    <nav class="nav">
+      <a class="nav-item" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span></span><span>Home</span></a>
+      <a class="nav-item active" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c.7-5 3.4-7 8-7s7.3 2 8 7"/></svg></span></span><span>Students</span></a>
+      <a class="nav-item" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M7 14h2M11 14h2M15 14h2M7 18h2M11 18h2"/></svg></span></span><span>Clinical Instructors</span></a>
+      <a class="nav-item" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><path d="M4 21V5h10v16M14 10h6v11M8 8h2M8 12h2M8 16h2M17 13h1M17 17h1M2 21h20"/></svg></span></span><span>Clinical Sites</span></a>
+      <a class="nav-item" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 21c.5-5 2.7-7 6-7s5.5 2 6 7M14 15c3.5-.5 6 1.4 7 5"/></svg></span></span><span>Scheduling</span></a>
+      <a class="nav-item" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span></span><span>Reports &<br>Paperwork</span></a>
+      <a class="nav-item" href="#"><span class="nav-icon"><span class="svg-icon "><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.5 1A8 8 0 0 0 15 6l-.4-2.7h-4L10 6a8 8 0 0 0-1.5 1L6 6 4 9.4 6 11a7 7 0 0 0 0 2l-2 1.6L6 18l2.5-1A8 8 0 0 0 10 18l.5 2.7h4L15 18a8 8 0 0 0 1.5-1l2.5 1 2-3.4-2-1.6a7 7 0 0 0 .1-1z"/></svg></span></span><span>System &amp; Setup</span></a>
+    </nav>
+    <div class="collapse"><span class="box">‹</span><span>Collapse</span></div>
+  </aside>
+
+  <section class="main">
+    <header class="topbar">
+      <div class="global-search"><span class="svg-icon "><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input placeholder="Search students, CIs, sites, or submissions..."></div>
+      <div class="top-actions"><span class="bell"><span class="svg-icon "><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span></span><span class="divider"></span><div class="profile"><span class="profile-avatar">M</span><span class="profile-name">Michele</span><span class="chev">⌄</span></div></div>
+    </header>
+
+    <main class="page">
+      <div class="page-head">
+        <div class="page-title"><h1>Students</h1><p>Clinical student records &amp; progress</p></div>
+        <select id="cohortSelect" class="cohort-select" onchange="studentsV2FilterCohort()"></select>
+      </div>
+
+      <div id="studentsError" class="error-surface" hidden></div>
+
+      <div class="workspace" id="studentsWorkspace">
+        <aside class="roster">
+          <button class="roster-toggle" onclick="toggleRoster()" aria-label="Collapse or expand student roster">
+            <span class="collapse-svg"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></span></span>
+            <span class="expand-svg"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></span></span>
+          </button>
+          <div class="roster-search">
+            <input id="rosterSearch" placeholder="Search students..." oninput="studentsV2RenderRoster()">
+            <span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>
+          </div>
+          <div class="roster-meta"><strong id="rosterCohort">Students</strong><span id="rosterCount">—</span></div>
+          <div id="rosterList" class="roster-list"><div class="empty">Loading students…</div></div>
+        </aside>
+
+        <section class="content" id="studentContent">
+          <div class="summary"><div class="loading-surface">Select a student to load the clinical record.</div></div>
+        </section>
+      </div>
+    </main>
+  </section>
+</div>
+
+
+<script>
+(function(){
+  'use strict';
+
+  const S = {
+    bootstrap:null,
+    students:[],
+    selectedId:'',
+    workspace:null,
+    tab:'overview',
+    documents:null,
+    documentsLoading:false
+  };
+
+  function rpc(name){
+    const args=[].slice.call(arguments,1);
+    return new Promise(function(resolve,reject){
+      if(!(window.google && google.script && google.script.run)){
+        reject(new Error('Google Apps Script runtime is unavailable in this standalone preview.'));
+        return;
+      }
+      let runner=google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(function(err){ reject(new Error((err&&err.message)||String(err))); });
+      runner[name].apply(runner,args);
+    });
+  }
+
+  function esc(v){
+    return String(v===null||v===undefined?'':v)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function num(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
+  function initials(name){ return String(name||'').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'—'; }
+  function dept(v){ const t=String(v||'').trim(); if(!t)return '—'; const n=parseInt(t,10); return Number.isFinite(n)?String(n).padStart(2,'0'):t; }
+  function pct(c,r){ return r>0?Math.max(0,Math.min(100,(c/r)*100)):0; }
+  function fmtPercent(v){ if(v===null||v===undefined||v==='')return '—'; const n=Number(v); return Number.isFinite(n)?(Math.round(n*10)/10)+'%':esc(v); }
+  function calloutCount(att){
+    const events=[].concat(att&&att.approvedEvents||[],att&&att.pendingEvents||[]);
+    return events.filter(e=>/call.?out|absence|absent/i.test(String(e.eventType||''))).length;
+  }
+
+  window.toggleRoster=function(){
+    document.getElementById('studentsWorkspace').classList.toggle('roster-collapsed');
+  };
+
+  window.studentsV2FilterCohort=function(){
+    studentsV2RenderRoster();
+    const visible=filteredStudents();
+    if(visible.length && !visible.some(s=>s.studentId===S.selectedId)){
+      selectStudent(visible[0].studentId);
+    }
+  };
+
+  function filteredStudents(){
+    const cohort=document.getElementById('cohortSelect').value;
+    const q=(document.getElementById('rosterSearch').value||'').trim().toLowerCase();
+    return S.students.filter(function(s){
+      const same=!cohort || String(s.cohort||'')===cohort;
+      const hit=!q || [s.student,s.studentId,s.clinicalTerm,s.cohort].join(' ').toLowerCase().includes(q);
+      return same&&hit;
+    });
+  }
+
+  window.studentsV2RenderRoster=function(){
+    const rows=filteredStudents();
+    const cohort=document.getElementById('cohortSelect').value;
+    document.getElementById('rosterCohort').textContent=cohort?'Class of '+cohort:'All Students';
+    document.getElementById('rosterCount').textContent=rows.length+' Active';
+    document.getElementById('rosterList').innerHTML=rows.length?rows.map(function(s){
+      const selected=s.studentId===S.selectedId?' selected':'';
+      return '<div class="student-row'+selected+'" data-student-id="'+esc(s.studentId)+'">'+
+        '<div class="initials">'+esc(initials(s.student))+'</div>'+
+        '<div><div class="student-name">'+esc(s.student)+'</div>'+
+        '<div class="student-sub">'+esc(s.clinicalTerm||'')+'</div></div></div>';
+    }).join(''):'<div class="empty">No students match this view.</div>';
+
+    document.querySelectorAll('#rosterList .student-row').forEach(function(el){
+      el.addEventListener('click',function(){ selectStudent(el.getAttribute('data-student-id')); });
+    });
+  };
+
+  async function selectStudent(id){
+    S.selectedId=id; S.workspace=null; S.documents=null; S.tab='overview';
+    studentsV2RenderRoster();
+    document.getElementById('studentContent').innerHTML='<div class="summary"><div class="loading-surface">Loading student clinical record…</div></div>';
+    clearError();
+    try{
+      S.workspace=await rpc('dashboardGetStudentV2Workspace',id);
+      renderStudent();
+    }catch(err){ showError(err.message); }
+  }
+
+  function renderStudent(){
+    const w=S.workspace||{}, d=w.dashboard||{}, i=w.identity||d.student||{};
+    const a=w.todayAssignment||{}, att=w.attendance||{}, sem=d.semester||{}, prog=w.programOverall||{};
+    const grade=d.grade||{};
+    const gradeValue=grade.semesterAverage&&grade.semesterAverage.available
+      ? (grade.semesterAverage.value || grade.semesterAverage.raw)
+      : null;
+    const semReq=num(sem.semesterRequirement), semDone=Math.max(0,semReq-num(sem.stillNeeded));
+    const eto=att.balances&&att.balances.currentAvailableBalanceHours;
+    const makeup=att.makeUp&&att.makeUp.outstandingHours;
+    const callouts=calloutCount(att);
+    const assignmentTitle=a.site || (a.scheduled?'Site not assigned':'Not scheduled');
+    const rotation=a.rotationArea || (a.scheduled?'Room rotation not assigned':'');
+    const shift=[a.startTime,a.endTime].filter(Boolean).join(' – ');
+
+    document.getElementById('studentContent').innerHTML=
+      '<div class="summary">'+
+        '<div class="identity">'+
+          '<div class="hero-avatar">'+esc(initials(i.student))+'</div>'+
+          '<div class="identity-main"><h2>'+esc(i.student)+'</h2><div class="identity-sub">#'+esc(dept(i.deptNumber))+
+            '<span class="dotsep">•</span> Class of '+esc(i.cohort)+
+            '<span class="dotsep">•</span> '+esc(i.clinicalTerm)+'</div></div>'+
+          (i.active?'<div class="active-pill">Active</div>':'')+
+          '<div class="new-entry-wrap"><button class="new-entry" onclick="studentsV2ToggleEntryMenu(event)"><span class="plus">＋</span>New Entry <span class="down">⌄</span></button>'+
+            '<div id="entryMenu" class="entry-menu">'+entryMenu(d.addNew)+'</div></div>'+
+        '</div>'+
+        '<div class="state-grid">'+
+          '<div class="state-card assignment"><div class="state-icon">'+icon('hospital')+'</div><div class="state-copy"><div class="state-label">Current Clinical Assignment</div>'+
+            '<div class="state-big">'+esc(assignmentTitle)+'</div>'+
+            (rotation?'<div class="state-line">'+esc(rotation)+'</div>':'')+
+            '<div class="state-line" style="margin-top:14px">Clinical Instructor: <span class="state-muted">CI coverage not yet connected</span></div>'+
+            (shift?'<div class="state-line">'+esc(shift)+'</div>':'')+
+            (!a.available?'<div class="state-note">Scheduling service unavailable.</div>':'')+
+          '</div></div>'+
+          '<div class="state-card grade"><div class="state-icon">'+icon('chart')+'</div><div class="state-copy"><div class="state-label">Current Clinical Grade</div>'+
+            '<div class="grade-number">'+fmtPercent(gradeValue)+'</div><div class="state-line">'+esc(i.clinicalTerm)+'</div>'+
+            '<div class="state-link clickable" onclick="studentsV2ShowGrade()">View grade details →</div></div></div>'+
+          '<div class="state-card attendance"><div class="state-icon">'+icon('calendar')+'</div><div class="state-copy"><div class="state-label">Attendance &amp; ETO</div>'+
+            '<div class="attendance-number">'+esc(eto===undefined||eto===null?'—':eto)+' <small>hrs ETO</small></div>'+
+            '<div class="state-line">'+callouts+' callout'+(callouts===1?'':'s')+'</div>'+
+            '<div class="state-line">'+esc(makeup===undefined||makeup===null?'—':makeup)+' make-up hours owed</div>'+
+            '<div class="state-link clickable" onclick="studentsV2ShowAttendance()">View attendance details →</div></div></div>'+
+        '</div>'+
+        '<div class="progress-grid">'+
+          progressBlock('semester','Semester Progress',semDone,semReq,num(sem.stillNeeded))+
+          progressBlock('program','Program Progress',num(prog.completed),num(prog.required),num(prog.remaining))+
+        '</div>'+
+      '</div>'+
+      '<div class="tabs">'+
+        tabButton('overview','Overview')+tabButton('requirements','Requirements')+
+        tabButton('record','Clinical Record')+tabButton('file','Student File')+
+      '</div>'+
+      '<div id="tabHost"></div>';
+
+    renderTab();
+  }
+
+  function progressBlock(kind,title,done,required,remaining){
+    return '<div class="progress-block"><div class="progress-icon">'+icon(kind==='program'?'cap':'clipboard')+'</div><div>'+
+      '<div class="progress-title">'+esc(title)+'</div>'+
+      '<div class="progress-copy"><strong>'+esc(done)+' of '+esc(required)+'</strong> requirements completed</div>'+
+      '<div class="barline"><div class="bar"><div class="fill '+(kind==='program'?'program-fill':'')+'" style="width:'+pct(done,required)+'%"></div></div>'+
+      '<div class="remaining">'+esc(remaining)+' remaining</div></div></div></div>';
+  }
+
+  function tabButton(key,label){
+    return '<button class="tab '+(S.tab===key?'active':'')+'" onclick="studentsV2ChangeTab(\''+key+'\')">'+esc(label)+'</button>';
+  }
+
+  window.studentsV2ChangeTab=function(tab){
+    S.tab=tab;
+    document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('active')});
+    const keys=['overview','requirements','record','file'], idx=keys.indexOf(tab);
+    if(idx>=0 && document.querySelectorAll('.tab')[idx])document.querySelectorAll('.tab')[idx].classList.add('active');
+    renderTab();
+  };
+
+  function renderTab(){
+    const host=document.getElementById('tabHost'); if(!host)return;
+    if(S.tab==='requirements') host.innerHTML=renderRequirements();
+    else if(S.tab==='record') host.innerHTML=renderRecord();
+    else if(S.tab==='file'){ host.innerHTML=renderFile(); loadDocuments(); }
+    else host.innerHTML=renderOverview();
+  }
+
+  function renderOverview(){
+    const w=S.workspace||{}, d=w.dashboard||{}, sem=d.semester||{};
+    const activities=w.recentActivity||[];
+    const upcoming=(d.requirements&&d.requirements.eligibleNow||[]).slice(0,4);
+    return '<div class="lower">'+
+      '<section class="panel activity"><div class="panel-head"><span class="head-icon">'+icon('file')+'</span>Recent Activity <span class="viewall clickable" onclick="studentsV2ChangeTab(\'record\')">View All →</span></div>'+
+      (activities.length?activities.slice(0,6).map(activityRow).join(''):'<div class="empty">No recent submitted activity was found for this student.</div>')+
+      '</section>'+
+      '<section class="panel semester"><div class="panel-head"><span class="head-icon" style="background:#65b8c8">'+icon('calendar')+'</span>Current Semester</div>'+
+        '<div class="semester-body"><div class="kv"><span>Semester</span><span>'+esc((w.identity||{}).clinicalTerm)+'</span></div>'+
+        '<div class="kv"><span>Requirements Completed</span><span>'+esc(Math.max(0,num(sem.semesterRequirement)-num(sem.stillNeeded)))+' of '+esc(num(sem.semesterRequirement))+'</span></div>'+
+        '<div class="kv"><span>Requirements Remaining</span><span>'+esc(num(sem.stillNeeded))+'</span></div>'+
+        '<div class="upcoming">Upcoming Requirements</div>'+
+        (upcoming.length?upcoming.map(x=>'<div class="req">'+esc(x.name)+'</div>').join(''):'<div class="req state-muted">No eligible requirements returned.</div>')+
+        '</div></section></div>';
+  }
+
+  function activityRow(a){
+    const cls=a.kind==='attendance'?'orange':a.kind==='grade'?'green':a.kind==='professional'?'blue':'purple';
+    const action=a.action||{};
+    let actionHtml='';
+    if(action.type==='url' && action.url){
+      actionHtml='<a href="'+esc(action.url)+'" target="_blank" rel="noopener">'+esc(action.label||'View')+' →</a>';
+    }else{
+      actionHtml='<button onclick="studentsV2ActivityAction(\''+esc(action.type||'clinicalRecord')+'\',\''+esc(a.id)+'\')">'+esc(action.label||'View')+' →</button>';
+    }
+    return '<div class="activity-row"><div class="activity-icon '+cls+'">'+icon(a.kind==='attendance'?'calendar':a.kind==='grade'?'chart':'clipboard')+'</div>'+
+      '<div><div class="activity-title">'+esc(a.title)+'</div><div class="activity-sub">'+esc(a.detail||'')+'</div></div>'+
+      '<div><div class="activity-date">'+esc(a.date||'')+'</div><div class="activity-site">'+esc(a.site||a.clinicalTerm||'')+'</div></div>'+
+      '<div class="activity-action">'+actionHtml+'</div></div>';
+  }
+
+  window.studentsV2ActivityAction=function(type,id){
+    if(type==='attendance'){ studentsV2ShowAttendance(); return; }
+    S.tab='record'; renderStudent();
+    setTimeout(function(){
+      const el=document.querySelector('[data-activity-id="'+CSS.escape(id)+'"]');
+      if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+    },0);
+  };
+
+  function renderRequirements(){
+    const r=(S.workspace.dashboard||{}).requirements||{};
+    return '<div class="lower single"><section class="panel">'+
+      '<div class="panel-head"><span class="head-icon">'+icon('clipboard')+'</span>Requirements</div>'+
+      requirementSection('Eligible Now',r.eligibleNow||[])+
+      requirementSection('Prerequisite Verification / Dependency',r.prerequisite||[])+
+      requirementSection('Future Requirements',r.future||[])+
+      '</section></div>';
+  }
+
+  function requirementSection(title,rows){
+    return '<div class="req-section"><h3>'+esc(title)+'</h3><div class="req-list">'+
+      (rows.length?rows.map(function(x){
+        return '<div class="req-row"><div><div class="req-name">'+esc(x.name)+'</div><div class="req-note">'+esc(x.notes||x.timing||'')+'</div></div>'+
+          '<div class="req-status">'+esc(x.status||x.timing||'')+'</div>'+
+          '<div class="req-count">'+esc(num(x.completedCount))+' / '+esc(num(x.requiredCount))+'</div></div>';
+      }).join(''):'<div class="empty">No requirements in this category.</div>')+
+      '</div></div>';
+  }
+
+  function renderRecord(){
+    const d=S.workspace.dashboard||{}, rows=[];
+    (d.evaluations||[]).forEach(function(x){
+      rows.push({id:'evaluation:'+x.submissionId,date:x.date,dateValue:num(x.dateValue),title:x.evaluationType==='Competency'?'Competency Evaluation':(x.evaluationType||'Evaluation'),sub:[x.examination,x.anatomicalArea,x.result||x.gradeDisplay].filter(Boolean).join(' • '),term:x.attributedClinicalTerm||x.clinicalTerm,site:x.clinicalSite});
+    });
+    (d.clinicalHistory||[]).forEach(function(t){
+      (t.academicRecords||[]).forEach(function(x){
+        rows.push({id:'grade:'+x.gradeRecordId,date:x.date,dateValue:num(x.dateValue),title:x.type||'Grade Record',sub:[x.title,x.scoreDisplay].filter(Boolean).join(' • '),term:x.clinicalTerm||t.clinicalTerm,site:''});
+      });
+    });
+    (S.workspace.recentActivity||[]).filter(x=>x.kind==='attendance').forEach(function(x){
+      rows.push({id:x.id,date:x.date,dateValue:num(x.dateValue),title:x.title,sub:x.detail,term:x.clinicalTerm,site:x.site});
+    });
+    rows.sort((a,b)=>b.dateValue-a.dateValue);
+    return '<div class="lower single"><section class="panel"><div class="panel-head"><span class="head-icon">'+icon('file')+'</span>Clinical Record</div>'+
+      '<div class="record-list">'+(rows.length?rows.map(function(x){
+        return '<div class="record-row" data-activity-id="'+esc(x.id)+'"><div>'+esc(x.date)+'</div><div><div class="record-title">'+esc(x.title)+'</div><div class="record-sub">'+esc(x.sub||'')+'</div></div><div>'+esc(x.term||'')+'</div><div>'+esc(x.site||'')+'</div></div>';
+      }).join(''):'<div class="empty">No clinical record activity found.</div>')+'</div></section></div>';
+  }
+
+  function renderFile(){
+    return '<div class="lower single"><section class="panel"><div class="panel-head"><span class="head-icon">'+icon('file')+'</span>Student File</div>'+
+      '<div class="file-toolbar">'+
+        '<button onclick="studentsV2GenerateDocument(\'semester\')">Generate Semester Requirements</button>'+
+        '<button onclick="studentsV2GenerateDocument(\'program\')">Generate Program Requirements</button>'+
+        '<button onclick="studentsV2GenerateDocument(\'grades\')">Generate Clinical Grades</button>'+
+      '</div><div id="studentFiles" class="file-list">'+
+      (S.documents?fileRows(S.documents):'<div class="empty">Loading student file…</div>')+
+      '</div></section></div>';
+  }
+
+  async function loadDocuments(){
+    if(S.documents||S.documentsLoading||!S.selectedId)return;
+    S.documentsLoading=true;
+    try{ S.documents=await rpc('dashboardGetStudentDocuments',S.selectedId); }
+    catch(err){ S.documents={error:err.message,files:[]}; }
+    finally{ S.documentsLoading=false; }
+    const el=document.getElementById('studentFiles'); if(el)el.innerHTML=fileRows(S.documents);
+  }
+
+  function fileRows(data){
+    if(data.error)return '<div class="error-surface">'+esc(data.error)+'</div>';
+    const files=data.files||[];
+    return files.length?files.map(function(f){
+      return '<div class="file-row"><div><a href="'+esc(f.url)+'" target="_blank" rel="noopener">'+esc(f.name)+'</a><div class="file-meta">'+esc(f.location||'Student Folder')+'</div></div><div class="file-meta">'+esc(f.updated||'')+'</div><div class="file-meta">'+esc(f.mimeType||'')+'</div></div>';
+    }).join(''):'<div class="empty">No files were found in the established student repository.</div>';
+  }
+
+  window.studentsV2GenerateDocument=async function(type){
+    if(!S.selectedId)return;
+    clearError();
+    try{
+      let result;
+      if(type==='semester'){
+        const term=(S.workspace.identity||{}).clinicalTerm;
+        result=await rpc('dashboardGenerateSemesterRequirement',{studentId:S.selectedId,clinicalTerm:term});
+      }else if(type==='program'){
+        result=await rpc('dashboardGenerateProgramRequirement',{studentId:S.selectedId});
+      }else{
+        result=await rpc('dashboardGenerateClinicalGrades',{studentId:S.selectedId,requestId:'STUDENTS-V2-'+Date.now()});
+      }
+      S.documents=null; await loadDocuments();
+      if(result&&result.viewUrl)window.open(result.viewUrl,'_blank','noopener');
+    }catch(err){showError(err.message);}
+  };
+
+  window.studentsV2ShowGrade=function(){ S.tab='record'; renderStudent(); };
+  window.studentsV2ShowAttendance=function(){ S.tab='record'; renderStudent(); };
+
+  function entryMenu(addNew){
+    const cats=(addNew&&addNew.categories)||[];
+    const standard=cats.map(c=>({key:c.key,label:c.label,disabled:false}));
+    standard.unshift({key:'competencyEvaluation',label:'Competency Evaluation',disabled:true,note:'Repair / QA workstream pending'});
+    standard.push({key:'attendance',label:'Attendance Event',disabled:false});
+    return standard.map(function(c){
+      return '<button '+(c.disabled?'disabled':'')+' onclick="'+(c.disabled?'':'studentsV2LaunchNewEntry(\''+esc(c.key)+'\')')+'">'+esc(c.label)+(c.note?'<small>'+esc(c.note)+'</small>':'')+'</button>';
+    }).join('');
+  }
+
+  window.studentsV2ToggleEntryMenu=function(ev){
+    ev.stopPropagation();
+    const menu=document.getElementById('entryMenu'); if(menu)menu.classList.toggle('open');
+  };
+
+  window.studentsV2LaunchNewEntry=function(type){
+    const detail={studentId:S.selectedId,type:type,student:(S.workspace.identity||{}).student,clinicalTerm:(S.workspace.identity||{}).clinicalTerm};
+    document.dispatchEvent(new CustomEvent('ccms:new-entry',{detail:detail}));
+    if(window.CCMS_STUDENTS_V2 && typeof window.CCMS_STUDENTS_V2.onNewEntry==='function'){
+      window.CCMS_STUDENTS_V2.onNewEntry(detail);
+    }else{
+      showError('New Entry launcher is ready, but this candidate shell does not yet contain the existing New Entry editor host. No record was written.');
+    }
+  };
+
+  function icon(name){
+    const p={
+      hospital:'<path d="M4 21V5h10v16M14 10h6v11M8 8h2M8 12h2M8 16h2M17 13h1M17 17h1M2 21h20"/>',
+      chart:'<path d="M5 20V11h4v9M10 20V5h4v15M15 20v-7h4v7"/>',
+      calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',
+      clipboard:'<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3h6v2M9 10h6M9 14h6M9 18h4"/>',
+      cap:'<path d="m2 9 10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5M22 9v6"/>',
+      file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>'
+    };
+    return '<span class="svg-icon"><svg viewBox="0 0 24 24">'+(p[name]||p.file)+'</svg></span>';
+  }
+
+  function showError(msg){
+    const el=document.getElementById('studentsError'); if(!el)return;
+    el.textContent=msg; el.hidden=false; el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  function clearError(){ const el=document.getElementById('studentsError'); if(el){el.hidden=true;el.textContent='';} }
+
+  async function init(){
+    try{
+      S.bootstrap=await rpc('getDashboardBootstrap');
+      S.students=(S.bootstrap&&S.bootstrap.students)||[];
+      const cohorts=[...new Set(S.students.map(s=>String(s.cohort||'').trim()).filter(Boolean))].sort().reverse();
+      const select=document.getElementById('cohortSelect');
+      select.innerHTML=cohorts.map(c=>'<option value="'+esc(c)+'">Class of '+esc(c)+'</option>').join('');
+      studentsV2RenderRoster();
+      const visible=filteredStudents();
+      if(visible.length)selectStudent(visible[0].studentId);
+    }catch(err){ showError(err.message); }
+  }
+
+  document.addEventListener('click',function(){
+    const menu=document.getElementById('entryMenu'); if(menu)menu.classList.remove('open');
+  });
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
+
+</body>
+</html>

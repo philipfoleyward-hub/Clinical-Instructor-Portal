@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+
+<html><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Clinical Instructor Portal — Standard Sections Candidate</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f8fb;color:#102b4d;font-family:Arial,Helvetica,sans-serif}button,textarea{font:inherit}
+.banner{height:112px;background:linear-gradient(90deg,#052b4a,#0b5278 58%,#062c4c);color:white;display:grid;grid-template-columns:280px 1fr 340px;align-items:center;padding:0 28px}
+.brand{border-right:1px solid #ffffff55;padding-right:25px}.brand .logo{font:700 28px Georgia,serif}.brand .logo i{font-style:normal;color:#ff7900}.brand small{display:block;font-size:16px;margin-top:4px}.portal{padding-left:24px}.portal h1{margin:0;font-size:25px}.portal p{margin:7px 0 0;color:#dceaf5}.profile{justify-self:end;background:#062a4a;border-radius:11px;padding:10px 14px;display:flex;gap:11px;align-items:center}.avatar{width:38px;height:38px;border-radius:50%;background:#dcecff;color:#285d94;display:grid;place-items:center;font-weight:bold}.profile small{display:block;color:#dce8f2;margin-top:2px}
+.crumbs{height:48px;background:#fff;border-bottom:1px solid #d9e4ed;padding:0 25px;display:flex;align-items:center;color:#0872d1;font-size:12px}.crumbs span{margin:0 8px;color:#8093a5}.exit{margin-left:auto;border:1px solid #0877dc;background:white;color:#0764be;border-radius:7px;padding:7px 12px;font-weight:bold}
+.context{margin:10px 14px;background:#fff;border:1px solid #d5e2eb;border-radius:9px;display:grid;grid-template-columns:1.6fr repeat(5,1fr);overflow:hidden}.student{padding:13px 16px;display:flex;gap:12px;align-items:center}.student .pic{width:58px;height:58px;border-radius:50%;background:#d9eafb;display:grid;place-items:center;font-weight:bold;color:#1d5d99}.student h2{margin:0 0 5px;font-size:20px}.student p{margin:0;color:#63778d;font-size:11px}.ctx{border-left:1px solid #dce6ee;padding:14px 12px;display:flex;flex-direction:column;justify-content:center}.ctx label{font-size:10px;color:#165499;font-weight:bold;margin-bottom:6px}.ctx b{font-size:12px}.ctx input{width:100%;border:0;outline:0;font-weight:bold;color:#124b84}
+.layout{display:grid;grid-template-columns:54px 278px minmax(650px,1fr) 286px;gap:11px;padding:0 14px 18px;align-items:start}
+.rail{position:sticky;top:10px;background:#07365d;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px #163f6120}.rail button{width:54px;height:54px;border:0;border-bottom:1px solid #ffffff22;background:transparent;color:white;font-size:20px;cursor:pointer}.rail button:hover,.rail button.active{background:#0877dc}.rail .menu{background:#ff7900;font-weight:bold}
+.card{background:#fff;border:1px solid #d5e2eb;border-radius:9px;box-shadow:0 3px 9px #173e5e0b;overflow:hidden}
+.left-head{padding:14px}.left-head h3{margin:0 0 5px;font-size:18px}.left-head p{margin:0;color:#62758a;font-size:11px}.section{display:flex;gap:10px;align-items:flex-start;padding:12px;border-top:1px solid #e2e9ef;cursor:pointer}.section:hover{background:#f7fbfe}.section.active{margin:0 6px 4px;border:0;border-radius:7px;background:#0b4f88;color:white}.num{width:34px;height:34px;border-radius:50%;background:#e5edf4;display:grid;place-items:center;flex:none;font-weight:bold}.active .num{background:#7ab7ea;color:white}.section b{display:block;font-size:12px}.section small{display:block;font-size:9.5px;line-height:1.3;color:#6a7e91;margin-top:3px}.active small{color:#dbeaf6}
+.section-head{display:grid;grid-template-columns:50px 1fr 190px;gap:13px;align-items:center;padding:15px 17px;border-bottom:1px solid #dce6ee}.big{width:46px;height:46px;border-radius:50%;background:#0877dc;color:white;display:grid;place-items:center;font-size:21px;font-weight:bold}.titleline{display:flex;align-items:center;gap:9px}.titleline h2{margin:0;font-size:20px}.badge{background:#fff0c7;color:#815d00;border-radius:14px;padding:4px 8px;font-size:9px;font-weight:bold}.desc{margin:5px 0 0;color:#526a82;font-size:11px}.bar{height:9px;background:#e1e9ef;border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:#28af69;width:0}.progress small{font-size:9px;color:#60748a}.progress b{font-size:10px}
+.naall{display:none;margin:10px 12px 0;background:#f1f5f8;border:1px solid #d3dee7;border-radius:8px;padding:10px 12px;align-items:center;justify-content:space-between}.naall.show{display:flex}.naall strong{font-size:11px}.naall small{display:block;color:#687b8e;font-size:9px;margin-top:2px}.naall button{border:1px solid #8197a9;background:#fff;color:#526a7d;border-radius:6px;padding:7px 10px;font-weight:bold}
+.criteria{padding:10px 12px 0}.criterion{border:1px solid #d8e4ed;border-radius:8px;background:#fbfdff;padding:12px;margin-bottom:9px;display:grid;grid-template-columns:minmax(280px,1fr) 430px;gap:14px;align-items:center}.ctitle{display:flex;gap:8px;align-items:center}.cnum{width:35px;height:35px;border-radius:50%;background:#e7f2fd;color:#17528d;display:grid;place-items:center;font-weight:bold;flex:none}.state{font-size:8px;background:#fff0c8;color:#865f00;border-radius:10px;padding:4px 6px;font-weight:bold}.criterion p{margin:5px 0 0 43px;font-size:12px;line-height:1.4;color:#294867}.scores{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.scores button{height:59px;border:1px solid #c9d9e6;background:white;border-radius:6px;color:#183a5a}.scores b{display:block;font-size:17px}.scores small{font-size:8px;line-height:1.1}.scores button.selected{border-width:2px}.scores button:nth-child(1).selected{background:#fde9e7;border-color:#d45b54;color:#9e3732}.scores button:nth-child(2).selected{background:#fff5d9;border-color:#d4a83a;color:#7e5a08}.scores button:nth-child(3).selected{background:#eaf6ef;border-color:#46a46a;color:#287349}.scores button:nth-child(4).selected{background:#e7f4ff;border-color:#1382dc;color:#075ca9}.scores button:nth-child(5).selected{background:#eef2f5;border-color:#8395a4;color:#586875}
+.comments{margin:0 12px 11px;background:#f8fbfe;border:1px solid #d8e4ed;border-radius:8px;padding:11px}.comments-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.comments strong{font-size:12px}.comments small{display:block;color:#6d8093;font-size:9px;margin-top:2px}.dictate{border:1px solid #0877dc;background:white;color:#0767c8;border-radius:6px;padding:7px 10px;font-weight:bold}.comments textarea{width:100%;height:72px;border:1px solid #c9d9e6;border-radius:6px;padding:9px;resize:vertical}
+.nav{position:sticky;bottom:0;z-index:20;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:9px 12px;background:#fffffffa;border-top:1px solid #d8e4ed;box-shadow:0 -4px 13px #173d5c12}.nav button{height:54px;border-radius:7px;font-weight:bold}.prev{border:1px solid #0877dc;background:#f5faff;color:#075eb8}.next{border:0;background:#0877dc;color:white}.nav small{display:block;font-size:9px;margin-top:3px;font-weight:normal}
+.right{display:flex;flex-direction:column;gap:9px}.fail{border:0;border-radius:8px;background:#f20d16;color:white;text-align:left;padding:12px;min-height:78px}.fail strong{display:block;font-size:16px}.fail small{display:block;margin:5px 0 0 35px;font-size:10px}.rbox{background:#fff;border:1px solid #d5e2eb;border-radius:8px;overflow:hidden}.rbox h3{margin:0;padding:11px 12px;background:#f5f9fc;border-bottom:1px solid #dfe8ef;font-size:14px}.overview-row{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #e8eef3;font-size:9.5px}.dot{width:26px;height:26px;border-radius:50%;background:#fff0c8;color:#8a6200;display:grid;place-items:center;font-weight:bold;flex:none}.overview-row.done .dot{background:#dff5e8;color:#167444}.quick button{display:grid;grid-template-columns:29px 1fr 12px;align-items:center;width:calc(100% - 14px);margin:7px;border:1px solid #c9dff1;background:#f8fcff;color:#164f82;border-radius:7px;padding:6px;text-align:left}.ico{width:27px;height:27px;border-radius:7px;background:#e3f2fd;display:grid;place-items:center}.quick b{font-size:10px}.quick small{display:block;font-size:8px;color:#73879a}.saved{text-align:center;color:#16804c;font-size:9px;font-weight:bold;padding:3px 0 9px}
+@media(max-width:1200px){.layout{grid-template-columns:54px 235px 1fr}.right{grid-column:2/-1;display:grid;grid-template-columns:repeat(3,1fr)}.criterion{grid-template-columns:1fr}.context{grid-template-columns:1.5fr repeat(3,1fr)}}
+</style>
+<style>
+/* APPROVED CHANGE ONLY: keep existing Previous / Next navigation visible while scrolling. */
+.nav{
+  position:sticky !important;
+  bottom:0 !important;
+  z-index:100 !important;
+}
+</style>
+<style>
+/* PATIENT CARE WORKFLOW MOCKUP — layered onto the locked global shell only. */
+.pc-group{border:1px solid #d8e4ed;border-radius:8px;margin:10px 12px;background:#fff;overflow:hidden}
+.pc-group-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px 13px;background:#f7fbfe;cursor:pointer}
+.pc-group-head:hover{background:#f1f8fd}
+.pc-group-head strong{font-size:12px;color:#173b5c}
+.pc-group-head small{display:block;margin-top:3px;font-size:9px;color:#718397}
+.pc-group-state{font-size:9px;font-weight:800;color:#8a6200;background:#fff0c8;border-radius:12px;padding:5px 8px}
+.pc-group.complete .pc-group-state{color:#167444;background:#dff5e8}
+.pc-group-body{display:none;padding:0 0 2px}
+.pc-group.open .pc-group-body{display:block}
+.pc-group.open .pc-group-head{border-bottom:1px solid #dfe8ef}
+.pc-group .criterion{margin:9px 10px}
+.pc-weight{display:inline-flex;align-items:center;justify-content:center;margin-left:7px;padding:3px 7px;border-radius:11px;background:#e8f1f8;color:#315d7e;font-size:9px;font-weight:800;border:1px solid #cbdce9}
+.pc-calc{display:none;margin-top:5px;margin-left:43px;font-size:9px;color:#60778b}
+.pc-calc.show{display:block}
+.pc-section-score{margin-top:7px;font-size:10px;color:#536b82}
+.pc-section-score b{color:#164f82}
+.pc-overview-group{border-bottom:1px solid #e6edf2}
+.pc-overview-head{display:grid;grid-template-columns:25px 1fr auto;gap:7px;align-items:center;padding:8px 10px;cursor:pointer;background:#fff}
+.pc-overview-head:hover{background:#f7fbfe}
+.pc-overview-head .dot{width:24px;height:24px}
+.pc-overview-head b{font-size:9.5px;color:#154b80}
+.pc-overview-head small{display:block;font-size:8px;color:#718397;margin-top:2px}
+.pc-overview-body{display:none}
+.pc-overview-group.open .pc-overview-body{display:block}
+.pc-overview-group.open .pc-overview-head{background:#f5f9fc}
+.pc-overview-row{display:grid;grid-template-columns:22px 28px 1fr;gap:5px;align-items:start;padding:6px 9px 6px 17px;border-top:1px solid #edf2f5;font-size:8.5px;color:#425c73}
+.pc-overview-row .mini{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#fff0c8;color:#8a6200;font-weight:bold}
+.pc-overview-row.done .mini{background:#dff5e8;color:#167444}
+.pc-group-score{font-size:8px;color:#668096;white-space:nowrap}
+.pc-scroll-note{font-size:8px;color:#7a8d9f;padding:0 13px 8px}
+</style>
+<style>
+/* PATIENT CARE SCORE-CONTROL FIT FIX ONLY
+   Preserve locked shell and five simultaneous choices: 0 / 1 / 2 / 3 / N/A. */
+.pc-group .criterion{
+  grid-template-columns:minmax(0,1fr) minmax(390px,44%) !important;
+  width:auto !important;
+  min-width:0 !important;
+}
+.pc-group .criterion > div{
+  min-width:0 !important;
+}
+.pc-group .scores{
+  width:100% !important;
+  min-width:0 !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:4px !important;
+}
+.pc-group .scores button{
+  min-width:0 !important;
+  width:100% !important;
+  padding:4px 2px !important;
+  overflow:hidden;
+}
+.pc-group .scores button small{
+  display:block;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  line-height:1.05;
+}
+@media(max-width:1350px){
+  .pc-group .criterion{
+    grid-template-columns:1fr !important;
+  }
+  .pc-group .scores{
+    margin-top:7px;
+  }
+}
+</style>
+<style>
+/* LOCKED STANDARD-SECTION FIT RULE:
+   Every visible criterion card must show 0 / 1 / 2 / 3 / N/A simultaneously.
+   Short sections remain fully expanded. Patient Care alone uses progressive disclosure here. */
+.criterion{
+  grid-template-columns:minmax(0,1fr) minmax(390px,44%) !important;
+  min-width:0 !important;
+}
+.criterion > div{min-width:0 !important}
+.scores{
+  width:100% !important;
+  min-width:0 !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:4px !important;
+}
+.scores button{
+  min-width:0 !important;
+  width:100% !important;
+  padding-left:2px !important;
+  padding-right:2px !important;
+}
+.scores button small{
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  line-height:1.05;
+}
+.criterion-label{
+  font-size:11px;
+  font-weight:800;
+  color:#173f67;
+}
+@media(max-width:1350px){
+  .criterion{grid-template-columns:1fr !important}
+  .scores{margin-top:7px}
+}
+</style>
+<style>
+/* IMAGE EVALUATION LOCK CANDIDATE — section-specific content only */
+.ie-wrap{padding:0 12px 10px}
+.ie-views{border:1px solid #d5e2eb;border-radius:8px;background:#fff;padding:9px;margin:10px 0}
+.ie-views-title{font-size:10px;font-weight:800;color:#173f67;margin-bottom:7px}
+.ie-view-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ie-tab{border:1px solid #cddce8;border-radius:7px;background:#fff;padding:8px 10px;text-align:left;cursor:pointer;color:#173f67}
+.ie-tab.active{border-color:#1478d1;background:#eaf4ff}.ie-tab.done{background:#edf9f2}
+.ie-tab b{display:block;font-size:10px}.ie-tab small{font-size:8px;color:#6d8092}
+.ie-workhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0 7px}
+.ie-workhead h3{margin:0;font-size:13px;color:#102f4b}
+.ref-btn{border:1px solid #1478d1;background:#fff;color:#0867b8;border-radius:6px;padding:7px 10px;font-size:9px;font-weight:800;cursor:pointer}
+.ie-main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(245px,.85fr);gap:10px}
+.ie-scorebox,.ie-marker{border:1px solid #d8e4ed;border-radius:8px;background:#fff;padding:10px}
+.ie-legend{background:#fff4d6;border-radius:6px;padding:7px 9px;font-size:8px;color:#8a5b00;margin-bottom:7px}
+.ie-matrix{width:100%;border-collapse:collapse;font-size:9px}
+.ie-matrix th,.ie-matrix td{border-bottom:1px solid #dce6ed;padding:7px 5px;text-align:center}
+.ie-matrix th:first-child,.ie-matrix td:first-child{text-align:left}
+.ie-radio{width:18px;height:18px;border:1px solid #8ea5b8;border-radius:50%;background:#fff;display:inline-grid;place-items:center;cursor:pointer}
+.ie-radio.sel:after{content:"";width:8px;height:8px;border-radius:50%;background:#d99a00}
+.ie-ei{display:grid;grid-template-columns:auto 1fr auto;gap:7px;align-items:center;margin-top:9px}
+.ie-ei label{font-size:9px;font-weight:800}.ie-ei input{border:1px solid #c9d9e5;border-radius:6px;padding:7px;width:100%}
+.range-btn{border:1px solid #1478d1;background:#f7fbff;color:#0867b8;border-radius:6px;padding:7px 8px;font-size:8px;font-weight:bold;cursor:pointer}
+.ie-marker h4{margin:0 0 9px;font-size:11px}
+.marker-line{margin-bottom:9px}.marker-line label{display:block;font-size:8px;margin-bottom:5px;color:#49657d}
+.marker-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.marker-pair button{border:1px solid #bcd0df;background:#fff;border-radius:6px;padding:8px 4px;font-size:8px;cursor:pointer}
+.marker-pair button.sel{border-color:#1478d1;background:#eaf4ff;color:#0867b8;font-weight:bold}
+.ie-comments{margin-top:10px;border:1px solid #d8e4ed;border-radius:8px;background:#fff;padding:10px}
+.ie-comments-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ie-comments-head b{font-size:10px}.dictate{border:1px solid #a8cce8;background:#f7fbff;color:#0867b8;border-radius:18px;padding:6px 11px;font-size:9px;font-weight:bold}
+.ie-comments textarea{width:100%;min-height:72px;resize:vertical;border:1px solid #cbdbe7;border-radius:6px;padding:8px;font-family:inherit;font-size:9px}
+.ie-calc{margin-top:10px;background:#edf9f2;border-radius:8px;padding:9px 11px}
+.calc-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #d2e8db;font-size:8.5px}
+.calc-final{display:flex;justify-content:space-between;align-items:center;background:#d8f2e2;margin-top:7px;padding:8px;font-weight:900;color:#08723a}
+.ie-note{font-size:8px;color:#708396;margin-top:6px}
+.ie-modal{position:fixed;inset:0;background:#09243b66;z-index:1000;display:none;place-items:center;padding:15px}
+.ie-modal.show{display:grid}.ie-dialog{width:min(720px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:10px;box-shadow:0 18px 45px #102d4566}
+.ie-dialog-head{background:#07365d;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.ie-dialog-head h3{margin:0;font-size:14px}.xbtn{border:0;background:#ffffff22;color:white;border-radius:5px;padding:5px 8px;cursor:pointer}
+.ie-dialog-body{padding:13px}
+.reference-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+.ref-image{min-height:280px;border-radius:8px;background:linear-gradient(135deg,#071827,#153a55);display:grid;place-items:center;color:#cde7f8;text-align:center;padding:18px}
+.ref-image b{font-size:16px}.ref-image small{display:block;margin-top:7px;color:#9dc2da}
+.ref-details h4{margin:0 0 5px;font-size:10px;color:#0d4f84}.ref-details p{font-size:9px;line-height:1.4;color:#4c657a;margin:0 0 10px}
+.ref-exposure{background:#eef7ff;border:1px solid #c9e1f5;border-radius:7px;padding:9px}
+.ref-exposure b{display:block;color:#0b568e;font-size:10px}.ref-exposure small{font-size:8px;color:#60788d}
+.range-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:8px}.range-table th,.range-table td{border:1px solid #d4e2ec;padding:6px;text-align:center}
+.future{margin-top:9px;font-size:8px;color:#718497;font-style:italic}
+@media(max-width:900px){
+ .ie-main{grid-template-columns:1fr}.ie-view-tabs{grid-template-columns:1fr}.reference-grid{grid-template-columns:1fr}
+ .ie-workhead{align-items:flex-start;flex-direction:column}.ie-ei{grid-template-columns:1fr}
+}
+</style>
+<style>
+/* IMAGE EVALUATION UX PASS — scoring personality + marker personality only */
+.ie-matrix td:not(:first-child){padding:5px 3px}
+.ie-radio{
+  width:100% !important;
+  min-width:34px;
+  height:31px !important;
+  border-radius:7px !important;
+  border:1px solid #c9d7e2 !important;
+  background:#f8fbfd !important;
+  color:#34546d;
+  font-size:10px;
+  font-weight:900;
+  display:grid !important;
+  place-items:center;
+  transition:.14s ease;
+}
+.ie-radio:after{display:none !important}
+.ie-radio:hover{transform:translateY(-1px);box-shadow:0 2px 6px #173b5c1f}
+.ie-radio[data-score="0"].sel{background:#fde8e8 !important;border-color:#d95252 !important;color:#a51f1f !important;box-shadow:inset 0 0 0 1px #d95252}
+.ie-radio[data-score="1"].sel{background:#fff0cf !important;border-color:#d89c28 !important;color:#875800 !important;box-shadow:inset 0 0 0 1px #d89c28}
+.ie-radio[data-score="2"].sel{background:#f2f3c9 !important;border-color:#a6a83a !important;color:#626600 !important;box-shadow:inset 0 0 0 1px #a6a83a}
+.ie-radio[data-score="3"].sel{background:#dff4e7 !important;border-color:#3a9c68 !important;color:#17663d !important;box-shadow:inset 0 0 0 1px #3a9c68}
+.ie-radio[data-score="N/A"].sel{background:#e7f0f7 !important;border-color:#6f91ab !important;color:#315b79 !important;box-shadow:inset 0 0 0 1px #6f91ab}
+
+.ie-marker{
+  background:linear-gradient(180deg,#fbfdff 0%,#f5f9fc 100%) !important;
+  border:1px solid #cbdde9 !important;
+  padding:0 !important;
+  overflow:hidden;
+}
+.marker-titlebar{
+  display:flex;gap:9px;align-items:center;
+  padding:10px 11px;
+  background:#edf6fc;
+  border-bottom:1px solid #d6e5ef;
+}
+.marker-icon{
+  width:31px;height:31px;border-radius:8px;
+  background:#0c5d94;color:#fff;display:grid;place-items:center;
+  font-weight:900;font-size:13px;
+}
+.marker-titlebar h4{margin:0 !important;font-size:11px;color:#173f67}
+.marker-titlebar small{display:block;font-size:8px;color:#6d8192;margin-top:2px}
+.marker-content{padding:10px}
+.marker-line{margin-bottom:10px !important}
+.marker-line:last-child{margin-bottom:0 !important}
+.marker-line label{
+  font-size:8.5px !important;
+  font-weight:800;
+  color:#35556f !important;
+  margin-bottom:5px !important;
+}
+.marker-pair{grid-template-columns:1fr 1.18fr !important}
+.marker-pair button{
+  position:relative;
+  min-height:36px;
+  border:1px solid #c8d8e4 !important;
+  background:#fff !important;
+  color:#36536a;
+  font-weight:700;
+  transition:.14s ease;
+}
+.marker-pair button:hover{transform:translateY(-1px);box-shadow:0 2px 6px #173b5c18}
+.marker-pair button.positive.sel{
+  background:#e3f5ea !important;
+  border-color:#55a978 !important;
+  color:#17633c !important;
+  box-shadow:inset 0 0 0 1px #55a978;
+}
+.marker-pair button.penalty.sel{
+  background:#fde9e9 !important;
+  border-color:#d85b5b !important;
+  color:#a12626 !important;
+  box-shadow:inset 0 0 0 1px #d85b5b;
+}
+.penalty-badge{
+  display:inline-block;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:10px;
+  background:#fbe1e1;
+  color:#a12626;
+  font-size:7px;
+  font-weight:900;
+}
+.marker-pair button.penalty.sel .penalty-badge{
+  background:#c83f3f;color:#fff;
+}
+</style>
+<style>header.banner{display:none!important}.layout>.rail{display:none!important}.layout{grid-template-columns:278px minmax(650px,1fr) 286px!important}@media(max-width:1200px){.layout{grid-template-columns:235px minmax(530px,1fr)!important}.right{grid-column:1/-1!important}}</style><style>.ctx:last-child{position:relative}#ccmsExamSearch{border-bottom:1px solid #b6cce0;padding:3px 0}#ccmsExamMatches:not([hidden]){position:absolute;top:calc(100% - 8px);left:7px;right:7px;z-index:120;background:#fff;border:1px solid #b9cce0;box-shadow:0 6px 20px #1233;max-height:200px;overflow:auto;border-radius:7px}#ccmsExamMatches button{display:block;width:100%;padding:9px 11px;text-align:left;background:white;border:0;color:#124b84;font:600 12px Arial}#ccmsExamMatches button:hover,#ccmsExamMatches button:focus{background:#e8f3ff}#ccmsExamSearch:focus{outline:2px solid #0878e5;outline-offset:2px}</style><style>
+/* Additive workflow controls only. Keep original component sizing unchanged. */
+.ccms-start-backdrop{position:fixed;inset:0;background:#0b203b88;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px}
+.ccms-start-card{width:min(520px,96vw);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 20px 60px #061b3470;padding:25px;color:#102440;font-family:Arial,sans-serif}
+.ccms-start-card h2{margin:0 0 7px;font-size:23px}.ccms-start-card p{color:#60738b;font-size:13px;line-height:1.5}.ccms-start-card label{display:block;font-weight:700;font-size:12px;margin:14px 0 5px}
+.ccms-start-card input{width:100%;height:40px;border:1px solid #b8cee0;border-radius:7px;padding:8px 11px;font-size:14px}.ccms-start-card .ccms-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.ccms-start-card button,.ccms-mini-action{border:1px solid #b8cee0;border-radius:7px;padding:10px 14px;background:#fff;color:#075da9;font-weight:700;cursor:pointer}.ccms-start-card button.primary{background:#0878e5;color:#fff;border-color:#0878e5}.ccms-start-card button:disabled{opacity:.5;cursor:not-allowed}
+.ccms-start-card .ccms-matches{max-height:160px;overflow:auto;border:1px solid #d3e0ee;border-radius:7px;margin-top:3px}.ccms-start-card .ccms-matches button{display:block;width:100%;border:0;border-radius:0;text-align:left;padding:9px 12px}
+.ccms-mini-bar{position:sticky;top:0;z-index:180;display:flex;align-items:center;gap:9px;justify-content:space-between;flex-wrap:wrap;background:#edf6ff;border-bottom:1px solid #bad4eb;padding:8px 15px;font:12px Arial;color:#123c65}
+.ccms-mini-bar strong{font-size:13px}.ccms-mini-bar button{padding:7px 10px}
+.ccms-mini-bar .ccms-status{color:#37745a}.ccms-mini-bar button[hidden]{display:none!important}#ccmsStop{background:#fff3ef;border-color:#d8a99d;color:#9e3f2a}#ccmsStart{background:#0872c6;color:white;border-color:#0872c6}
+.ccms-section-done{color:#148349!important}.ccms-section-done .num{background:#e1f7e8!important;color:#148349!important;border-color:#90d7a6!important}
+.ccms-section-done .ccms-check{color:#148349;font-weight:900}
+@media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr)!important}.layout>.left,.layout>.right{grid-column:1!important}.ccms-mini-bar{position:sticky}}
+</style><style>
+.ci-review-overlay{position:fixed;z-index:2000;inset:0;background:#10213c9a;display:flex;align-items:flex-start;justify-content:center;padding:10px;font-family:Inter,"Segoe UI",Arial,sans-serif;color:#11355b}
+.ci-review-dialog{width:min(950px,100%);max-height:min(66vh,630px);overflow:auto;border:1px solid #cfdeed;border-radius:12px;background:#fff;box-shadow:0 15px 50px #062b4a55;font-size:13px}
+.ci-review-heading{background:#f0f6fc;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #d9e5ef}.ci-review-heading b{font-size:15px}.ci-review-heading span{font-size:10px;color:#7d93a8;margin-left:auto}.ci-review-x{border:0;background:none;font-size:23px;color:#456981;cursor:pointer}
+.ci-review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px}.ci-review-box{border:1px solid #cfdfed;border-radius:9px;padding:13px;background:#fbfdff}.ci-review-label{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-bottom:9px}.ci-review-label button{background:none;border:0;color:#0b508c;font-weight:700;cursor:pointer}.ci-review-chips{font-size:10px;color:#8297a9;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px}.ci-review-chips span{border:1px solid #c9dce9;border-radius:20px;padding:3px 7px;background:#fff;color:#426989}
+.ci-review-box textarea{width:100%;min-height:100px;border:1px solid #bcd0e2;border-radius:7px;background:#fff;color:#132f4c;font:inherit;line-height:1.45;padding:9px;resize:vertical}.ci-review-full{margin:0 12px 10px}.ci-review-full textarea{min-height:115px}.ci-review-refs{font-size:10px;color:#7890a5;margin-top:9px}
+.ci-review-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px}.ci-review-status{padding:13px 12px;border:1px solid #cbddeb;border-radius:8px;background:white;text-align:left;color:#173856;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:13px}.ci-review-status small{font-size:10px}.ci-review-status.chosen[data-status="reviewed"]{border-color:#39a571;background:#eaf8ef;color:#116d40}.ci-review-status.chosen[data-status="pending"]{border-color:#70a3cc;background:#eff7fd}
+.ci-review-footer{margin:0 12px;background:#eef5fb;border-radius:8px;color:#617b92;font-size:11px;line-height:1.45;padding:12px}.ci-review-actions{display:flex;gap:9px;justify-content:flex-end;padding:14px}.ci-review-actions button{border-radius:7px;border:1px solid #9fc4e4;background:white;color:#075c9b;padding:9px 14px;font-weight:700;cursor:pointer}.ci-review-actions #ci-review-save{background:#0878e5;color:#fff;border-color:#0878e5}
+@media(max-width:630px){.ci-review-grid,.ci-review-choice{grid-template-columns:1fr}.ci-review-heading span{display:none}.ci-review-dialog{max-height:min(52vh,510px)}}
+</style>
+
+<style id="ccms-approved-overall-v2-style">
+/* Restore selected CI_Portal_Overall_Competency_Simplified_v2.html visual composition. */
+.simple-final{padding:0 12px 16px}
+.final-hero{margin:10px 0 12px;border:1px solid #c9dbe7;border-radius:10px;background:#fff;overflow:hidden}
+.final-hero-top{text-align:center;padding:15px 14px 11px;background:linear-gradient(180deg,#f8fbfe,#fff)}
+.final-hero-top small{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;color:#688094}
+.final-percent{font-size:38px;line-height:1;font-weight:900;color:#123f67;margin-top:5px}
+.final-score{font-size:12px;font-weight:800;color:#557086;margin-top:5px}
+.pass-banner{margin:0 12px 12px;border-radius:8px;padding:11px;text-align:center;background:#dff5e8;border:1px solid #68b989;color:#11623a;font-size:22px;font-weight:1000;letter-spacing:.08em}
+.pass-banner.fail{background:#fee8e8;border-color:#d78484;color:#922b2b}
+.pass-banner.pending{background:#eef5fb;border-color:#c9dbe7;color:#356380;font-size:16px;letter-spacing:0}
+.score-split{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px}
+.score-split div{border:1px solid #d9e4ec;border-radius:7px;background:#f8fbfd;padding:8px 10px;text-align:center}
+.score-split small{display:block;font-size:10px;color:#6d8193;font-weight:800}
+.score-split b{display:block;margin-top:3px;font-size:13px;color:#174f7c}
+.simple-panel{border:1px solid #d5e2eb;border-radius:8px;background:#fff;margin-bottom:10px;overflow:hidden}
+.simple-head{padding:9px 11px;background:#f3f8fc;border-bottom:1px solid #dce7ee;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.simple-head h4{margin:0;font-size:13px;color:#173f67}.simple-head small{font-size:10px;color:#718497}
+.simple-body{padding:10px}
+.section-result{display:grid;grid-template-columns:minmax(155px,1fr) 120px 75px;gap:8px;align-items:center;padding:8px 5px;border-bottom:1px solid #e5edf2;font-size:11px}
+.section-result:last-child{border-bottom:0}.section-result b{color:#274f6d}
+.section-result .score{text-align:right;color:#526d82}.section-result .pct{text-align:right;font-weight:900;color:#174f7c}
+.section-result.na .score,.section-result.na .pct{color:#7b8b98}
+.final-comment-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.final-comment-head b{font-size:12px;color:#315873}
+.final-comment{width:100%;min-height:92px;border:1px solid #cbdbe7;border-radius:7px;padding:9px;font-family:inherit;font-size:12px;resize:vertical}
+.final-dictate{border:1px solid #a8cce8;background:#f7fbff;color:#0867b8;border-radius:18px;padding:6px 10px;font-size:10px;font-weight:800;cursor:pointer}
+.simple-actions{display:grid;grid-template-columns:.85fr 1.15fr;gap:8px;margin-top:11px}
+.review-button,.submit-button{border:0;border-radius:8px;padding:12px 10px;font-size:12px;font-weight:900;cursor:pointer}
+.review-button{background:#e8f2f9;color:#195d8e;border:1px solid #b8d4e7}
+.submit-button{background:#0878dc;color:#fff;box-shadow:0 3px 8px #0a5ea329}
+.submit-button:disabled{background:#e8edf1;color:#8999a6;box-shadow:none;cursor:not-allowed}
+.simple-note{text-align:center;margin-top:8px;font-size:10px;color:#7a8b98}
+#ci-final-details{font-size:11px;color:#5b7388;padding:0 14px 12px;text-align:center}
+#ci-final-grade-error{font-size:11px;color:#8d3c3c;text-align:center;margin:0 0 9px}#ci-final-grade-retry[hidden]{display:none!important}
+@media(max-width:620px){.score-split,.simple-actions{grid-template-columns:1fr}.section-result{grid-template-columns:minmax(90px,1fr) 90px 52px;gap:4px;font-size:10px}}
+</style>
+<style id="ci-finish-view-status">
+#overview .ovrow{display:flex;gap:7px;align-items:center;flex-wrap:nowrap;font-size:11px;line-height:1.5;padding:5px 8px;cursor:pointer}
+#overview .ovrow .dot{width:22px;height:22px;min-width:22px;display:inline-grid;place-items:center;border-radius:50%;background:#fff0c8;color:#906b10}
+#overview .ovrow.done .dot{background:#def5e6;color:#167444}
+#overview .ovrow.done span:last-child{color:#166b3c;font-weight:700}
+#overview .ovrow.unused .dot{background:#eef2f5;color:#7a8995}
+#overview .ovrow.unused span:last-child{color:#738294}
+#overview .ovrow.in-progress .dot{background:#e7f2ff;color:#126eb2}
+.ie-tab.unused{opacity:.76}
+#ci-quick-return{border-color:#9cc8e5}
+</style></head><body>
+
+
+<section class="context"><div class="student"><div class="pic">LC</div><div><h2>Selected Student</h2><p>Student ID will load from your authorized session</p></div></div><div class="ctx"><label>Today's Site</label><b>Selected Clinical Site</b></div><div class="ctx"><label>Date</label><b>Evaluation Date</b></div><div class="ctx"><label>Evaluator</label><b>Authenticated Evaluator</b></div><div class="ctx"><label>Evaluation Type</label><b>Competency</b></div><div class="ctx"><label>Examination</label><input aria-autocomplete="list" aria-controls="ccmsExamMatches" aria-expanded="false" autocomplete="off" id="ccmsExamSearch" placeholder="Search examination…" role="combobox" value=""/><div hidden="" id="ccmsExamMatches" role="listbox"></div></div></section>
+<div class="layout">
+<nav aria-label="Portal sidebar" class="rail"><button class="menu active" title="Menu">☰</button><button title="Home">⌂</button><button title="Students">♟</button><button title="Evaluations">▤</button><button title="Documents">▱</button><button title="Schedule">□</button><button title="Clinical Instructor">CI</button><button title="Help">?</button></nav>
+<aside class="card" id="sectionList"></aside>
+<main class="card">
+<div class="section-head"><div class="big" id="bigNum">1</div><div><div class="titleline"><h2 id="title">Exam Preparation</h2><span class="badge">◇ In Progress</span><span id="countLabel" style="font-size:10px"></span></div><p class="desc" id="desc"></p></div><div class="progress"><b>Section Progress</b><div class="bar"><i id="sectionBar"></i></div><small id="sectionProgress"></small></div></div>
+<div class="naall" id="naall"><div><strong>Section not applicable to this examination?</strong><small>Apply N/A to every criterion in this section.</small></div><button onclick="applyNA()">Apply N/A to All</button></div>
+<div class="criteria" id="criteria"></div>
+<div class="comments"><div class="comments-head"><div><strong id="commentTitle"></strong><small>One comment area for this entire section.</small></div><button class="dictate" onclick="dictate(this)">🎙 Dictate</button></div><textarea placeholder="Add section comments..."></textarea></div>
+<div class="nav"><button class="prev" id="prev" onclick="move(-1)">← Previous Section<small id="prevLabel"></small></button><button class="next" id="next" onclick="move(1)">Next Section →<small id="nextLabel"></small></button></div>
+</main>
+<aside class="right"><button class="fail"><strong>⚠ AUTO FAIL THIS EXAM</strong><small>Clinical Instructor terminates evaluation →</small></button><div class="rbox"><h3>Quick Section Overview</h3><div id="overview"></div></div><div class="rbox"><h3>Evaluation Progress</h3><div style="padding:11px"><div class="bar"><i id="overallBar"></i></div><p id="overallText" style="font-size:10px;margin-bottom:0"></p></div></div><div class="rbox quick"><h3>Quick Actions</h3>
+<button type="button" id="ci-quick-save"><span class="ico">▣</span><span><b>Save Progress</b><small>Confirm draft storage</small></span><span>›</span></button>
+<button type="button" id="ci-quick-comment"><span class="ico">✎</span><span><b>Add General Comment</b><small>Go to final evaluator comments</small></span><span>›</span></button>
+<button type="button" id="ci-quick-scoring"><span class="ico">?</span><span><b>View Scoring Guide</b><small>Open official scale summary</small></span><span>›</span></button>
+<button type="button" id="ci-quick-print"><span class="ico">▤</span><span><b>Print / Save PDF</b><small>Printable unsubmitted draft</small></span><span>›</span></button>
+<button type="button" id="ci-quick-return"><span class="ico">↩</span><span><b>Save &amp; Return</b><small>Return after save is confirmed</small></span><span>›</span></button>
+<div class="saved" role="status" aria-live="polite">● Not yet saved</div></div></aside>
+</div>
+<script>
+const sections = [{"name":"Exam Preparation","criteria":["Verify exam orders for accuracy and completeness based on the patient’s prescription and chief complaint (correct body part and side).","Confirm with staff technologist appropriate protocol before performing exam.","Provide appropriate IRs, positioning aids, IR holders, grids, sponges and other necessary items BEFORE beginning the exam.","Maintain room/equipment organization and cleanliness before, during and after the exam."],"naAll":false},{"name":"Patient Care","criteria":["Identify patient using 3 point ID check, (Name, DOB, wristband)","Address patient in a professional manner.","Obtain a pertinent patient history using the Sacred Seven BEFORE beginning the exam.","DOCUMENT LEGIBLY a pertinent patient history, using correct medical terminology and spelling prior to beginning the exam.","Communicate effectively and appropriately based on patient’s physical and mental status.","Communicate changing instructions to include removal of anything that might cause a radiographic artifact (jewelry, dentures, socks, etc.) and maintain security of belongings.","Maintain patient modesty and comfort by using sheets, blankets, etc.","Assist unsteady patients or transport patient to radiographic room (proper use of wheelchair, stretcher) & walk along side of the ambulatory patient.","Assist patient onto or off of table or stool, using proper body mechanics to avoid injury to patient and self; use patient transfer devices when needed.","Establish rapport with the patient using verbal & non-verbal skills.","Explain procedure instructions to patient or family.","Uses patient name a minimum of 3 times, during the exam.","Listens & Responds appropriately to patient needs.","Maintain medical equipment associated with patient (IVs, oxygen, etc.).","Maintain confidentiality of patient information (HIPAA).","Communicate relevant information to others (e.g. MDs, RNs, other radiology personnel).","Explain post-procedural instructions to patient or patient’s family.","Practice Standard Precautions.","Follow appropriate procedures when caring for patients with communicable diseases to include isolation patients.","Notify appropriate personnel of adverse events or incidents (e.g., patient fall, wrong patient imaged).","Communicate scheduling delays to waiting patients.","Use sterile or aseptic technique when indicated.","Recognize and communicate the need for prompt medical attention."],"naAll":false},{"name":"Radiation Protection","criteria":["Question female patient of child-bearing age about date of last menstrual period or possible pregnancy and take appropriate action.","Restrict beam to the anatomical area of interest.","Apply lead shielding to patient appropriately according to program/department guidelines.","Provide lead apron/gloves/glasses as needed to medical personnel, family, or others.","Document fluoroscopy time and/or dose.","Prevent unnecessary persons from remaining in the area during x-ray exposure.","Take appropriate precautions to minimize occupational radiation exposure.","Describe potential risk of radiation exposure when asked."],"naAll":false},{"name":"Equipment Manipulation","criteria":["Manipulate control panel to set correct mode for radiography, fluoroscopy, tabletop, AEC, etc.","Use calipers to measure patient thickness to determine technical factors.","Set technical factors from a well-developed Technique Book to produce diagnostic images and adhere to ALARA.","Modify exposure factors for circumstances such as involuntary motion, casts/splints, pathology, contrast agent, or inability to cooperate.","Set technical factors for each exposure BEFORE final positioning.","Identify and use appropriate tube locks.","Identify and use appropriate locks and controls on table/upright bucky.","Operate Fixed or Mobile (C-Arm) fluoroscopic unit and accessories including: connect/disconnect monitor, cables, Ethernet, etc..","Add electronic annotations on digital images to indicate position or other relevant information."],"naAll":false},{"name":"Positioning Skills","criteria":["Perform examination in an organized manner and logical sequence with minimal patient movement.","Position patient to demonstrate desired anatomy using anatomical landmarks.","Position patient’s entire body for maximum efficiency and comfort.","Explain, assist and improve patient position through appropriate verbal/non-verbal instruction and physical assistance.","Use immobilization devices as required.","Center the IR to the Central Ray.","Give correct breathing instructions and explain/rehearse BEFORE exposure.","Follow department protocol for examination."],"naAll":false},{"name":"Portable / Mobile Radiography","criteria":["Transport portable radiography equipment in a safe manner.","Park outside patient room, enter and explain exam to patient.","Know site protocol to verify portable orders or obtain permission from nursing staff.","Assess area before entering patient room with portable equipment.","Use portable equipment in an efficient and organized manner.","Notify nearby individuals of impending x-ray exposure.","Wear proper lead shielding and maintain maximum distance between source and self during exposure."],"naAll":true},{"name":"Contrast","criteria":["Explain and confirm patient's preparation (e.g. diet restrictions, preparatory medications) prior to beginning the imaging examination.","Recognize abnormal lab values relative to the imaging study ordered.","Prior to administration of a contrast agent, determine if patient is at risk for an adverse reaction","Verify informed consent was obtained.","Prior to administration of a contrast agent, review information to prepare appropriate type and dosage of contrast (Esophogram, UGI, Small Bowel Series or BE)","Prepares syringe using sterile technique.","Assist MD/RN with the administration of contrast media.","Observe patient after admininstration of a contrast agent to detect adverse reactions.","Follow environmental protections standards for handling and disposing of biohazardous materials (e.g. sharps, blood, syringes, contrast media and body fluids."],"naAll":true}];
+const extras=[{name:"Image Evaluation",criteria:[],naAll:false},{name:"Overall Competency",criteria:[],naAll:false}];
+const all=[...sections,...extras];
+const summaries=["Orders • Protocol • Supplies • Organization","Patient ID • History • Communication • Care & safety","Pregnancy • Collimation • Shielding • Exposure safety","Controls • Calipers • Technique • Equipment","Sequence • Anatomy • Patient position • Protocol","Transport • Portable setup • Radiation safety","Preparation • Labs • Consent • Contrast workflow","Separate specialized image workflow","Final review • Submission audit"];
+let current=1;
+const scores={};
+function buildList(){
+ let x='<div class="left-head"><h3>Evaluation Sections</h3><p>Navigate freely — final audit checks completeness</p></div>';
+ all.forEach((s,i)=>x+=`<div class="section ${i===current?'active':''}" onclick="go(${i})"><span class="num">${i+1}</span><div><b>${s.name}</b><small>${s.criteria.length?s.criteria.length+' criteria · ':''}${summaries[i]}</small></div><span style="margin-left:auto">›</span></div>`);
+ document.getElementById('sectionList').innerHTML=x;
+}
+function go(i){ if(i>6){alert(i===7?'Image Evaluation uses the separate specialized workflow.':'Overall Competency opens the final review/submission audit.');return;} current=i;render(); }
+function render(){
+ buildList(); const s=sections[current]; document.getElementById('bigNum').textContent=current+1;document.getElementById('title').textContent=s.name;document.getElementById('countLabel').textContent=s.criteria.length+' criteria in this section';
+ document.getElementById('desc').textContent='Score each applicable criterion using the approved clinical competency scale.';
+ document.getElementById('commentTitle').textContent=s.name+' Comments'; document.getElementById('naall').classList.toggle('show',s.naAll);
+ let c=''; s.criteria.forEach((t,i)=>{let key=current+'-'+i, val=scores[key]; c+=`<div class="criterion"><div><div class="ctitle"><span class="cnum">${current+1}.${i+1}</span><strong>Criterion ${i+1}</strong><span class="state">${val!==undefined?'Completed':'Not Completed'}</span></div><p>${t}</p></div><div class="scores">${['0','1','2','3','N/A'].map(v=>`<button class="${val===v?'selected':''}" onclick="setScore(${i},'${v}')"><b>${v}</b><small>${v==='0'?'Gross Error':v==='1'?'Minor Error':v==='2'?'Satisfactory':v==='3'?'Optimal':'Not Applicable'}</small></button>`).join('')}</div></div>`});
+ document.getElementById('criteria').innerHTML=c; update();
+ document.getElementById('prev').disabled=current===0;document.getElementById('prevLabel').textContent=current?sections[current-1].name:'Evaluation Setup';document.getElementById('nextLabel').textContent=current<6?sections[current+1].name:'Image Evaluation';const n=document.getElementById('next');if(n?.firstChild?.nodeType===3)n.firstChild.textContent='Next Section →';
+}
+// Update only the chosen card. Rebuilding #criteria here detached the clicked
+// button and triggered browser scroll anchoring inside the Portal iframe.
+function setScore(i,v){
+  scores[current+'-'+i]=v;
+  const row=document.querySelectorAll('#criteria .criterion')[i];
+  if(row){
+    row.querySelectorAll('.scores button').forEach(button=>{
+      button.classList.toggle('selected',button.querySelector('b')?.textContent===v);
+    });
+    const state=row.querySelector('.state');if(state)state.textContent='Completed';
+  }
+  update();
+}
+function applyNA(){sections[current].criteria.forEach((_,i)=>scores[current+'-'+i]='N/A');render()}
+function update(){const s=sections[current],done=s.criteria.filter((_,i)=>scores[current+'-'+i]!==undefined).length,pct=s.criteria.length?Math.round(done/s.criteria.length*100):0;document.getElementById('sectionBar').style.width=pct+'%';document.getElementById('sectionProgress').textContent=`${done} of ${s.criteria.length} completed (${pct}%)`;document.getElementById('overview').innerHTML=s.criteria.map((t,i)=>`<div class="overview-row ${scores[current+'-'+i]!==undefined?'done':''}"><span class="dot">${scores[current+'-'+i]!==undefined?'✓':'•'}</span><b>${current+1}.${i+1}</b><span>${t}</span></div>`).join('');let total=sections.reduce((a,x)=>a+x.criteria.length,0),d=sections.reduce((a,x,si)=>a+x.criteria.filter((_,i)=>scores[si+'-'+i]!==undefined).length,0),op=Math.round(d/total*100);document.getElementById('overallBar').style.width=op+'%';document.getElementById('overallText').textContent=`${sections[current].name} · Section ${current+1} of 9 · ${d}/${total} standard criteria completed`;}
+function move(d){let n=current+d;if(n>=0&&n<=6){current=n;render()}else if(n===7)alert('Next: specialized Image Evaluation workflow.')}
+function dictate(b){const field=b?.closest('.comments,.ie-comments')?.querySelector('textarea');if(field&&typeof window.ciEvalDictate_==='function')window.ciEvalDictate_(field,b);}
+render();
+</script>
+<script>
+/* Patient Care interaction prototype.
+   Does NOT redefine academic weights/calculation; weight badges remain pending authoritative mapping. */
+(function(){
+  const PC_INDEX = 1;
+  const GROUPS = [[0,5],[6,11],[12,17],[18,22]];
+  let pcOpen = 0;
+
+  function pcScores(){ return window.scores || scores; }
+
+  function groupDone(g){
+    const sc=pcScores(), range=GROUPS[g];
+    for(let i=range[0];i<=range[1];i++) if(sc[PC_INDEX+'-'+i]===undefined) return false;
+    return true;
+  }
+  function groupCount(g){
+    const sc=pcScores(), range=GROUPS[g]; let d=0;
+    for(let i=range[0];i<=range[1];i++) if(sc[PC_INDEX+'-'+i]!==undefined) d++;
+    return d;
+  }
+  function openPcGroup(g){
+    pcOpen=g;
+    document.querySelectorAll('.pc-group').forEach((el,i)=>el.classList.toggle('open',i===g));
+    document.querySelectorAll('.pc-overview-group').forEach((el,i)=>el.classList.toggle('open',i===g));
+    const target=document.querySelector('.pc-group.open');
+    if(target) target.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  window.openPcGroup=openPcGroup;
+
+  const oldRender=window.render || render;
+  const oldSetScore=window.setScore || setScore;
+
+  function renderPatientCare(){
+    buildList();
+    const sec=sections[PC_INDEX];
+    document.getElementById('bigNum').textContent='2';
+    document.getElementById('title').textContent='Patient Care';
+    document.getElementById('countLabel').textContent='23 criteria in this section';
+    document.getElementById('desc').textContent='Score each applicable criterion using the approved clinical competency scale.';
+    document.getElementById('commentTitle').textContent='Patient Care Comments';
+    document.getElementById('naall').classList.remove('show');
+
+    let out='';
+    GROUPS.forEach((range,g)=>{
+      const total=range[1]-range[0]+1, done=groupCount(g), complete=done===total;
+      out+=`<section class="pc-group ${g===pcOpen?'open':''} ${complete?'complete':''}">
+        <div class="pc-group-head" onclick="openPcGroup(${g})">
+          <div><strong>Patient Care Criteria ${range[0]+1}–${range[1]+1}</strong>
+          <small>${done} of ${total} completed${complete?' · Click to review':' · Click to expand'}</small></div>
+          <span class="pc-group-state">${complete?'✓ Complete':done?done+'/'+total+' Completed':'Not Started'} &nbsp; ${g===pcOpen?'▾':'▸'}</span>
+        </div><div class="pc-group-body">`;
+
+      for(let i=range[0];i<=range[1];i++){
+        const key=PC_INDEX+'-'+i, val=pcScores()[key], text=sec.criteria[i];
+        out+=`<div class="criterion"><div>
+          <div class="ctitle"><span class="cnum">2.${i+1}</span><strong>Criterion ${i+1}</strong>
+          <span class="pc-weight" title="Criterion weight will be populated from the authoritative paper/grade mapping">Weight ×—</span>
+          <span class="state">${val!==undefined?'Completed':'Not Completed'}</span></div>
+          <p>${text}</p>
+          <div class="pc-calc ${val!==undefined && val!=='N/A'?'show':''}">${val!==undefined && val!=='N/A' ? `${val} × criterion weight = calculated points` : ''}</div>
+        </div><div class="scores">${['0','1','2','3','N/A'].map(v=>`<button class="${val===v?'selected':''}" onclick="setScore(${i},'${v}')"><b>${v}</b><small>${v==='0'?'Gross Error':v==='1'?'Minor Error':v==='2'?'Satisfactory':v==='3'?'Optimal':'Not Applicable'}</small></button>`).join('')}</div></div>`;
+      }
+      out+='</div></section>';
+    });
+    document.getElementById('criteria').innerHTML=out;
+
+    const completed=sec.criteria.filter((_,i)=>pcScores()[PC_INDEX+'-'+i]!==undefined).length;
+    const pct=Math.round(completed/sec.criteria.length*100);
+    document.getElementById('sectionBar').style.width=pct+'%';
+    document.getElementById('sectionProgress').innerHTML=`${completed} of 23 completed (${pct}%)<div class="pc-section-score"><b>Patient Care Score:</b> pending verified weight calculation</div>`;
+
+    let ov='';
+    GROUPS.forEach((range,g)=>{
+      const total=range[1]-range[0]+1, done=groupCount(g), complete=done===total;
+      ov+=`<div class="pc-overview-group ${g===pcOpen?'open':''}">
+        <div class="pc-overview-head" onclick="openPcGroup(${g})">
+          <span class="dot">${complete?'✓':done?'◐':'•'}</span>
+          <span><b>Criteria ${range[0]+1}–${range[1]+1}</b><small>${done}/${total} completed</small></span>
+          <span class="pc-group-score">${complete?'Complete':g===pcOpen?'▾':'▸'}</span>
+        </div><div class="pc-overview-body">`;
+      for(let i=range[0];i<=range[1];i++){
+        const doneRow=pcScores()[PC_INDEX+'-'+i]!==undefined;
+        ov+=`<div class="pc-overview-row ${doneRow?'done':''}"><span class="mini">${doneRow?'✓':'•'}</span><b>2.${i+1}</b><span>${sec.criteria[i]}</span></div>`;
+      }
+      ov+='</div></div>';
+    });
+    document.getElementById('overview').innerHTML=ov;
+
+    let totalAll=sections.reduce((a,x)=>a+x.criteria.length,0);
+    let dAll=sections.reduce((a,x,si)=>a+x.criteria.filter((_,i)=>pcScores()[si+'-'+i]!==undefined).length,0);
+    document.getElementById('overallBar').style.width=Math.round(dAll/totalAll*100)+'%';
+    document.getElementById('overallText').textContent=`Patient Care · Section 2 of 9 · ${dAll}/${totalAll} standard criteria completed`;
+    document.getElementById('prev').disabled=false;
+    document.getElementById('prevLabel').textContent='Exam Preparation';
+    document.getElementById('nextLabel').textContent='Radiation Protection';
+  }
+
+  window.render = function(){
+    if(current===PC_INDEX) renderPatientCare();
+    else oldRender();
+  };
+// Patient Care has grouped cards. Update their scored state and counters in
+// place rather than destroying/recreating all 23 cards on each selection.
+window.setScore = function(i,v){
+  if(current!==PC_INDEX){oldSetScore(i,v);return;}
+  const sc=pcScores();sc[PC_INDEX+'-'+i]=v;
+  const row=document.querySelectorAll('#criteria .criterion')[i];
+  if(row){
+    row.querySelectorAll('.scores button').forEach(button=>
+      button.classList.toggle('selected',button.querySelector('b')?.textContent===v));
+    const state=row.querySelector('.state');if(state)state.textContent='Completed';
+    const calc=row.querySelector('.pc-calc');
+    if(calc){calc.classList.toggle('show',v!=='N/A');calc.textContent=v==='N/A'?'':v+' × criterion weight = calculated points';}
+  }
+  const groupElements=document.querySelectorAll('#criteria .pc-group');
+  const overviewElements=document.querySelectorAll('#overview .pc-overview-group');
+  GROUPS.forEach((range,g)=>{
+    const total=range[1]-range[0]+1,done=groupCount(g),complete=done===total;
+    const group=groupElements[g],overview=overviewElements[g];
+    if(group){
+      group.classList.toggle('complete',complete);
+      const note=group.querySelector('.pc-group-head small');
+      if(note)note.textContent=done+' of '+total+' completed'+(complete?' · Click to review':' · Click to expand');
+      const indicator=group.querySelector('.pc-group-state');
+      if(indicator)indicator.textContent=(complete?'✓ Complete':done?done+'/'+total+' Completed':'Not Started')+'  '+(group.classList.contains('open')?'▾':'▸');
+    }
+    if(overview){
+      const head=overview.querySelector('.pc-overview-head'),dot=head?.querySelector('.dot');
+      if(dot)dot.textContent=complete?'✓':done?'◐':'•';
+      const counter=head?.querySelector('small');if(counter)counter.textContent=done+'/'+total+' completed';
+      const status=head?.querySelector('.pc-group-score');
+      if(status)status.textContent=complete?'Complete':overview.classList.contains('open')?'▾':'▸';
+      const rows=overview.querySelectorAll('.pc-overview-row');
+      rows.forEach((item,j)=>{const scored=sc[PC_INDEX+'-'+(range[0]+j)]!==undefined;
+        item.classList.toggle('done',scored);
+        const dot=item.querySelector('.mini');if(dot)dot.textContent=scored?'✓':'•';});
+    }
+  });
+  const completed=sections[PC_INDEX].criteria.filter((_,j)=>sc[PC_INDEX+'-'+j]!==undefined).length;
+  const percent=Math.round(completed/sections[PC_INDEX].criteria.length*100);
+  document.getElementById('sectionBar').style.width=percent+'%';
+  document.getElementById('sectionProgress').innerHTML=completed+' of 23 completed ('+percent+'%)<div class="pc-section-score"><b>Patient Care Score:</b> pending verified weight calculation</div>';
+  const total=sections.reduce((a,s)=>a+s.criteria.length,0);
+  const scored=sections.reduce((a,s,si)=>a+s.criteria.filter((_,j)=>sc[si+'-'+j]!==undefined).length,0);
+  document.getElementById('overallBar').style.width=Math.round(scored/total*100)+'%';
+  document.getElementById('overallText').textContent='Patient Care · Section 2 of 9 · '+scored+'/'+total+' standard criteria completed';
+  const g=GROUPS.findIndex(range=>i>=range[0]&&i<=range[1]);
+  if(g>=0&&groupDone(g)&&g<GROUPS.length-1)pcOpen=g+1;
+};
+
+  current=PC_INDEX;
+  renderPatientCare();
+})();
+</script>
+<script>
+/* APPROVED SCAN-LABEL LAYER.
+   These are UI navigation labels only. The full paper-authoritative criterion wording is unchanged. */
+(function(){
+  const CRITERION_LABELS = {"Exam Preparation": ["Order Verification", "Protocol Confirmation", "Room & Equipment Preparation", "Room Organization & Cleaning"], "Patient Care": ["Patient Identification", "Professional Interaction", "Patient History", "History Documentation", "Patient Communication", "Changing Instructions & Belongings", "Modesty & Comfort", "Patient Transport", "Transfers & Body Mechanics", "Patient Rapport", "Procedure Explanation", "Patient Name Use", "Responding to Patient Needs", "Medical Equipment", "Confidentiality / HIPAA", "Interprofessional Communication", "Post-Procedure Instructions", "Standard Precautions", "Communicable Disease Precautions", "Adverse Events", "Scheduling Delays", "Sterile / Aseptic Technique", "Prompt Medical Attention"], "Radiation Protection": ["Pregnancy Assessment", "Beam Restriction", "Patient Shielding", "Personnel Shielding", "Fluoroscopy Dose Documentation", "Area Control", "Occupational Exposure", "Radiation Risk Communication"], "Equipment Manipulation": ["Control Panel Setup", "Caliper Measurement", "Technique Selection", "Technique Modification", "Exposure Setup", "Tube Locks", "Table / Bucky Controls", "Fluoroscopy Equipment", "Digital Annotation"], "Positioning Skills": ["Exam Sequence", "Anatomical Positioning", "Whole-Body Positioning", "Positioning Communication", "Immobilization", "IR / CR Centering", "Breathing Instructions", "Department Protocol"], "Portable / Mobile Radiography": ["Safe Transport", "Patient Approach", "Order Verification", "Room Assessment", "Portable Workflow", "Exposure Warning", "Operator Radiation Safety"], "Contrast": ["Patient Preparation", "Lab Values", "Reaction Risk", "Informed Consent", "Contrast Selection & Dose", "Sterile Syringe Preparation", "Contrast Administration Assistance", "Post-Contrast Observation", "Biohazard Handling"]};
+
+  function applyScanLabels(){
+    const sec = (window.sections || sections)[current];
+    if(!sec || !CRITERION_LABELS[sec.name]) return;
+    const names = CRITERION_LABELS[sec.name];
+    document.querySelectorAll('#criteria .criterion').forEach((card,i)=>{
+      const strong = card.querySelector('.ctitle strong');
+      if(strong && names[i]){
+        strong.textContent = names[i];
+        strong.classList.add('criterion-label');
+      }
+    });
+  }
+
+  const priorRender = window.render;
+  const priorSetScore = window.setScore;
+  const priorGo = window.go;
+  const priorMove = window.move;
+
+  window.render = function(){ priorRender(); applyScanLabels(); };
+  window.setScore = function(i,v){ priorSetScore(i,v); applyScanLabels(); };
+  window.go = function(i){ priorGo(i); setTimeout(applyScanLabels,0); };
+  window.move = function(d){ priorMove(d); setTimeout(applyScanLabels,0); };
+
+  applyScanLabels();
+})();
+</script>
+<script>
+(function(){
+ const IDX=7;
+ const imageViews=[
+  {viewId:'',name:'',scores:{},present:'',side:'',legible:'',ei:'',comment:''},
+  {viewId:'',name:'',scores:{},present:'',side:'',legible:'',ei:'',comment:''},
+  {viewId:'',name:'',scores:{},present:'',side:'',legible:'',ei:'',comment:''}
+ ];
+ let active=0;
+ window.ciEvalImageViews=imageViews;
+ const rows=['Positioning / Anatomy','Equipment / Central Ray','Radiation Protection / Artifacts','Exposure'];
+ function viewDone(v){return Boolean(String(v.viewId||'').trim()) && Object.keys(v.scores).length===4 && v.present && v.side && v.legible}
+ function imageProgress_(){
+   const selected=imageViews.filter(v=>String(v.viewId||'').trim()||String(v.name||'').trim()||Object.keys(v.scores||{}).length||v.present||v.side||v.legible||v.ei||v.comment);
+   const done=selected.filter(viewDone).length, total=Math.max(1,selected.length);
+   return {done,selected:selected.length,pct:Math.round(done/total*100)};
+ }
+
+ function viewStatus_(view){
+  if(viewDone(view))return 'Completed';
+  const selected=Boolean(String(view.viewId||'').trim()||String(view.name||'').trim());
+  const started=selected||Object.keys(view.scores||{}).length>0||view.present||view.side||view.legible||view.ei||view.comment;
+  return !started?'Not Used':selected&&Object.keys(view.scores||{}).length===0&&!view.present&&!view.side&&!view.legible?'Not Started':'In Progress';
+ }
+ function viewStatusClass_(view){return viewDone(view)?'done':viewStatus_(view)==='Not Used'?'unused':viewStatus_(view)==='Not Started'?'not-started':'in-progress';}
+ function escIE(v){return String(v==null?'':v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+ function renderIE(){
+   buildList();
+   document.getElementById('bigNum').textContent='8';
+   document.getElementById('title').textContent='Image Evaluation';
+   document.getElementById('countLabel').textContent=imageViews.length+' official image-view slots';
+   document.getElementById('desc').textContent='Evaluate each required view. Scoring criteria and penalties are applied automatically.';
+   document.getElementById('naall').classList.remove('show');
+   const {done,selected,pct}=imageProgress_();
+   active=Math.min(active,imageViews.length-1);
+   document.getElementById('sectionBar').style.width=pct+'%';
+   document.getElementById('sectionProgress').textContent=`${done} of ${selected} selected views completed (${pct}%)`;
+   const v=imageViews[active];
+   let html=`<div class="ie-wrap"><div class="ie-views"><div class="ie-views-title">Views for this Examination (${escIE(document.getElementById('ccmsExamSearch')?.value||'Selected Examination')})</div><div class="ie-view-tabs">`;
+   imageViews.forEach((x,i)=>html+=`<button class="ie-tab ${i===active?'active':''} ${viewDone(x)?'done':''}" onclick="ieSelect(${i})"><b>${viewDone(x)?'✓ ':''}${i+1} &nbsp; ${escIE(x.name||'View '+(i+1))}</b><small>${viewStatus_(x)}</small></button>`);
+   const available=Array.isArray(window.ciEvalViewOptions)?window.ciEvalViewOptions:[];
+   const selectedExists=available.some(item=>String(item.viewId)===String(v.viewId)&&String(item.name)===String(v.name));
+   const unknown=String(v.name||'').trim()&&!selectedExists?`<option value="" selected disabled>${escIE(v.name)} — reselect current view</option>`:'';
+   const options=available.map(item=>`<option value="${escIE(item.viewId)}" ${String(item.viewId)===String(v.viewId)?'selected':''}>${escIE(item.name)}</option>`).join('');
+   html+=`</div></div><div class="ie-workhead"><h3>View ${active+1}: ${escIE(v.name||'Choose projection')}</h3><button class="ref-btn" onclick="ieReference()">▣ View Reference</button></div><label class="ie-views-title" style="display:block;margin:10px 0">View / Projection <select id="ci-image-view-select" aria-label="Select official CCMS View / Projection" onchange="ieChooseViewId(this.value)" style="max-width:430px;width:100%;padding:9px;border:1px solid #bad1e2;border-radius:6px"><option value="">Select a view from CCMS…</option>${unknown}${options}</select></label><div class="ie-main"><div class="ie-scorebox"><div class="ie-legend">ⓘ Image Evaluation scale: 0 = Gross Error &nbsp; 1 = Minor Error &nbsp; 2 = Satisfactory &nbsp; 3 = Optimal</div><table class="ie-matrix"><thead><tr><th>Criteria</th><th>0</th><th>1</th><th>2</th><th>3</th><th>N/A</th></tr></thead><tbody>`;
+   rows.forEach((r,ri)=>{html+=`<tr><td>${r}</td>${['0','1','2','3','N/A'].map(n=>`<td><button class="ie-radio ${v.scores[ri]===n?'sel':''}" data-score="${n}" onclick="ieScore(${ri},'${n}')">${n}</button></td>`).join('')}</tr>`});
+   html+=`</tbody></table><div class="ie-ei"><label>Exposure Index / S Number</label><input value="${escIE(v.ei)}" oninput="ieEI(this.value)" placeholder="Enter EI / S#"><button class="range-btn" onclick="ieRange()">View Exposure Range</button></div></div>
+   <div class="ie-marker">
+    <div class="marker-titlebar"><span class="marker-icon">R</span><div><h4>Marker Evaluation</h4><small>Marker presence, laterality & placement</small></div></div>
+    <div class="marker-content">
+      <div class="marker-line"><label>MARKER PRESENT</label><div class="marker-pair"><button class="positive ${v.present==='Present'?'sel':''}" onclick="ieMarker('present','Present')">✓ Present</button><button class="penalty ${v.present==='Missing'?'sel':''}" onclick="ieMarker('present','Missing')">⚠ Missing <span class="penalty-badge">−5</span></button></div></div>
+      <div class="marker-line"><label>CORRECT SIDE</label><div class="marker-pair"><button class="positive ${v.side==='Correct'?'sel':''}" onclick="ieMarker('side','Correct')">✓ Correct</button><button class="penalty ${v.side==='Wrong'?'sel':''}" onclick="ieMarker('side','Wrong')">⚠ Wrong <span class="penalty-badge">−5</span></button></div></div>
+      <div class="marker-line"><label>MARKER QUALITY</label><div class="marker-pair"><button class="positive ${v.legible==='Legible'?'sel':''}" onclick="ieMarker('legible','Legible')">✓ Legible / Well Placed</button><button class="penalty ${v.legible==='Illegible'?'sel':''}" onclick="ieMarker('legible','Illegible')">⚠ Illegible / Poorly Placed <span class="penalty-badge">−3</span></button></div></div>
+    </div>
+   </div></div>
+   <div class="ie-comments"><div class="ie-comments-head"><b>Evaluator Comments (optional)</b><button class="dictate">🎙 Dictate</button></div><textarea oninput="ieComment(this.value)">${escIE(v.comment)}</textarea></div>
+   <div class="ie-calc"><b style="font-size:9px">View Score (Calculated)</b>
+    <div class="calc-row"><span>Image Criterion Ratings</span><b>${Object.keys(v.scores).length} / 4</b></div>
+    <div class="calc-row"><span>Marker Selection</span><b>${v.present&&v.side&&v.legible?'Complete':'Incomplete'}</b></div>
+   </div></div>`;
+   document.getElementById('criteria').innerHTML=html;
+   document.getElementById('commentTitle').textContent='Image Evaluation Notes';
+   document.getElementById('overview').innerHTML=imageViews.map((x,i)=>`<div class="ovrow ${viewStatusClass_(x)}" onclick="ieSelect(${i})"><span class="dot">${viewDone(x)?'✓':viewStatus_(x)==='Not Used'?'−':'•'}</span><b>8.${i+1}</b><span>${escIE(x.name||'View '+(i+1))} · ${viewStatus_(x)}</span></div>`).join('');
+   document.getElementById('overallText').textContent=`Image Evaluation · ${done}/${selected} selected views completed`;
+   document.getElementById('overallBar').style.width=pct+'%';
+   document.getElementById('prevLabel').textContent='Contrast Media Procedures';document.getElementById('nextLabel').textContent='Overall Competency';
+   const reviewNext=document.getElementById('next');if(reviewNext?.firstChild?.nodeType===3)reviewNext.firstChild.textContent='Complete Image Evaluation → Review Overall Competency';document.getElementById('prev').disabled=false;
+ }
+ window.ieSelect=i=>{active=Math.max(0,Math.min(imageViews.length-1,Number(i)||0));renderIE()}
+ window.ieChooseViewId=id=>{
+  const chosen=(window.ciEvalViewOptions||[]).find(x=>String(x.viewId)===String(id));
+  imageViews[active].viewId=chosen?String(chosen.viewId):'';
+  imageViews[active].name=chosen?String(chosen.name):'';
+  renderIE();document.dispatchEvent(new Event('ci-eval-ui-change'));
+};
+window.ieViewName=x=>{imageViews[active].viewId='';imageViews[active].name=String(x||'');};
+// Preserve the Image Evaluation view and scroll position while toggling a
+// rating or marker. Only redraw the small status indicators, never #criteria.
+function refreshImageSelection(){
+  const v=imageViews[active],{done,selected,pct}=imageProgress_();
+  document.querySelectorAll('.ie-matrix tbody tr').forEach((tr,ri)=>{
+    tr.querySelectorAll('.ie-radio').forEach(btn=>btn.classList.toggle('sel',v.scores[ri]===btn.dataset.score));
+  });
+  const expected={present:['Present','Missing'],side:['Correct','Wrong'],legible:['Legible','Illegible']};
+  document.querySelectorAll('.marker-line').forEach((line,i)=>{
+    const key=['present','side','legible'][i];
+    line.querySelectorAll('.marker-pair button').forEach((btn,j)=>btn.classList.toggle('sel',v[key]===expected[key][j]));
+  });
+  const calc=document.querySelectorAll('.ie-calc .calc-row b');
+  if(calc[0])calc[0].textContent=Object.keys(v.scores).length+' / 4';
+  if(calc[1])calc[1].textContent=v.present&&v.side&&v.legible?'Complete':'Incomplete';
+  document.getElementById('sectionBar').style.width=pct+'%';
+  document.getElementById('sectionProgress').textContent=done+' of '+selected+' selected views completed ('+pct+'%)';
+  document.getElementById('overallText').textContent='Image Evaluation · '+done+'/'+selected+' selected views completed';
+  document.getElementById('overallBar').style.width=pct+'%';
+  document.querySelectorAll('.ie-tab').forEach((tab,i)=>{
+    const view=imageViews[i],finished=viewDone(view);
+    tab.classList.toggle('done',finished);
+    const label=tab.querySelector('b');if(label)label.textContent=(finished?'✓ ':'')+(i+1)+'   '+(view.name||'View '+(i+1));
+    const small=tab.querySelector('small');if(small)small.textContent=viewStatus_(view);tab.classList.toggle('unused',viewStatus_(view)==='Not Used');
+  });
+  document.querySelectorAll('#overview .ovrow').forEach((row,i)=>{
+    const view=imageViews[i],finished=viewDone(view);
+    const dot=row.querySelector('.dot');if(dot)dot.textContent=finished?'✓':viewStatus_(view)==='Not Used'?'−':'•';row.className='ovrow '+viewStatusClass_(view);
+    const label=row.querySelector('span:last-child');if(label)label.textContent=(view.name||'View '+(i+1))+' · '+viewStatus_(view);
+  });
+}
+window.ieScore=(ri,n)=>{imageViews[active].scores[ri]=n;refreshImageSelection();document.dispatchEvent(new Event('ci-eval-ui-change'));};
+window.ieEI=x=>imageViews[active].ei=x;
+window.ieMarker=(k,x)=>{imageViews[active][k]=x;refreshImageSelection();document.dispatchEvent(new Event('ci-eval-ui-change'));};
+ window.ieComment=x=>imageViews[active].comment=x;
+ window.ieReference=()=>document.getElementById('refModal').classList.add('show');
+ window.ieRange=()=>document.getElementById('rangeModal').classList.add('show');
+ window.ieClose=id=>document.getElementById(id).classList.remove('show');
+
+ const oldGo=window.go,oldMove=window.move,oldRender=window.render;
+ function renderFinalAudit(){
+   current=8;buildList();
+   document.getElementById('bigNum').textContent='9';
+   document.getElementById('title').textContent='Overall Competency';
+   document.getElementById('countLabel').textContent='Final Review';
+   document.getElementById('desc').textContent='Review the final competency result, add final comments if needed, and submit.';
+   document.getElementById('naall').classList.remove('show');
+   document.getElementById('commentTitle').textContent='Final Review';
+   const criteria=document.getElementById('criteria');
+   criteria.innerHTML=`<div class="simple-final">
+    <section class="final-hero"><div class="final-hero-top"><small>OVERALL COMPETENCY SCORE</small>
+      <div class="final-percent" id="ci-final-percent">—</div>
+      <div class="final-score" id="ci-final-score">Awaiting official grade</div></div>
+     <div class="pass-banner pending" id="ci-final-result">Grade not yet calculated</div>
+     <div class="score-split"><div><small>PERFORMANCE SCORE</small><b id="ci-final-performance">—</b></div>
+      <div><small>IMAGE EVALUATION</small><b id="ci-final-image">—</b></div></div>
+     <div id="ci-final-details"></div>
+    </section>
+    <section class="simple-panel"><div class="simple-head"><h4>Section Results</h4><small id="ci-final-complete-label">Checking completion…</small></div>
+     <div class="simple-body" id="ci-final-section-results"></div></section>
+    <section class="simple-panel"><div class="simple-head"><h4>Performance Highlights</h4><small>Based on scored criteria · evaluator reviews and decides what to discuss</small></div>
+     <div class="simple-body" id="ci-final-highlights">Complete scoring to see strongest and lowest-scoring areas.</div></section>
+    <section class="simple-panel"><div class="simple-head"><h4>Final Evaluator Comments</h4><small>Optional · preserved from the historical evaluation workflow</small></div>
+     <div class="simple-body"><div class="final-comment-head"><b>Overall comments</b><button type="button" class="final-dictate" id="ci-final-dictate">🎙 Dictate</button></div>
+     <textarea id="ci-final-comment" class="final-comment" placeholder="Add final comments about this competency evaluation..."></textarea></div></section>
+    <div id="ci-final-grade-error" role="status" aria-live="polite"></div><button type="button" id="ci-final-grade-retry" hidden onclick="ciRetryGrade_()" style="display:block;margin:8px auto;padding:9px 15px;border:1px solid #0877dc;border-radius:8px;color:#0877dc;background:#fff;cursor:pointer">Retry Grade Calculation</button>
+    <div class="simple-actions"><button type="button" class="review-button" id="ci-final-review">Student Review & Feedback</button>
+     <button type="button" class="submit-button" id="ci-final-submit" disabled>Finalize & Submit Competency</button></div>
+    <div class="simple-note" id="ci-final-review-status">Student Review & Feedback is optional and does not block competency submission.</div>
+   </div>`;
+   // Approved final screen is the terminus; section navigation remains in sidebar.
+   document.querySelector('.comments').style.display='none';
+   document.querySelector('.nav').style.display='none';
+   const comment=document.getElementById('ci-final-comment');
+   comment.value=(window.ciFinalGetComments_?window.ciFinalGetComments_():'');
+   comment.addEventListener('input',()=>window.ciFinalPutComments_?.(comment.value));
+   document.getElementById('ci-final-dictate').onclick=()=>window.ciFinalDictate_?.(comment);
+   document.getElementById('ci-final-review').onclick=()=>window.ciOpenStudentReview_?.();
+   document.getElementById('ci-final-submit').onclick=()=>window.ciFinalizeSubmit_?.();
+   window.ciFinalPaint_?.();
+ }
+ window.go=function(i){
+   if(i!==8){document.querySelector('.comments').style.display='';document.querySelector('.nav').style.display='';}
+   if(i===IDX){current=IDX;renderIE();return;}
+   if(i===8){renderFinalAudit();return;}
+   oldGo(i);
+ }
+ window.move=function(d){if(current===6&&d===1){window.go(IDX);return;}if(current===IDX){if(d<0){current=6;oldRender();}else window.go(8);return;}if(current===8){if(d<0)window.go(IDX);return;}oldMove(d)}
+ // Begin at first real criterion section after authorized init.
+})();
+</script>
+<div class="ie-modal" id="refModal"><div class="ie-dialog">
+<div class="ie-dialog-head"><h3>Image Reference</h3><button class="xbtn" onclick="ieClose('refModal')">✕ Close</button></div>
+<div class="ie-dialog-body"><div class="reference-grid">
+<div class="ref-image"><div><b>AUTHORIZED IMAGE REFERENCE</b><small>Validated program reference radiograph will display here.</small></div></div>
+<div class="ref-details">
+<h4>Positioning / Anatomy</h4><p>Approved view-specific positioning and anatomy reference will appear here.</p>
+<h4>Equipment / Central Ray</h4><p>Approved CR location, angle, SID/grid and centering guidance.</p>
+<h4>Collimation</h4><p>Approved collimation borders and required anatomy for this projection.</p>
+<div class="ref-exposure"><b>Exposure Reference</b><small>Resolved from the student's current clinical site and equipment/system.</small><table class="range-table"><tr><th>0 Gross</th><th>1 Minor</th><th>2 Satisfactory</th><th>3 Optimal</th></tr><tr><td>—</td><td>—</td><td>—</td><td>—</td></tr></table></div>
+<div class="future">Atlas-ready: this same contextual button can later open the full CCMS radiographic atlas entry for AP Elbow.</div>
+</div>
+</div></div>
+</div></div>
+<div class="ie-modal" id="rangeModal"><div class="ie-dialog" style="width:min(520px,94vw)">
+<div class="ie-dialog-head"><h3>Exposure Range Grading Scale</h3><button class="xbtn" onclick="ieClose('rangeModal')">✕ Close</button></div>
+<div class="ie-dialog-body">
+<div class="ref-exposure"><b>Site-specific exposure reference</b><small>Live version will retrieve the authoritative site/equipment-specific EI or S-number ranges.</small>
+<table class="range-table"><tr><th>Score</th><th>Meaning</th><th>EI / S# Range</th></tr><tr><td>0</td><td>Gross Error</td><td>—</td></tr><tr><td>1</td><td>Minor Error</td><td>—</td></tr><tr><td>2</td><td>Satisfactory</td><td>—</td></tr><tr><td>3</td><td>Optimal</td><td>—</td></tr></table>
+</div>
+</div>
+</div></div>
+
+<style id="ccms-paged-style">
+#ccms-page-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:#edf5fb;border:1px solid #c9ddec;border-radius:8px;padding:10px 12px;margin:8px 12px 12px;color:#194a70;font-family:inherit}
+#ccms-page-bar .ccms-page-title{font-weight:750;font-size:13px}#ccms-page-bar .ccms-page-sub{font-size:11px;color:#55748d;margin-top:3px}
+#ccms-page-bar button,#ccms-page-bar select{background:#fff;border:1px solid #a6c6dc;border-radius:6px;padding:8px 11px;color:#194a70;font-weight:700;cursor:pointer}#ccms-page-bar button:disabled{opacity:.35;cursor:default}#ccms-page-bar select{padding:7px}
+#ccms-page-bar .ccms-next{background:#17679e;color:white}#ccms-page-bar .ccms-page-controls{display:flex;align-items:center;gap:6px}
+#ccms-page-bar .ccms-page-count{font-size:12px;font-weight:700;min-width:65px;text-align:center}
+#ccms-page-bar .ccms-page-capacity{font-size:11px;display:flex;gap:5px;align-items:center}
+#criteria.ccms-paged .pc-group:not(.ccms-visible-group){display:none!important}
+#criteria.ccms-paged .pc-group.ccms-visible-group .pc-group-body{display:block!important}
+</style>
+<script id="ccms-paged-experiment">
+(function(){
+// Presentation-only pagination: no changes to the original criterion data, score handlers, or score-button CSS.
+const criteria=document.getElementById('criteria');if(!criteria)return;
+let page=0,capacity=3,lastSection=-1,scheduled=false;
+const bar=document.createElement('div');bar.id='ccms-page-bar';
+criteria.parentNode.insertBefore(bar,criteria);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function counts(){let s=sections&&sections[current];return s?s.criteria.length:0}
+function update(){
+ if(typeof current==='undefined'||!sections)return;
+ // This paginator only owns the seven ordinary criteria sections.
+ if(current>=sections.length){bar.hidden=true;return;}
+ bar.hidden=false;
+ if(current!==lastSection){page=0;lastSection=current}
+ const n=counts(),total=Math.max(1,Math.ceil(n/capacity));page=clamp(page,0,total-1);
+ const first=page*capacity,last=Math.min(n,first+capacity);
+ criteria.classList.add('ccms-paged');
+ const rows=[...criteria.querySelectorAll('.criterion')];
+ rows.forEach((row,i)=>{row.style.display=i>=first&&i<last?'':'none'});
+ const groups=[...criteria.querySelectorAll('.pc-group')];
+ groups.forEach((group,i)=>{
+   const show=group.querySelectorAll('.criterion').length&&[...group.querySelectorAll('.criterion')].some(r=>r.style.display!=='none');
+   group.classList.toggle('ccms-visible-group',!!show);
+   group.classList.toggle('open',!!show);
+ });
+ const done=sections[current].criteria.slice(first,last).filter((_,i)=>scores&&scores[current+'-'+(first+i)]!==undefined).length;
+ const bulkNA=sections[current].criteria.length>0&&sections[current].criteria.every((_,i)=>scores[current+'-'+i]==='N/A');
+ bar.innerHTML=`<div><div class="ccms-page-title">${sections[current].name} · Criteria ${first+1}–${last} of ${n}</div><div class="ccms-page-sub">${done} of ${last-first} scored in this part · Existing scoring controls unchanged</div></div><div class="ccms-page-controls"><button type="button" data-dir="-1" ${page===0?'disabled':''}>‹ Previous</button><span class="ccms-page-count">Part ${page+1} / ${total}</span><button type="button" class="ccms-next" data-dir="1" ${page===total-1&&!bulkNA?'disabled':''}>${bulkNA?'Continue to Next Section →':'Next ›'}</button></div><label class="ccms-page-capacity">Show <select id="ccms-capacity"><option value="3" ${capacity===3?'selected':''}>3</option><option value="4" ${capacity===4?'selected':''}>4</option></select> criteria</label>`;
+ const prev=document.getElementById('prev'),next=document.getElementById('next');
+ // Preserve the original section-navigation semantics; add only in-section steps.
+ if(prev){prev.disabled=!(page>0||current>0);const l=document.getElementById('prevLabel');if(l)l.textContent=page>0?'Previous part':current>0?sections[current-1].name:'Evaluation Setup'}
+ if(next){const l=document.getElementById('nextLabel');if(l)l.textContent=page<total-1?'Next part':current<6?sections[current+1].name:'Image Evaluation'}
+}
+function goPage(dir){let total=Math.max(1,Math.ceil(counts()/capacity));if(dir<0&&page>0){page--;update();return true}if(dir>0&&sections[current].criteria.every((_,i)=>scores[current+'-'+i]==='N/A')){window.go(Math.min(8,current+1));update();return true;}if(dir>0&&page<total-1){page++;update();return true}return false}
+bar.addEventListener('click',e=>{let b=e.target.closest('[data-dir]');if(b)goPage(Number(b.dataset.dir))});
+bar.addEventListener('change',e=>{if(e.target.id==='ccms-capacity'){let first=page*capacity;capacity=Number(e.target.value);page=Math.floor(first/capacity);update()}});
+for(const [id,dir] of [['prev',-1],['next',1]]){let btn=document.getElementById(id);if(btn)btn.addEventListener('click',e=>{if(goPage(dir)){e.preventDefault();e.stopImmediatePropagation()}},true)}
+const observer=new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;update()})});
+observer.observe(criteria,{childList:true,subtree:true});
+// Track section navigation even if a section happens to have the same number of cards.
+const nav=document.getElementById('sectionList');if(nav)nav.addEventListener('click',()=>requestAnimationFrame(update));
+update();
+})();
+</script>
+<script>/** Preserves the selected v5 evaluation DOM/CSS. Only the data/persistence
+ * layer is added here. The authoritative Form schema always wins. */
+(function(){
+'use strict';
+let context=null,formItems=[],draftId='',saving=false,timer=null,dirty=false;
+let sectionComments={},autoFail={occurred:false,reasons:[],comments:''};
+let studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null};
+// Submission is OFF until server authorization plus the original CCMS gate agree.
+let ciSubmitAllowed=false,ciSubmitBusy=false,ciSubmitDone=false,ciAwaitingSubmitPreview=false;
+let ciPreparedSubmit=null;
+let ciOfficialGrade=null,ciOfficialGradeSignature='',ciRequestedGradeSignature='';
+let ciGradeError='';
+const ciScoreSignature_=()=>JSON.stringify({scores,images:window.ciEvalImageViews||[],autoFail,examId:context?.examinationId||''});
+function ciInvalidateGrade_(){
+ const currentSig=ciScoreSignature_();
+ if(ciPreviewFailedSignature&&currentSig!==ciPreviewFailedSignature)ciPreviewFailedSignature='';
+ if(ciOfficialGrade&&currentSig!==ciOfficialGradeSignature){ciOfficialGrade=null;ciGradeError='Scores changed; recalculating grade.';}
+ if(current===8)ciFinalPaint_();
+}
+function ciProgressState_(){
+ const total=sections.reduce((n,s)=>n+s.criteria.length,0);
+ const completed=sections.reduce((n,section,sectionIndex)=>n+section.criteria.filter((_,i)=>scores[sectionIndex+'-'+i]!==undefined).length,0);
+ const images=(window.ciEvalImageViews||[]);
+ const selected=images.filter(v=>String(v.name||'').trim()||Object.keys(v.scores||{}).length||v.present||v.side||v.legible||v.ei||v.comment);
+ const finished=selected.filter(v=>String(v.name||'').trim()&&Object.keys(v.scores||{}).length===4&&v.present&&v.side&&v.legible).length;
+ const imageDenominator=Math.max(1,selected.length);
+ const progress=Math.round((completed+finished)/(total+imageDenominator)*100);
+ return {total,completed,selected:selected.length,finished,progress,complete:completed===total&&finished===selected.length&&selected.length>0};
+}
+function ciProgressRefresh_(){
+ if(!context)return;
+ const p=ciProgressState_();
+ const bar=document.getElementById('overallBar'),label=document.getElementById('overallText');
+ if(bar)bar.style.width=p.progress+'%';
+ if(label)label.textContent=p.completed+'/'+p.total+' criteria · '+p.finished+'/'+p.selected+' selected image views · '+p.progress+'% complete';
+ if(current===8){
+   const sb=document.getElementById('sectionBar'),st=document.getElementById('sectionProgress');
+   if(sb)sb.style.width=p.progress+'%';
+   if(st)st.textContent=p.completed+'/'+p.total+' criteria · '+p.finished+'/'+p.selected+' selected images';
+ }
+}
+function ciFinalPaint_(){
+ const final=document.getElementById('ci-final-percent');if(!final)return;
+ const p=ciProgressState_(),grade=ciOfficialGrade&&ciOfficialGradeSignature===ciScoreSignature_()?ciOfficialGrade:null;
+ const set=(id,value)=>{const node=document.getElementById(id);if(node)node.textContent=value;};
+ const readable=score=>Number.isFinite(Number(score))&&score!==null&&score!==undefined?Number(score).toFixed(2)+' / 3.00':'—';
+ const percent=score=>score!==null&&score!==undefined&&Number.isFinite(Number(score))?String(Number(score).toFixed(2).replace(/\.00$/,''))+'%':'—'; // receives existing CCMS conversion only
+ set('ci-final-percent',grade?(grade.automaticFailure?.occurred?'0%':percent(grade.convertedPercent)):'—');
+ set('ci-final-score',grade?readable(grade.finalScore):p.complete?'Calculating official grade…':'Complete required items to calculate grade');
+ set('ci-final-performance',grade?readable(grade.performance?.score)+' · '+percent(grade.performance?.convertedPercent):'—');
+ set('ci-final-image',grade?readable(grade.image?.score)+' · '+percent(grade.image?.convertedPercent):'—');
+ const banner=document.getElementById('ci-final-result');
+ if(banner){banner.className='pass-banner '+(!grade?'pending':String(grade.result).toUpperCase()==='PASS'?'':'fail');banner.textContent=grade?(grade.automaticFailure?.occurred?'FAIL · AUTOMATIC FAILURE':String(grade.result).toUpperCase()==='PASS'?'✓ PASS':'FAIL'):p.complete?'Official grade requested':'Evaluation incomplete';}
+ set('ci-final-complete-label',autoFail.occurred?'Automatic failure recorded · review for submission':p.complete?'All selected sections complete':'Incomplete · complete required criteria and selected images');
+ set('ci-final-details','');
+ set('ci-final-grade-error',ciGradeError||(!grade&&!p.complete?'Finish all applicable performance criteria and select, score and mark at least one image view.':''));
+ const retry=document.getElementById('ci-final-grade-retry');if(retry)retry.hidden=!(ciPreviewFailedSignature===ciScoreSignature_());
+ set('ci-final-review-status',(studentReview.status==='reviewed'?'Reviewed with Student':'Review Pending')+' · Student Review & Feedback is optional for submission.');
+ const results=document.getElementById('ci-final-section-results');
+ if(results){
+   results.replaceChildren();
+   const byName=new Map([...(grade?.performance?.sections||[]),...(grade?.uiSectionScores||[])].map(sec=>[String(sec.name||'').toLowerCase(),sec]));
+   for(let i=0;i<sections.length;i++){
+     if(i===6)continue; // The authoritative engine has one Portable / Contrast group.
+     const sec=sections[i],count=i===5?sections[5].criteria.length+sections[6].criteria.length:sec.criteria.length;
+     const done=i===5?sections[5].criteria.filter((_,j)=>scores['5-'+j]!==undefined).length+
+       sections[6].criteria.filter((_,j)=>scores['6-'+j]!==undefined).length:
+       sec.criteria.filter((_,j)=>scores[i+'-'+j]!==undefined).length;
+     const normalized=i===5?'portable / contrast':String(sec.name).toLowerCase();
+     // The native grading engine combines Portable and Contrast. Never make up separate weighted grades.
+     const official=byName.get(normalized);
+     const row=document.createElement('div');row.className='section-result';
+     const title=document.createElement('b');title.textContent=(i===5?'Portable / Contrast':sec.name)+' · '+done+'/'+count;
+     const rating=document.createElement('span');rating.className='score';rating.textContent=grade&&official?readable(official.score):'—';
+     const pct=document.createElement('span');pct.className='pct';pct.textContent=grade&&official?percent(official.convertedPercent):done===count?'Complete':'Incomplete';
+     row.append(title,rating,pct);results.append(row);
+   }
+   const row=document.createElement('div');row.className='section-result';
+   const title=document.createElement('b');title.textContent='Image Evaluation · '+p.finished+'/'+p.selected+' selected views';
+   const rating=document.createElement('span');rating.className='score';rating.textContent=grade?readable(grade.image?.score):'—';
+   const pct=document.createElement('span');pct.className='pct';pct.textContent=grade?percent(grade.image?.convertedPercent):p.selected&&p.finished===p.selected?'Complete':'Incomplete';
+   row.append(title,rating,pct);results.append(row);
+ }
+ const submit=document.getElementById('ci-final-submit');
+ if(submit){submit.disabled=!ciSubmitAllowed||ciSubmitBusy||ciSubmitDone||!grade||!(p.complete||(autoFail.occurred&&autoFail.reasons.length&&autoFail.comments.trim()));submit.textContent=ciSubmitDone?'Evaluation Submitted':ciSubmitBusy?'Submitting…':'Finalize & Submit Competency';}
+ ciRenderHighlights_(grade);
+ ciProgressRefresh_();
+}
+/** Read-only performance discussion prompts; never write evaluator feedback. */
+function ciGradeHighlights_(grade) {
+  if(!grade||!grade.performance)return {strong:[],low:[],criteria:[]};
+  const sections=(grade.performance.sections||[]).filter(s=>s.score!==null&&Number.isFinite(Number(s.score)))
+    .slice().sort((a,b)=>b.score-a.score);
+  const strong=sections.filter(s=>Number(s.score)>=2.0).slice(0,2);
+  const low=sections.filter(s=>Number(s.score)<3).slice().reverse().slice(0,2);
+  const rated=[];
+  for(const section of grade.performance.sections||[]){
+    for(const row of section.rows||[]){
+      if(row.applicable && Number.isFinite(Number(row.ratingText)))
+        rated.push({section:section.name,criterion:row.criterion,rating:Number(row.ratingText)});
+    }
+  }
+  rated.sort((a,b)=>a.rating-b.rating);
+  const minimum=rated.length?rated[0].rating:null;
+  return {strong,low,criteria:minimum!==null&&minimum<3?rated.filter(r=>r.rating===minimum).slice(0,4):[]};
+}
+function ciAppendHintLine_(root,label,values){
+  const p=document.createElement('p');p.style.cssText='font-size:12px;line-height:1.5;margin:5px 0';
+  const b=document.createElement('b');b.textContent=label+': ';p.append(b,document.createTextNode(values||'—'));root.append(p);
+}
+function ciRenderHighlights_(grade){
+ const root=document.getElementById('ci-final-highlights');if(!root)return;
+ root.replaceChildren();
+ if(!grade){root.textContent='Calculated highlights appear with the grade. No feedback is added automatically.';return;}
+ const h=ciGradeHighlights_(grade);
+ const score=s=>String(s.name)+' ('+Number(s.score).toFixed(2)+' / 3.00)';
+ ciAppendHintLine_(root,'Highest-scoring areas',h.strong.map(score).join('; ')||'No applicable performance scores');
+ ciAppendHintLine_(root,'Lowest-scoring areas',h.low.map(score).join('; ')||'No below-maximum scored sections');
+ ciAppendHintLine_(root,'Lowest-scored criteria for student discussion',h.criteria.map(c=>c.section+' — '+c.criterion+' ('+c.rating+'/3)').join('; ')||'All rated criteria scored 3, or no scored criteria recorded');
+ const weakImages=(grade.image?.views||[]).flatMap(v=>(v.components||[]).filter(c=>c.applicable&&c.score!==null&&Number(c.score)<3).map(c=>({view:v.projection||'View '+v.viewNumber,criterion:c.name,score:Number(c.score)}))).sort((a,b)=>a.score-b.score).slice(0,4);
+ ciAppendHintLine_(root,'Image areas to review',weakImages.map(v=>v.view+' — '+v.criterion+' ('+v.score+'/3)').join('; ')||'No image criteria below 3');
+ const penaltyNotes=(grade.image?.views||[]).flatMap(v=>[
+   ['Zero in view',v.zeroPenalty],['Missing marker',v.missingMarkerPenalty],['Wrong marker',v.wrongMarkerPenalty],['Illegible marker',v.illegibleMarkerPenalty]
+ ].filter(x=>Number(x[1])!==0).map(x=>(v.projection||'View '+v.viewNumber)+' — '+x[0]+' ('+x[1]+')'));
+ if(penaltyNotes.length)ciAppendHintLine_(root,'Image deductions',penaltyNotes.join('; '));
+ const note=document.createElement('p');note.style.cssText='font-size:11px;color:#667f94;margin:7px 0 0';note.textContent='These are scoring facts, not automated judgments. The evaluator decides what feedback to record.';root.append(note);
+}
+window.ciFinalPaint_=ciFinalPaint_;
+window.ciFinalGetComments_=()=>sectionComments[8]||'';
+window.ciFinalPutComments_=text=>{sectionComments[8]=text;scheduleSave();};
+window.ciFinalDictate_=element=>dictation(element);
+let ciPreviewTimer=null,ciPreviewInFlight=false,ciPreviewFailedSignature='';
+function ciQueueGradePreview_(){
+ if(!context || current!==8 || ciSubmitDone || ciSubmitBusy)return;
+ const p=ciProgressState_(), validAuto=autoFail.occurred&&autoFail.reasons.length&&autoFail.comments.trim();
+ if(!p.complete && !validAuto){
+   ciGradeError='Incomplete evaluation: '+(p.total-p.completed)+' performance ratings remain; '+(p.selected===0?'select and fully score at least one image view.':(p.selected-p.finished)+' selected image views remain incomplete.');
+   ciFinalPaint_();return;
+ }
+ const sig=ciScoreSignature_();
+ if(ciOfficialGrade && ciOfficialGradeSignature===sig)return;
+ if(ciPreviewFailedSignature===sig)return;
+ if(ciPreviewInFlight && ciRequestedGradeSignature===sig)return;
+ clearTimeout(ciPreviewTimer);
+ ciPreviewTimer=setTimeout(()=>{
+   if(!context||current!==8||ciScoreSignature_()!==sig)return;
+   ciRequestedGradeSignature=sig;ciPreviewInFlight=true;ciGradeError='';
+   ciFinalPaint_();post('preview',{uiState:UI()});
+ },250);
+}
+function ciProgressSchedule_(){requestAnimationFrame(()=>{ciInvalidateGrade_();ciProgressRefresh_();if(current===8){ciFinalPaint_();ciQueueGradePreview_();}});}
+
+function ciSetSubmitState_(allowed,message){
+ ciSubmitAllowed=Boolean(allowed);const btn=document.getElementById('ci-final-submit');
+ if(btn){btn.title=message||'Official submission is not yet enabled';}
+ ciFinalPaint_();
+}
+function ciResetSubmitAfterError_(message){
+ ciSubmitBusy=false;ciAwaitingSubmitPreview=false;ciPreparedSubmit=null;
+ ciSetSubmitState_(ciSubmitAllowed);notify(message||'Submission not confirmed; save your draft and contact the coordinator before retrying.');
+}
+
+const post=(type,payload={})=>parent.postMessage({source:'ci-eval-inner',type,payload},'*');
+const byTitle=t=>formItems.filter(x=>String(x.title||'').trim().toLowerCase()===String(t||'').trim().toLowerCase());
+const notify=text=>{let e=document.getElementById('ci-live-message');if(!e){e=document.createElement('div');e.id='ci-live-message';e.setAttribute('role','status');e.style.cssText='position:fixed;top:9px;right:12px;z-index:500;padding:8px 14px;background:#fff;border:1px solid #cadceb;border-radius:8px;color:#173653';document.body.append(e)}e.textContent=text;};
+const UI=()=>({section:typeof current==='number'?current:0,scores:Object.assign({},scores),images:JSON.parse(JSON.stringify(window.ciEvalImageViews||[])),sectionComments:{...sectionComments},autoFail:{...autoFail},studentReview:{...studentReview},examId:context?.examinationId||''});
+function restoreUI(st){if(!st)return;sectionComments={...(st.sectionComments||{})};autoFail={occurred:false,reasons:[],comments:'',...(st.autoFail||{})};studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null,...(st.studentReview||{})};Object.keys(scores).forEach(k=>delete scores[k]);Object.assign(scores,st.scores||{});
+ const imgs=window.ciEvalImageViews||[];(st.images||[]).forEach((v,i)=>{if(imgs[i])Object.assign(imgs[i],v)});
+ for(const img of imgs){
+   const choices=(window.ciEvalViewOptions||[]).filter(x=>String(x.name).toLowerCase()===String(img.name||'').toLowerCase());
+   if(!img.viewId&&choices.length===1){img.viewId=String(choices[0].viewId);img.name=String(choices[0].name);}
+ }
+ if(Number.isInteger(st.section))current=Math.min(8,Math.max(0,st.section));
+ try{if(current===7||current===8)window.go(current);else render();}catch(e){notify('Unable to restore evaluation layout');}
+ hydrateSectionComment();ciInvalidateGrade_();ciProgressSchedule_();
+}
+function validateFormSections(){
+ const mapping=[['Exam Preparation',0],['Patient Care',1],['Radiation Protection',2],['Equipment Manipulation',3],['Positioning Skills',4]];
+ const grids=formItems.filter(x=>String(x.type)==='GRID');
+ mapping.forEach(([title,index])=>{
+  const g=grids.find(x=>x.title.toLowerCase()===title.toLowerCase());
+  if(!g||!Array.isArray(g.rows)||!g.rows.length)throw new Error('Authoritative Form section unavailable: '+title);
+  sections[index].criteria=g.rows.slice();
+ });
+ const combined=grids.find(x=>String(x.title).toLowerCase()==='portable / contrast');
+ if(!combined||!Array.isArray(combined.rows)||combined.rows.length!==16)throw new Error('Portable/Contrast criterion contract requires reconciliation');
+ sections[5].criteria=combined.rows.slice(0,7);sections[6].criteria=combined.rows.slice(7);
+ // Exact official Form view slots, not a hardcoded elbow/three-view demo.
+ const viewIds=formItems.filter(item=>/^Image Evaluation\s*-\s*View\s+\d+$/i.test(String(item.title||'')))
+   .map(item=>Number(String(item.title).match(/View\s+(\d+)/i)[1])).sort((a,b)=>a-b);
+ if(!viewIds.length||viewIds.length>10||viewIds.some((v,i)=>v!==i+1))
+   throw new Error('Official image view sections are absent, duplicated, or not sequential; grading schema needs reconciliation');
+ const slots=window.ciEvalImageViews;
+ if(!Array.isArray(slots))throw new Error('Image evaluation UI unavailable');
+ slots.splice(0,slots.length,...viewIds.map(()=>({viewId:'',name:'',scores:{},present:'',side:'',legible:'',ei:'',comment:''})));
+}
+function exportAnswers(){
+ if(!context||!formItems.length)throw new Error('Evaluation schema not loaded');
+ const answers={};let complete=true;
+ for(const g of formItems.filter(x=>String(x.type)==='GRID')) {
+   let ratings=[];
+   let index=sections.findIndex(s=>s.name.toLowerCase()===String(g.title).toLowerCase());
+   if(index>=0)ratings=sections[index].criteria.map((_,i)=>scores[index+'-'+i]);
+   else if(String(g.title).toLowerCase()==='portable / contrast')ratings=sections[5].criteria.map((_,i)=>scores['5-'+i]).concat(sections[6].criteria.map((_,i)=>scores['6-'+i]));
+   else throw new Error('Unknown authoritative performance grid: '+g.title);
+   if(ratings.some(x=>x===undefined)){complete=false;continue;}
+   answers[g.itemId]=ratings.map(x=>String(x));
+ }
+ // Read section-owned notes from every visited section, not only the
+ // currently rendered textarea. Source Form comment names are authoritative.
+ for(let i=0;i<sections.length;i++){
+  const section=sections[i],formTitle=i>=5?'Portable / Contrast Comments':section.name+' Comments';
+  const note=i>=5?[sectionComments[5],sectionComments[6]].filter(Boolean).map((v,j)=>(j===0?'Portable/Mobile: ':'Contrast: ')+v).join('\n'):sectionComments[i];
+  if(!note)continue;
+  const item=byTitle(formTitle)[0];if(item)answers[item.itemId]=note;
+ }
+ // Approved simplified v2 final evaluator comments flow into the existing
+ // official Form field consumed by grade.evaluation.comments and the tokenized PDF.
+ const finalComment=String(sectionComments[8]||'').trim();
+ const overallCommentItem=byTitle('Evaluator Comments')[0];
+ if(finalComment&&overallCommentItem)answers[overallCommentItem.itemId]=finalComment;
+ const afNames=['did an automatic failure occur?','did an automatic-failure condition occur during this evaluation?'];
+ for(const q of formItems){const t=String(q.title||'').toLowerCase();
+  if(afNames.includes(t))answers[q.itemId]=autoFail.occurred?'Yes':'No';
+  if(t==='automatic failure reason(s)'&&autoFail.occurred)answers[q.itemId]=autoFail.reasons.slice();
+  if(t==='automatic failure comments'&&autoFail.occurred)answers[q.itemId]=autoFail.comments;
+ }
+ const images=window.ciEvalImageViews||[];
+ const imageViewRegex=/^Image Evaluation\s*-\s*View\s+(\d+)$/i;
+ let group=0;
+ formItems.forEach(q=>{
+  let match=String(q.title).match(imageViewRegex);
+  if(match){group=Number(match[1]);return}
+  if(!group)return;const v=images[group-1];if(!v)return;
+  const title=String(q.title).trim().toLowerCase();
+  const index={positioning:0,equipment:1,'radiation protection':2,exposure:3}[title];
+  if(index!==undefined&&v.scores&&v.scores[index]!==undefined)answers[q.itemId]=String(v.scores[index]);
+  if(title==='view/projection'&&v.name)answers[q.itemId]=v.name;
+  if(title.includes('exposure index')&&v.ei)answers[q.itemId]=v.ei;
+  if((title==='marker placement'||title==='marker evaluation')&&v.present) {
+    answers[q.itemId]=v.present==='Missing'?'Missing Marker':v.side==='Wrong'?'Wrong Marker':v.legible==='Illegible'?'Illegible Marker':'Correct';
+  }
+  if(title==='view '+group+' comments'&&v.comment)answers[q.itemId]=v.comment;
+ });
+ return {answers,complete:complete||autoFail.occurred};
+}
+
+function hydrateSectionComment(){const el=document.querySelector('.comments textarea');if(el){el.value=sectionComments[current]||'';el.setAttribute('aria-label',sections[current]?.name+' Comments');}}
+function bindEvaluationIdentity(ctx){
+ const info=document.querySelector('.context');if(!info)return;
+ const avatar=info.querySelector('.student .pic'),name=info.querySelector('.student h2'),meta=info.querySelector('.student p');
+ if(avatar)avatar.textContent=String(ctx.student||'').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('');
+ if(name)name.textContent=ctx.student||'Student';if(meta)meta.textContent=ctx.studentId||'';
+ const labels=[...info.querySelectorAll('.ctx')];
+ const lookup={"today's site":ctx.site,"date":ctx.date,"evaluator":ctx.evaluator,"evaluation type":'Competency'};
+ for(const node of labels){const label=node.querySelector('label')?.textContent?.toLowerCase().trim();if(Object.prototype.hasOwnProperty.call(lookup,label)){const b=node.querySelector('b');if(b)b.textContent=lookup[label]||''}}
+}
+function autoFailModal(){
+ const source=byTitle('Automatic Failure Reason(s)')[0];const choices=source?.choices||[];
+ if(!choices.length){notify('Official Auto-Fail reasons unavailable. Submission disabled.');return;}
+ // The approved form is inside a tall iframe. A fixed modal in that iframe
+ // centers in the iframe, not the instructor's visible Portal viewport.
+ // Ask the Portal shell to host this SAME Auto-Fail interaction at page level.
+ if(window.parent!==window){post('autofail_open',{choices,selected:autoFail.reasons.slice(),comments:autoFail.comments});return;}
+
+ const modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;background:#10213c99;z-index:1000;display:grid;place-items:center;padding:16px';
+ const panel=document.createElement('div');panel.style.cssText='background:#fff;border:1px solid #cfdeea;border-radius:12px;max-width:510px;width:100%;padding:20px;max-height:90vh;overflow:auto';
+ const title=document.createElement('h2');title.textContent='Automatic Failure';panel.append(title);
+ const instructions=document.createElement('p');instructions.textContent='Select the official failure reason(s) and provide an explanation. Previously completed scoring is preserved.';panel.append(instructions);
+ const boxes=[];for(const reason of choices){const label=document.createElement('label');label.style.cssText='display:block;margin:9px 0';const c=document.createElement('input');c.type='checkbox';c.checked=autoFail.reasons.includes(reason);label.append(c,document.createTextNode(' '+reason));panel.append(label);boxes.push([c,reason]);}
+ const expl=document.createElement('textarea');expl.rows=4;expl.style.cssText='width:100%;padding:10px;border:1px solid #b5cadc;border-radius:8px;margin:8px 0';expl.placeholder='Required evaluator explanation';expl.value=autoFail.comments;panel.append(expl);
+ const line=document.createElement('div');line.style.cssText='display:flex;gap:10px;justify-content:flex-end';
+ const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.onclick=()=>modal.remove();
+ const confirm=document.createElement('button');confirm.type='button';confirm.textContent='Record Auto-Fail';confirm.onclick=()=>{const reasons=boxes.filter(x=>x[0].checked).map(x=>x[1]);if(!reasons.length||!expl.value.trim()){alert('Select an official reason and enter an explanation.');return;}autoFail={occurred:true,reasons,comments:expl.value.trim()};modal.remove();notify('Auto-Fail recorded in draft; not yet submitted');scheduleSave()};
+ line.append(cancel,confirm);panel.append(line);modal.append(panel);document.body.append(modal);
+}
+
+let ciLeaveRequested=false,ciLeaveTarget='evaluations';
+function scheduleSave(){
+ if(!context||ciSubmitBusy||ciSubmitDone)return;
+ ciProgressSchedule_();dirty=true;
+ const el=document.querySelector('.rbox.quick .saved');if(el)el.textContent='● Unsaved changes';
+ clearTimeout(timer);timer=setTimeout(()=>save(false),850);
+}
+function save(stopping){
+ if(!context||ciSubmitBusy||ciSubmitDone)return;
+ clearTimeout(timer);
+ if(stopping)ciLeaveRequested=true;
+ if(saving){dirty=true;return;}
+ const data={uiState:UI(),currentSection:typeof current==='number'?current:0,reviewPending:studentReview.status==='pending'};
+ // Canonical answers are extracted from the authoritative item-ID schema,
+ // while uiState also preserves incomplete sections exactly for resume.
+ try{Object.assign(data,exportAnswers());}catch(e){data.answers={};}
+ post((stopping||ciLeaveRequested)?'draft_stop':'draft_save',data);saving=true;dirty=false;const el=document.querySelector('.rbox.quick .saved');if(el)el.textContent='↻ Saving…';notify((stopping||ciLeaveRequested)?'Saving before leaving…':'Saving draft…');}
+let ciSpeech_=null;
+function dictation(textarea,button){
+ if(!textarea)return;
+ if(ciSpeech_){try{ciSpeech_.stop();}catch(e){}ciSpeech_=null;return;}
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){notify('Speech recognition is unavailable in this browser or embedded editor. Type comments, or use your device’s voice typing.');return;}
+ const rec=new SpeechRecognition();rec.lang='en-US';rec.interimResults=false;rec.continuous=false;
+ ciSpeech_=rec;
+ if(button)button.textContent='■ Stop Dictation';
+ rec.onresult=e=>{
+   const phrase=Array.from(e.results||[]).map(r=>r[0]?.transcript||'').join(' ').trim();
+   if(!phrase)return;
+   const space=textarea.value&&!/\s$/.test(textarea.value)?' ':'';
+   textarea.value+=space+phrase;textarea.dispatchEvent(new Event('input',{bubbles:true}));
+ };
+ rec.onerror=e=>{const reason=String(e.error||'browser error');notify(reason==='not-allowed'?'Microphone denied by browser or embedded page. Check site permission; if policy blocks embedded speech recognition, use approved device voice typing.':'Dictation unavailable ('+reason+'). Use the comment box or approved device voice typing.');};
+ rec.onend=()=>{if(ciSpeech_===rec)ciSpeech_=null;if(button)button.textContent='🎙 Dictate';};
+ try{rec.start();notify('Listening for your comments…');}catch(e){ciSpeech_=null;if(button)button.textContent='🎙 Dictate';notify('Dictation could not start: '+String(e.message||e));}
+}
+window.ciEvalDictate_=dictation;
+function setupDictation(){/* Delegated native dictation handler below survives approved re-renders. */}
+
+function ciOpenStudentReview(){
+ if(!context){notify('Open an evaluation first.');return;}
+ post('review_open',{review:{...studentReview}});
+}
+window.addEventListener('message',e=>{
+ const msg=e.data||{};if(msg.source!=='ci-eval-parent')return;
+ if(msg.type==='save_and_leave'){ciLeaveTarget=String(msg.payload?.target||'evaluations');save(true);return;}
+ if(msg.type==='review_result'){
+   const r=msg.payload?.review||{};
+   for(const key of ['strengths','improvements','discussion'])studentReview[key]=String(r[key]||'').slice(0,8000);
+   studentReview.status=r.status==='reviewed'?'reviewed':'pending';studentReview.reviewedAt=studentReview.status==='reviewed'?r.reviewedAt:null;
+   scheduleSave();notify('Student review updated; saving draft…');return;
+ }
+ if(msg.type==='init'){
+  context=msg.payload.context;formItems=msg.payload.formItems||[];window.ciEvalViewOptions=msg.payload.viewOptions||[];draftId=context?.submissionId||'';
+  try{validateFormSections();for(const v of window.ciEvalImageViews||[]){Object.assign(v,{viewId:'',name:'',scores:{},present:'',side:'',legible:'',ei:'',comment:''})}
+   Object.keys(scores).forEach(k=>delete scores[k]);ciOfficialGrade=null;ciOfficialGradeSignature='';ciRequestedGradeSignature='';ciGradeError='';current=0;render();
+   sectionComments={};autoFail={occurred:false,reasons:[],comments:''};studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null};
+   bindEvaluationIdentity(context);hydrateSectionComment();ciProgressSchedule_();
+   const search=document.getElementById('ccmsExamSearch');if(search){search.value=context.examination||'';search.disabled=true;}
+   if(msg.payload.initialDraft?.success===false){notify('Draft storage unavailable: '+msg.payload.initialDraft.error+'. Keep this evaluation open; no save is confirmed.');}
+   else notify('Evaluation ready · checking saved draft');
+   setupDictation();post('draft_load',{});post('release_status',{});
+  }catch(err){context=null;notify('Evaluation blocked: '+err.message);post('blocking_error',{message:err.message});}
+ }
+if(msg.type==='autofail_result'){
+  const received=msg.payload||{};
+  const allowed=byTitle('Automatic Failure Reason(s)')[0]?.choices||[];
+  const reasons=Array.isArray(received.reasons)?[...new Set(received.reasons.filter(r=>allowed.includes(r)))]:[];
+  const comments=String(received.comments||'').trim();
+  if(!reasons.length||!comments){notify('Select an official Auto-Fail reason and explanation.');return;}
+  autoFail={occurred:true,reasons,comments};
+  notify('Auto-Fail recorded in draft; not yet submitted');scheduleSave();
+}
+if(msg.type==='release_status'){
+   ciSetSubmitState_(Boolean(msg.payload?.submitEnabled),msg.payload?.reason||'');
+   if(!ciSubmitAllowed)notify('Draft mode · official submission is not enabled');ciFinalPaint_();
+ }
+ if(msg.type==='draft_loaded'){if(msg.payload.found&&msg.payload.draft?.uiState)restoreUI(msg.payload.draft.uiState);notify(msg.payload.found?'Draft restored':'New evaluation · not submitted');}
+ if(msg.type==='save_result'){
+   saving=false;
+   const recordedAt=msg.payload?.savedAt;const displayTime=recordedAt&&!Number.isNaN(Date.parse(recordedAt))?new Date(recordedAt).toLocaleTimeString():'time unavailable';
+   const el=document.querySelector('.rbox.quick .saved');if(el)el.textContent=dirty?'● Unsaved changes':'✓ Saved '+displayTime;
+   notify(dirty?'Changes pending; saving again…':'Draft saved '+displayTime);
+   if(dirty){save(Boolean(ciLeaveRequested));return;}
+   if(msg.payload.stopping||ciLeaveRequested){post('exit',{target:ciLeaveTarget});ciLeaveRequested=false;}
+ }
+ if(msg.type==='error'){
+   const action=String(msg.payload?.action||'');const detail=String(msg.payload?.message||'Unknown error');
+   if(action==='draft_save'||action==='draft_stop'||action==='draft_load'){
+     saving=false;dirty=true;ciLeaveRequested=false;const el=document.querySelector('.rbox.quick .saved');if(el)el.textContent='⚠ Not saved';
+     notify('Draft storage unavailable: '+detail+'. Keep this page open; no save is confirmed.');
+   } else if(action==='release_status'){
+     ciSetSubmitState_(false,detail);notify('Submission access unavailable: '+detail);
+   } else {
+     if(ciPreviewInFlight)ciPreviewFailedSignature=ciRequestedGradeSignature;
+     ciPreviewInFlight=false;ciGradeError=detail;
+     ciProgressSchedule_();
+     if(ciAwaitingSubmitPreview||ciSubmitBusy)ciResetSubmitAfterError_('Grade request failed: '+detail);
+     else notify('Unable to calculate grade: '+detail);
+   }
+ }
+ if(msg.type==='preview_result'){
+   ciPreviewInFlight=false;ciPreviewFailedSignature='';
+   if(ciRequestedGradeSignature && ciRequestedGradeSignature!==ciScoreSignature_()){
+     ciGradeError='Scores changed during grading; recalculating.';
+     ciOfficialGrade=null;ciAwaitingSubmitPreview=false;ciPreparedSubmit=null;
+     ciProgressSchedule_();notify(ciGradeError);return;
+   }
+   const returned=msg.payload||{};
+   if(!Number.isFinite(Number(returned.finalScore))||!['PASS','FAIL'].includes(String(returned.result||'').toUpperCase())){
+     ciGradeError='Official grading response incomplete. Submission remains disabled.';
+     ciOfficialGrade=null;ciAwaitingSubmitPreview=false;ciPreparedSubmit=null;
+     ciProgressSchedule_();notify(ciGradeError);return;
+   }
+   ciOfficialGrade=returned;ciOfficialGradeSignature=ciScoreSignature_();ciGradeError='';
+   ciProgressSchedule_();
+   notify('Official preview: '+returned.result+' · '+returned.finalScore);
+   if(ciAwaitingSubmitPreview){
+     ciAwaitingSubmitPreview=false;
+     if(!ciSubmitAllowed||ciSubmitDone){ciResetSubmitAfterError_('Submission no longer enabled');return;}
+     const grade=msg.payload||{};
+     const score=grade.finalScore===undefined?'not available':String(grade.finalScore);
+     const review=studentReview.status==='reviewed'?'Reviewed with Student':'Review Pending';
+     const summary='Finalize '+(context?.examination||'this examination')+' for '+(context?.student||'the selected student')+'?\n\nOfficial result: '+(grade.result||'Pending')+' · score '+score+'\nStudent review: '+review+'\n\nThis creates an official Clinical Tracking record, document/PDF and coordinator notification. Continue?';
+     if(!confirm(summary)){ciResetSubmitAfterError_('Finalization canceled; draft preserved');return;}
+     ciSubmitBusy=true;ciSetSubmitState_(true);notify('Submitting official evaluation · do not close this page…');
+     post('submit',ciPreparedSubmit);ciPreparedSubmit=null;
+   }
+ }
+ if(msg.type==='submit_error'){
+   ciResetSubmitAfterError_('Submission NOT confirmed: '+String(msg.payload?.message||'Unknown error')+' · submission ID '+(context?.submissionId||''));
+ }
+
+ if(msg.type==='submit_result'){
+   ciSubmitBusy=false;ciSubmitDone=true;ciSetSubmitState_(false);
+   notify('Official evaluation committed: '+String(msg.payload?.submissionId||context?.submissionId||''));
+   const toolbar=document.getElementById('ci-eval-confirmation-host')||document.getElementById('ci-final-details');
+   if(toolbar){let summary=document.getElementById('ci-eval-confirmation');if(!summary){summary=document.createElement('div');summary.id='ci-eval-confirmation';summary.setAttribute('role','status');summary.style.cssText='padding:12px;border:1px solid #a3cfaa;background:#ebf8ed;border-radius:8px;flex:1 0 100%';toolbar.append(summary);}
+     summary.replaceChildren();const title=document.createElement('strong');title.textContent='Official evaluation recorded';const note=document.createElement('p');note.textContent='Submission ID: '+String(msg.payload?.submissionId||'')+' · '+(msg.payload?.duplicate?'Previously committed (no duplicate created)':'New submission');summary.append(title,note);
+     const doc=msg.payload?.document||{};
+     for(const [label,url] of [['Open evaluation document',doc.docUrl],['Open evaluation PDF',doc.pdfUrl]]){
+       if(typeof url==='string'&&/^https:\/\/docs\.google\.com\//.test(url)||typeof url==='string'&&/^https:\/\/drive\.google\.com\//.test(url)){
+         const a=document.createElement('a');a.textContent=label;a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.style.cssText='margin-right:12px;color:#0969b5';summary.append(a);
+       }
+     }
+     const back=document.createElement('button');back.type='button';back.textContent='Return to Evaluations';back.onclick=()=>post('exit',{});summary.append(back);
+   }
+ }
+
+});
+// Capture the pre-existing approved score and navigation controls; no change
+// to criterion CSS, grouping, page sizes or main visual composition.
+document.addEventListener('click',e=>{if(e.target.closest('.fail')){e.preventDefault();e.stopImmediatePropagation();autoFailModal();return;}
+   if(e.target.closest('.dictate')){e.preventDefault();e.stopImmediatePropagation();const button=e.target.closest('.dictate');const t=button.closest('.ie-comments,.comments')?.querySelector('textarea');if(t)dictation(t,button);return;}
+ if(e.target.closest('#prev,#next,.section')){const t=document.querySelector('.comments textarea');if(t)sectionComments[current]=t.value;}
+ if(e.target.closest('.scorebtn,.scores,.criterion,.pc-group,.section,#prev,#next,.ie-view,.score-option'))setTimeout(()=>{scheduleSave();setupDictation();ciProgressSchedule_();},60)},true);
+document.addEventListener('input',e=>{if(e.target.matches('.comments textarea'))sectionComments[current]=e.target.value;if(e.target.matches('textarea,input'))scheduleSave()},true);
+document.addEventListener('ci-eval-ui-change',()=>{scheduleSave();ciProgressSchedule_();});
+let ciLastSection=-1;const titleNode=document.getElementById('commentTitle');if(titleNode){new MutationObserver(()=>{if(typeof current==='number'&&current!==ciLastSection){ciLastSection=current;hydrateSectionComment();}}).observe(titleNode,{characterData:true,childList:true,subtree:true});}
+/** Only the approved Overall Competency action can submit. Never enable here. */
+function ciFinalizeSubmit_(){
+   if(!ciSubmitAllowed||ciSubmitBusy||ciSubmitDone){notify('Official submission is unavailable or already in progress');return;}
+   if(!context||!context.submissionId){notify('Missing stable submission ID');return;}
+   try{
+     const data=exportAnswers();if(!data.complete)throw new Error('Complete every required criterion or record an official Auto-Fail first');
+     if(autoFail.occurred&&(!autoFail.reasons.length||!autoFail.comments.trim()))throw new Error('Auto-Fail requires an official reason and explanation');
+     if(!autoFail.occurred){
+       const views=window.ciEvalImageViews||[];
+       const used=views.filter(v=>String(v.name||'').trim()||Object.keys(v.scores||{}).length||v.present||v.ei||v.comment);
+       if(!used.length)throw new Error('Record at least one graded image view before official submission');
+       for(const view of used)if(!String(view.name||'').trim()||Object.keys(view.scores||{}).length!==4||!view.present||!view.side||!view.legible)
+         throw new Error('Complete every started image view: projection, 4 criteria, and 3 marker checks');
+     }
+     const review=UI().studentReview;
+     if(review.status!=='reviewed'&&review.status!=='pending')throw new Error('Select Reviewed with Student or Review Pending');
+     ciPreparedSubmit={...data,uiState:UI(),currentSection:typeof current==='number'?current:0,reviewPending:review.status==='pending'};
+     ciAwaitingSubmitPreview=true;ciRequestedGradeSignature=ciScoreSignature_();
+     notify('Checking official grading before final confirmation…');post('preview',ciPreparedSubmit);
+   }catch(err){ciAwaitingSubmitPreview=false;ciPreparedSubmit=null;notify(String(err.message||err));}
+}
+/** Quick Actions are contextual, never a second cramped toolbar. */
+function ciWireQuickActions_(){
+ const bind=(id,action)=>{const button=document.getElementById(id);if(button)button.onclick=action;};
+ bind('ci-quick-save',()=>{if(!context){notify('Evaluation is not ready');return;}save(false);});
+ bind('ci-quick-return',()=>{ciLeaveTarget='evaluations';save(true);});
+ bind('ci-quick-comment',()=>{window.go(8);const field=document.getElementById('ci-final-comment');if(field){field.focus({preventScroll:true});field.scrollIntoView({behavior:'smooth',block:'center'});}});
+ bind('ci-quick-scoring',()=>post('scoring_guide_open',{}));
+ bind('ci-quick-print',()=>{
+  if(!context){notify('Evaluation is not ready to print');return;}
+  const rows=[];
+  sections.forEach((section,i)=>section.criteria.forEach((criterion,j)=>{
+   const rating=scores[i+'-'+j];rows.push({section:section.name,criterion:String(criterion),rating:rating===undefined?'Not scored':String(rating)});
+  }));
+  const images=(window.ciEvalImageViews||[]).filter(v=>String(v.name||'').trim()||Object.keys(v.scores||{}).length).map(v=>({name:v.name||'Unselected view',scores:{...v.scores},markerPresent:v.present,markerSide:v.side,markerQuality:v.legible,comment:v.comment}));
+  post('draft_print_open',{student:context.student,studentId:context.studentId,examination:context.examination,date:context.date,
+    savedStatus:document.querySelector('.rbox.quick .saved')?.textContent||'Not saved',
+    grade:ciOfficialGrade?{result:ciOfficialGrade.result,finalScore:ciOfficialGrade.finalScore,convertedPercent:ciOfficialGrade.convertedPercent}:null,
+    rows,images,comments:{...sectionComments},reviewStatus:studentReview.status});
+ });
+}
+window.ciOpenStudentReview_=ciOpenStudentReview;window.ciFinalizeSubmit_=ciFinalizeSubmit_;
+ciWireQuickActions_();ciSetSubmitState_(false);
+setupDictation();
+const ciGradingPriorGo_=window.go;
+ window.ciRetryGrade_=()=>{ciPreviewFailedSignature='';ciQueueGradePreview_();};
+ window.go=function(section){
+ // Explicitly leaving and reopening Overall allows a manual retry after a
+ // transient rule/service failure without adding a permanent grade button.
+ if(Number(section)!==8)ciPreviewFailedSignature='';
+ ciGradingPriorGo_(section);
+ if(Number(section)===8)ciQueueGradePreview_();
+};
+})();
+</script></body></html>

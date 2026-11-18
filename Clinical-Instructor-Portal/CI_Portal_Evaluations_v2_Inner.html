@@ -1,0 +1,278 @@
+<!-- Based on user-approved Evaluations LOCKED v2 (2026-10-06). No second portal header/sidebar. -->
+<style>
+#ci-evaluations-overview-root{max-width:1180px;margin:0 auto;padding:24px 24px 48px}
+#ci-evaluations-overview-root .eval-section{margin-top:20px}
+#ci-evaluations-overview-root .eval-section:first-child{margin-top:0}
+#ci-evaluations-overview-root .eval-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:11px}
+#ci-evaluations-overview-root .eval-head h2{margin:0;color:#173653;font-size:15px}
+#ci-evaluations-overview-root .eval-head p{margin:4px 0 0;color:#7a8da0;font-size:11px}
+#ci-evaluations-overview-root .eval-link{border:0;background:transparent;color:#0877dc;font-weight:800;padding:7px}
+#ci-evaluations-overview-root .progress-card{background:#fff;border:1px solid #dce6ee;border-radius:14px;padding:17px 18px;display:grid;grid-template-columns:54px 1fr auto;gap:14px;align-items:center;box-shadow:0 3px 10px rgba(22,51,80,.05)}
+#ci-evaluations-overview-root .progress-icon{width:48px;height:48px;border-radius:12px;background:#edf6ff;color:#0877dc;display:grid;place-items:center;font-weight:900;font-size:18px}
+#ci-evaluations-overview-root .progress-copy strong{display:block;color:#173653;font-size:14px}
+#ci-evaluations-overview-root .progress-copy small{display:block;color:#70839a;font-size:11px;margin-top:4px;line-height:1.45}
+#ci-evaluations-overview-root .mini-progress{width:170px;height:6px;background:#e9eff4;border-radius:6px;overflow:hidden;margin-top:9px}
+#ci-evaluations-overview-root .mini-progress span{display:block;height:100%;width:44%;background:#1681dd;border-radius:6px}
+#ci-evaluations-overview-root .resume-btn{border:0;background:#0877dc;color:#fff;border-radius:9px;padding:10px 14px;font-weight:800}
+#ci-evaluations-overview-root .start-card{background:#fff;border:1px solid #dce6ee;border-radius:14px;padding:19px;box-shadow:0 3px 10px rgba(22,51,80,.05)}
+#ci-evaluations-overview-root .step-label{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8395a7;margin-bottom:9px}
+#ci-evaluations-overview-root .student-picker{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+#ci-evaluations-overview-root .student-chip{border:1px solid #d5e2ec;background:#fff;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:9px;color:#36536d;font-weight:750}
+#ci-evaluations-overview-root .student-chip.active{border-color:#78b7e6;background:#f2f9ff;color:#0877dc}
+#ci-evaluations-overview-root .student-dot{width:30px;height:30px;border-radius:9px;background:#e8f0f6;display:grid;place-items:center;font-size:10px;font-weight:900}
+#ci-evaluations-overview-root .instrument-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+#ci-evaluations-overview-root .instrument{border:1px solid #dce6ee;background:#fff;border-radius:12px;padding:15px;text-align:left;min-height:108px;position:relative}
+#ci-evaluations-overview-root .instrument:hover{border-color:#8ec2e8;background:#f9fcff}
+#ci-evaluations-overview-root .instrument-icon{width:34px;height:34px;border-radius:9px;background:#edf6ff;color:#0877dc;display:grid;place-items:center;font-weight:900;margin-bottom:10px}
+#ci-evaluations-overview-root .instrument strong{display:block;color:#203d58;font-size:13px}
+#ci-evaluations-overview-root .instrument small{display:block;color:#788b9e;font-size:10.5px;margin-top:5px;line-height:1.35}
+#ci-evaluations-overview-root .instrument .arrow{position:absolute;right:13px;top:14px;color:#91a4b6;font-size:18px}
+#ci-evaluations-overview-root .recent-card{background:#fff;border:1px solid #dce6ee;border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(22,51,80,.05)}
+#ci-evaluations-overview-root .recent-row{display:grid;grid-template-columns:1.4fr 1fr .8fr auto;gap:14px;align-items:center;padding:14px 17px;border-bottom:1px solid #e8eef3}
+#ci-evaluations-overview-root .recent-row:last-child{border-bottom:0}
+#ci-evaluations-overview-root .recent-row strong{display:block;color:#203d58;font-size:12.5px}
+#ci-evaluations-overview-root .recent-row small{display:block;color:#7c8fa1;font-size:10.5px;margin-top:3px}
+#ci-evaluations-overview-root .status{display:inline-flex;border-radius:12px;padding:4px 8px;font-size:10px;font-weight:850}
+#ci-evaluations-overview-root .status.reviewed{background:#edf8f1;color:#237b43}
+#ci-evaluations-overview-root .status.submitted{background:#edf6ff;color:#0877dc}
+#ci-evaluations-overview-root .status.action{background:#fff0ee;color:#c13c32}
+#ci-evaluations-overview-root .row-btn{border:0;background:transparent;color:#0877dc;font-weight:800}
+#ci-evaluations-overview-root .start-overlay{position:fixed;inset:0;background:rgba(10,29,49,.34);z-index:80;display:none;place-items:center;padding:22px}
+#ci-evaluations-overview-root .start-overlay.open{display:grid}
+#ci-evaluations-overview-root .start-modal{width:min(560px,96vw);background:#fff;border-radius:15px;box-shadow:0 24px 60px rgba(8,30,53,.25);overflow:hidden}
+#ci-evaluations-overview-root .start-modal-head{padding:17px 19px;border-bottom:1px solid #e5ecf2;display:flex;justify-content:space-between;align-items:center}
+#ci-evaluations-overview-root .start-modal-head strong{color:#173653}
+#ci-evaluations-overview-root .modal-close{border:0;background:none;font-size:24px;color:#71859a}
+#ci-evaluations-overview-root .start-modal-body{padding:19px}
+#ci-evaluations-overview-root .selected-context{background:#f5f9fc;border-radius:10px;padding:11px 13px;color:#49667f;font-size:11px;margin-bottom:14px}
+#ci-evaluations-overview-root .start-modal-body h3{font-size:16px;color:#173653;margin:0 0 7px}
+#ci-evaluations-overview-root .start-modal-body p{font-size:11px;color:#74889b;line-height:1.5;margin:0 0 14px}
+#ci-evaluations-overview-root .continue-btn{width:100%;border:0;background:#0877dc;color:#fff;border-radius:9px;padding:11px;font-weight:850}
+@media (max-width:850px){#ci-evaluations-overview-root .instrument-grid{grid-template-columns:1fr 1fr}
+#ci-evaluations-overview-root .recent-row{grid-template-columns:1fr auto}
+#ci-evaluations-overview-root .recent-row>div:nth-child(2){display:none}
+#ci-evaluations-overview-root .progress-card{grid-template-columns:48px 1fr}
+#ci-evaluations-overview-root .progress-card .resume-btn{grid-column:1/-1}
+#ci-evaluations-overview-root .mini-progress{width:100%}}
+@media (max-width:560px){#ci-evaluations-overview-root .instrument-grid{grid-template-columns:1fr}}
+#ci-evaluations-overview-root .instrument{
+  position:relative;
+  overflow:hidden;
+  min-height:128px;
+  padding:0 42px 0 148px !important;
+  text-align:left;
+}
+#ci-evaluations-overview-root .instrument .instrument-icon{display:none !important}
+#ci-evaluations-overview-root .instrument .instrument-picture{
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:126px;
+  overflow:hidden;
+  border-right:1px solid #e5e7eb;
+  background:#15202b;
+}
+#ci-evaluations-overview-root .instrument .instrument-picture svg{width:100%;height:100%;display:block}
+#ci-evaluations-overview-root .instrument strong{display:block;margin-bottom:6px}
+#ci-evaluations-overview-root .instrument small{display:block;line-height:1.45}
+#ci-evaluations-overview-root .instrument .arrow{z-index:2}
+@media (max-width:800px){#ci-evaluations-overview-root .instrument{padding-left:116px !important;min-height:118px}
+#ci-evaluations-overview-root .instrument .instrument-picture{width:96px}}
+#ci-evaluations-overview-root{padding:18px 22px 44px;max-width:1200px;margin:0 auto;color:#102440}
+#ci-evaluations-overview-root .ci-evals-page-title{font-size:24px;font-weight:800;color:#173653;margin:0 0 5px}
+#ci-evaluations-overview-root .ci-evals-page-description{color:#70839a;font-size:13px;margin:0 0 20px}
+#ci-evaluations-overview-root .ci-evals-placeholder{padding:20px;border:1px solid #dce6ee;border-radius:12px;background:#fff;color:#60738b;font-size:13px;line-height:1.5}
+#ci-evaluations-overview-root .ci-evals-student-empty{font-size:13px;color:#6b7b91;padding:12px 0}
+#ci-evaluations-overview-root .ci-evals-chosen{border-color:#1681dd;background:#f0f8ff}
+#ci-evaluations-overview-root .ci-evals-record{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid #e7eef4}
+#ci-evaluations-overview-root .ci-evals-record:last-child{border-bottom:0}
+#ci-evaluations-overview-root .ci-evals-record strong{display:block;font-size:13px;color:#173653}
+#ci-evaluations-overview-root .ci-evals-record small{display:block;font-size:11px;color:#6e8196;margin-top:4px}
+#ci-evaluations-overview-root .ci-evals-result{border-radius:12px;background:#edf6ff;color:#076dc8;font-size:11px;font-weight:800;padding:5px 10px}
+#ci-evaluations-overview-root .ci-evals-result.fail{color:#a72c2c;background:#fff1ee}
+#ci-evaluations-overview-root .instrument{cursor:pointer}
+#ci-evals-v2-modal{position:fixed;inset:0;z-index:1000}
+#ci-evals-v2-modal[hidden]{display:none!important}
+#ci-evals-v2-modal .start-modal{max-height:calc(100vh - 40px);overflow:auto}
+@media(max-width:620px){#ci-evaluations-overview-root{padding:16px 12px 28px}#ci-evaluations-overview-root .ci-evals-page-title{font-size:21px}}
+</style>
+<div class="eval-wrap" id="ci-evaluations-overview-root"><h1 class="ci-evals-page-title">Evaluations</h1><p class="ci-evals-page-description">Review your progress, select a student, and choose an evaluation instrument.</p>
+<section class="eval-section">
+<div class="eval-head">
+<div><h2>In Progress</h2><p>Continue exactly where you left off.</p></div>
+<button class="eval-link" data-ev-action="all-drafts" type="button">View All →</button>
+</div>
+<div aria-live="polite" class="ci-evals-placeholder" id="ci-evals-draft-state">Saved evaluations and resume functionality will appear here once the approved draft service is connected. No draft status has been verified.</div>
+</section>
+<section class="eval-section">
+<div class="eval-head">
+<div><h2>Start an Evaluation</h2><p>Choose the student, then the evaluation instrument.</p></div>
+</div>
+<div class="start-card">
+<div class="step-label">1 · Student</div>
+<div aria-label="Select student for evaluation" class="student-picker" id="ci-evals-student-picker"></div>
+<div class="step-label">2 · Evaluation Instrument</div>
+<div class="instrument-grid">
+<button class="instrument" data-instrument="Competency Evaluation" type="button"><span class="arrow">›</span><span aria-hidden="true" class="instrument-picture"><svg viewbox="0 0 126 128" xmlns="http://www.w3.org/2000/svg"><defs><radialgradient id="g1"><stop stop-color="#dbeafe"></stop><stop offset="1" stop-color="#0f172a"></stop></radialgradient></defs>
+<rect fill="#07111e" height="128" width="126"></rect><rect fill="url(#g1)" height="114" opacity=".9" rx="12" width="82" x="22" y="7"></rect>
+<path d="M63 18v91M59 25C42 29 31 44 31 66s11 37 28 41M67 25c17 4 28 19 28 41s-11 37-28 41" fill="none" opacity=".8" stroke="#e5f2ff" stroke-width="3"></path>
+<path d="M45 33c-8 11-11 23-10 38 1 15 7 26 18 32M81 33c8 11 11 23 10 38-1 15-7 26-18 32" fill="none" opacity=".7" stroke="#b9d9f6" stroke-width="2"></path></svg></span><strong>Competency Evaluation</strong><small>Clinical examination scoring and image evaluation.</small></button>
+
+
+
+
+<button class="instrument" data-instrument="Professional Competency Evaluation" type="button"><span class="arrow">›</span><span aria-hidden="true" class="instrument-picture"><svg viewbox="0 0 126 128" xmlns="http://www.w3.org/2000/svg"><defs><lineargradient id="g6" x2="1" y2="1"><stop stop-color="#31556a"></stop><stop offset="1" stop-color="#10212c"></stop></lineargradient></defs>
+<rect fill="url(#g6)" height="128" width="126"></rect><circle cx="42" cy="39" fill="#e5c5a8" r="17"></circle><circle cx="86" cy="42" fill="#d7b092" r="16"></circle>
+<path d="M20 105c2-27 12-43 29-43s27 16 29 43" fill="#e8f0f3"></path><path d="M64 105c2-25 11-40 27-40 14 0 23 14 25 40" fill="#8ec5c5"></path>
+<path d="M37 67l5 25 7-25M82 68l4 23 7-22" fill="none" stroke="#31556a" stroke-width="3"></path>
+<rect fill="#fff" height="29" rx="3" stroke="#78909c" width="24" x="50" y="84"></rect><path d="M55 93h14M55 99h14M55 105h10" stroke="#7a8d99" stroke-width="2"></path></svg></span><strong>Professional Competency Evaluation</strong><small>Professional competency assessment workflow.</small></button>
+</div>
+</div>
+</section>
+<section class="eval-section">
+<div class="eval-head">
+<div><h2>Recently Completed</h2><p>Your recent submissions and coordinator review state.</p></div>
+<button class="eval-link" data-ev-action="all-recent" type="button">View All Evaluations →</button>
+</div>
+<div class="recent-card" id="ci-evals-recent-list"><div aria-live="polite" class="ci-evals-placeholder" id="ci-evals-recent-state">Select an authorized student above to view recorded evaluations.</div></div>
+</section>
+<div class="start-overlay" hidden="" id="ci-evals-v2-modal">
+<div class="start-modal">
+<div class="start-modal-head"><strong>Start Evaluation</strong><button class="modal-close" id="ci-evals-v2-close">×</button></div>
+<div class="start-modal-body">
+<div class="selected-context" id="ci-evals-v2-context">Select student · Competency Evaluation</div>
+<h3 id="ci-evals-v2-title">Competency Evaluation</h3>
+<p id="ci-evals-v2-text">Select an examination to open the approved Competency Evaluation for the selected student.</p>
+<button class="continue-btn" id="ci-evals-v2-continue">Continue →</button>
+</div>
+</div>
+</div></div>
+<script>
+/* Approved Evaluations v2 overview: read-only until an instructor explicitly starts an evaluation. */
+(function () {
+ 'use strict';
+ let selectedId='';
+ let pendingInstrument='';
+ let historyRequest=0;
+ let draftRequest=0;
+ const byId=id=>document.getElementById(id);
+ const root=()=>byId('ci-evaluations-overview-root');
+ function roster() {
+   if(typeof ciRoster!=='function'||!ciHome)return [];
+   return ciRoster().filter(s=>s&&s.studentId);
+ }
+ function studentName(s) {return typeof ciStudentName==='function'?ciStudentName(s):String(s.name||s.studentId||'Student');}
+ function showMessage(title,message) {
+   if(typeof ciDialog==='function')ciDialog(title,'<p>'+ciEsc(message)+'</p>');
+ }
+ function setSelected(id) {
+   selectedId=String(id||'');
+   root().querySelectorAll('.student-chip[data-student-id]').forEach(b=>b.classList.toggle('active',b.dataset.studentId===selectedId));
+   loadRecent();
+ }
+ function render() {
+   const dest=byId('ci-evals-student-picker');
+   if(!dest)return;
+   dest.replaceChildren();
+   const items=roster();
+   if(selectedId&&!items.some(s=>String(s.studentId)===selectedId))selectedId='';
+   if(!selectedId&&items.length)selectedId=String(items[0].studentId);
+   if(!items.length){const e=document.createElement('span');e.className='ci-evals-student-empty';e.textContent='No students in the current authorized roster. Use Home → Add Student first.';dest.append(e);}
+   items.forEach(s=>{
+     const btn=document.createElement('button');btn.type='button';btn.className='student-chip';btn.dataset.studentId=String(s.studentId);
+     if(String(s.studentId)===selectedId)btn.classList.add('active');
+     const avatar=document.createElement('span');avatar.className='student-dot';avatar.textContent=typeof ciInitials==='function'?ciInitials(studentName(s)):'CI';
+     btn.append(avatar,document.createTextNode(studentName(s)));btn.addEventListener('click',()=>setSelected(s.studentId));dest.append(btn);
+   });
+   const other=document.createElement('button');other.type='button';other.className='student-chip';other.innerHTML='<span class="student-dot">+</span> Other Student';
+   other.addEventListener('click',()=>{if(typeof ciAddStudent==='function')ciAddStudent();else showMessage('Add student','Return to Home to add a student to your current session.');});dest.append(other);
+   loadRecent();loadDrafts();
+ }
+ async function loadRecent() {
+   const dest=byId('ci-evals-recent-list');if(!dest)return;
+   dest.replaceChildren();
+   const myRequest=++historyRequest;
+   if(!selectedId){dest.textContent='Select an authorized student to view their evaluations.';return;}
+   if(typeof ciRun!=='function'||!ciHome||!ciSite){dest.textContent='Evaluation history is unavailable until your signed-in site has loaded.';return;}
+   dest.textContent='Loading the selected student’s existing evaluation history…';
+   try{
+     const data=await ciRun('ciR1StudentProfile',ciToken,ciSite,ciHome.date,selectedId);
+     if(myRequest!==historyRequest)return;
+     dest.replaceChildren();
+     const rows=Array.isArray(data.evaluations)?data.evaluations:[];
+     if(!rows.length){dest.textContent=data.historyNote||'No evaluation history was returned for this instructor and student.';return;}
+     rows.slice().reverse().slice(0,12).forEach(e=>{
+       const row=document.createElement('div');row.className='ci-evals-record';
+       const details=document.createElement('div'),name=document.createElement('strong'),meta=document.createElement('small'),status=document.createElement('span');
+       name.textContent=[e.examination,e.evaluationType].filter(Boolean).join(' · ')||'Evaluation';
+       meta.textContent=[e.date,e.site,e.reviewStatus].filter(Boolean).join(' · ');
+       details.append(name,meta);status.className='ci-evals-result'+(String(e.result||'').toLowerCase()==='fail'?' fail':'');status.textContent=e.result||'Recorded';row.append(details,status);dest.append(row);
+     });
+   }catch(err){if(myRequest===historyRequest)dest.textContent='Could not load evaluation history: '+String(err?.message||err);}
+ }
+ async function loadDrafts(){
+   const dest=byId('ci-evals-draft-state');if(!dest)return;
+   const generation=++draftRequest;
+   if(typeof ciRun!=='function'||!ciToken){dest.textContent='Sign in to see saved evaluations.';return;}
+   dest.textContent='Loading your saved draft evaluations…';
+   try{
+     const result=await ciRun('ciR1EvaluationDraftList',ciToken);
+     if(generation!==draftRequest)return;
+     dest.replaceChildren();const drafts=Array.isArray(result.drafts)?result.drafts:[];
+     if(!drafts.length){dest.textContent='No in-progress evaluations were returned for this instructor.';return;}
+     for(const draft of drafts){
+       const student=roster().find(s=>String(s.studentId)===String(draft.studentId));
+       const row=document.createElement('div');row.className='ci-evals-record';
+       const details=document.createElement('div');const title=document.createElement('strong');
+       title.textContent=student?studentName(student):String(draft.studentId||'Student');
+       const meta=document.createElement('small');meta.textContent=[draft.date,draft.examinationId,'Last saved '+String(draft.savedAt||'').slice(0,16),draft.reviewPending?'Review pending':''].filter(Boolean).join(' · ');
+       details.append(title,meta);row.append(details);
+       const button=document.createElement('button');button.className='eval-link';button.type='button';button.textContent='Resume →';
+       button.onclick=()=>ciResumeEvaluation(draft); // server reauthorizes original site/date/student
+       row.append(button);dest.append(row);
+     }
+   }catch(err){if(generation===draftRequest)dest.textContent='Draft service unavailable: '+String(err?.message||err);}
+ }
+ function openInstrument(name) {
+   const student=roster().find(s=>String(s.studentId)===selectedId);
+   if(!student){showMessage('Select student','Choose a student from your authorized roster first.');return;}
+   if (name === 'Competency Evaluation') {
+  if (typeof ciStartEvaluation !== 'function') {
+    showMessage('Examination picker unavailable', 'The approved examination picker is not loaded.');
+    return;
+  }
+  ciStartEvaluation(student.studentId);
+  return;
+}
+   pendingInstrument=name;
+   byId('ci-evals-v2-context').textContent=studentName(student)+' · '+name;
+   byId('ci-evals-v2-title').textContent=name;
+   const enabled=name==='Competency Evaluation';
+   byId('ci-evals-v2-text').textContent=enabled
+    ? 'Continue to select an examination. The official evaluation form requires the existing CCMS scoring service; if it is not connected, no evaluation will be submitted.'
+    : 'This approved instrument is scheduled for its own functionality integration. No record can be created from this menu yet.';
+   const go=byId('ci-evals-v2-continue');go.textContent=enabled?'Continue →':'Close';
+   byId('ci-evals-v2-modal').hidden=false;
+   byId('ci-evals-v2-modal').classList.add('open');
+ }
+ function closeModal() {const m=byId('ci-evals-v2-modal');m.hidden=true;m.classList.remove('open');}
+ function proceed() {
+   const name=pendingInstrument;closeModal();
+   if(name!=='Competency Evaluation')return;
+   const student=roster().find(s=>String(s.studentId)===selectedId);
+   if(student&&typeof ciStartEvaluation==='function')ciStartEvaluation(student.studentId);
+   else showMessage('Select student','The selected student is no longer available in your current authorized roster.');
+ }
+ const pane=root();
+ if(pane){
+   pane.querySelectorAll('.instrument').forEach(b=>b.addEventListener('click',()=>openInstrument(b.dataset.instrument)));
+   pane.querySelectorAll('[data-ev-action]').forEach(b=>b.addEventListener('click',()=>{
+     if(b.dataset.evAction==='all-recent')loadRecent();
+     else loadDrafts();
+   }));
+ }
+ byId('ci-evals-v2-close').addEventListener('click',closeModal);
+ byId('ci-evals-v2-modal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeModal();});
+ byId('ci-evals-v2-continue').addEventListener('click',proceed);
+ window.ciEvalsV2Render=render;
+})();
+</script>
