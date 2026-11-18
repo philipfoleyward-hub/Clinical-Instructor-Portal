@@ -54,7 +54,7 @@
 function rebuildAttributedClinicalTerms() {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    ccmsPortalWorkbook_();
 
 
   const trackingSheet =
@@ -341,7 +341,7 @@ function clinicalTerm_getForDate(
 ) {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    ccmsPortalWorkbook_();
 
 
   const semesterSheet =

@@ -72,6 +72,16 @@ function ciLink_identity_(data) {
     throw Error('Evaluator session identity mismatch');
   return identity;
 }
+function ccmsPortalWorkbook_() {
+  return ScriptApp.getScriptId() === '1AChtkkIwGg1B3rQdxYVZwu3AMAb_KHSQzguhi0GBSBSWAtsUH372QE7Z'
+    ? ciLink_sandboxBook_() : SpreadsheetApp.getActiveSpreadsheet();
+}
+function ciLink_sandboxBook_() {
+  const id = '1QnKQEKFipHvDz7xitjOoVu1IhlHcBCI1Z_SBQUaJF6Y';
+  if (ScriptApp.getScriptId() !== '1AChtkkIwGg1B3rQdxYVZwu3AMAb_KHSQzguhi0GBSBSWAtsUH372QE7Z' ||
+      ciLink_prop_('CI_PORTAL_QA_WORKBOOK_ID') !== id) throw Error('Invalid TEST-001 backend or workbook');
+  return SpreadsheetApp.openById(id);
+}
 function ciLink_testOnly_(data) {
   if (ciLink_prop_('CI_PORTAL_CCMS_SUBMIT_MODE') !== 'test_only')
     throw Error('CCMS submission is not enabled for TEST-001');
@@ -81,7 +91,7 @@ function ciLink_testOnly_(data) {
   const configured = APP_CONFIG.NOTIFICATIONS.COORDINATOR_RECIPIENTS;
   const recipients = (Array.isArray(configured) ? configured : String(configured || '').split(/[;,]/))
     .map(x => String(x || '').trim().toLowerCase()).filter(Boolean);
-  if (!inbox || recipients.length !== 1 || recipients[0] !== inbox)
+  if (inbox !== 'philipfoleyward@sunyorange.edu' || recipients.length !== 1 || recipients[0] !== inbox)
     throw Error('Approved test-only coordinator mailbox is not isolated');
   return inbox;
 }
@@ -115,7 +125,7 @@ function ciLink_draftOwned_(saved, identity) {
   if (saved.date !== date) throw Error('Evaluation draft date mismatch');
 }
 function ciLink_duplicate_(id) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = ccmsPortalWorkbook_();
   const sheet = appGetSheet_(ss, APP_CONFIG.SHEETS.CLINICAL_TRACKING);
   return clinicalTracking_submissionExists_(sheet, ciLink_draftId_(id));
 }
@@ -149,14 +159,14 @@ function ciLink_draftList_(data) {
   const evaluatorId = String(data.authenticatedEvaluatorId || '');
   // A signed request by itself isn't a user authorization. Verify active
   // evaluator role and Portal Access against the original source workbook.
-  const row = ccmsPortal_reference_(SpreadsheetApp.getActiveSpreadsheet(),
+  const row = ccmsPortal_reference_(ccmsPortalWorkbook_(),
     APP_CONFIG.SHEETS.EVALUATORS, 'Evaluator ID', evaluatorId,
     ['Evaluator Type', 'Active', 'Portal Access']);
   if (!ccmsPortal_true_(row.Active) || !ccmsPortal_true_(row['Portal Access']) ||
       ccmsPortal_norm_(row['Evaluator Type']) !== 'college ci') throw Error('Draft access denied');
   const drafts = [], files = ciLink_draftFolder_().getFiles();
   let count = 0;
-  const ss = SpreadsheetApp.getActiveSpreadsheet(), tracking = appGetSheet_(ss, APP_CONFIG.SHEETS.CLINICAL_TRACKING);
+  const ss = ccmsPortalWorkbook_(), tracking = appGetSheet_(ss, APP_CONFIG.SHEETS.CLINICAL_TRACKING);
   while (files.hasNext()) {
     if (++count > 500) throw Error('Draft list limit exceeded');
     const f = files.next();
@@ -170,18 +180,9 @@ function ciLink_draftList_(data) {
   return {success: true, drafts: drafts.sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt))).slice(0, 100)};
 }
 function ciLink_commitTest001_(data) {
-  // Never let TEST-001 mutate the real master workbook or live script.
-  const sandboxWorkbookId = '1QnKQEKFipHvDz7xitjOoVu1IhlHcBCI1Z_SBQUaJF6Y';
-  const liveWorkbookId = '1YAPUuZ4Es4dzOk1AGsUsc-QC7ECcocBFl4Zy1-IOx80';
-  const activeBook = SpreadsheetApp.getActiveSpreadsheet();
-  if (!activeBook || activeBook.getId() !== sandboxWorkbookId ||
-      activeBook.getId() === liveWorkbookId ||
-      ciLink_prop_('CI_PORTAL_QA_WORKBOOK_ID') !== sandboxWorkbookId) {
-    throw Error('TEST-001 requires the dedicated, explicitly configured sandbox workbook');
-  }
-  if (ScriptApp.getScriptId() === '1d_dO1Oh8fpWIXfJZDx8LHw4etJxSrGLJTCPdb-CpLbf0tB2VTbj7buY_') {
-    throw Error('TEST-001 cannot execute from the live Original CCMS project');
-  }
+  const activeBook = ciLink_sandboxBook_();
+  if (data.authenticatedEvaluatorId !== 'EV-999' || data.evaluatorId !== 'EV-999' ||
+      data.siteId !== 'SITE-004') throw Error('TEST-001 requires its synthetic evaluator at SITE-004');
   if (ciLink_prop_('CI_PORTAL_QA_EVALUATIONS_FOLDER_ID') !==
       '1lWav9VPbat6yj2K2Xx_gAWC6qAQy0BfZ') {
     throw Error('TEST-001 must file documents only in its isolated Evaluations folder');
@@ -302,7 +303,7 @@ function ciLink_commitTest001_(data) {
     });
     // Source Document remains V5.2, NOT the student-review companion.
     // The unrelated Tracking Supporting Document columns are NOT repurposed.
-    track = clinicalTracking_addRecord(record);
+    track = clinicalTracking_addRecord(record, activeBook);
     if (!track || !track.success) throw Error('Original ClinicalTrackingService failed to confirm write');
     if (track.duplicate) return {success: true, duplicate: true, submissionId: id,
       testOnly: true, document: doc, reviewDocument: reviewDoc};
@@ -315,7 +316,7 @@ function ciLink_commitTest001_(data) {
   } finally { lock.releaseLock(); }
 
   let req, notice;
-  try {req = rebuildStudentRequirementStatus();}
+  try {req = reqUpdateStudent_(activeBook, identity.studentId);}
   catch (err) {req = {success: false, error: err.message};}
   // Only this approved institutional inbox is contacted; do NOT call
   // optional evaluator receipt, and visibly label QA subject.
@@ -380,7 +381,7 @@ function ciLink_commitProduction_(data) {
     }
     const term = clinicalTerm_getForDate(outcome.grade.evaluation.date);
     // Evaluator identity and address come from the authoritative Evaluators row.
-    const erow = ccmsPortal_reference_(SpreadsheetApp.getActiveSpreadsheet(),
+    const erow = ccmsPortal_reference_(ccmsPortalWorkbook_(),
       APP_CONFIG.SHEETS.EVALUATORS,'Evaluator ID',identity.evaluatorId,['Evaluator','Evaluator Type','Active','Portal Access']);
     const email = String(erow['Evaluator Email'] || erow.Email || '').trim();
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
@@ -401,7 +402,7 @@ function ciLink_commitProduction_(data) {
       'PDF Document':doc.pdfUrl,'Source Document':doc.docUrl});
   } finally {lock.releaseLock();}
   let requirements, notifications;
-  try {requirements=rebuildStudentRequirementStatus();}
+  try {requirements=reqUpdateStudent_(ccmsPortalWorkbook_(), identity.studentId);}
   catch(e){requirements={success:false,error:String(e.message||e)};}
   // Reuse the exact existing coordinator/evaluator email templates and routing.
   try {notifications=notification_sendEvaluationNotificationsSafely(record);}
@@ -419,6 +420,15 @@ function doPost(e) {
     if (!raw || raw.length > 360000) throw Error('Missing or oversize gateway request');
     const verified = ciLink_verify_(JSON.parse(raw));
     const a = verified.action, data = verified.data;
+    if (ScriptApp.getScriptId() === '1AChtkkIwGg1B3rQdxYVZwu3AMAb_KHSQzguhi0GBSBSWAtsUH372QE7Z') {
+      ciLink_sandboxBook_();
+      if (ciLink_prop_('CI_PORTAL_CCMS_SUBMIT_MODE') !== 'test_only' ||
+          data.authenticatedEvaluatorId !== 'EV-999' ||
+          (a !== 'draft_list' && (data.studentId !== 'TEST-001' || data.siteId !== 'SITE-004'))) {
+        throw Error('Request outside TEST-001 scope');
+      }
+      if (a.startsWith('draft_')) throw Error('Sandbox drafts are managed by the Portal');
+    }
     let result;
     if (a === 'schema') {
       ciLink_identity_(data);
@@ -446,3 +456,4 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
+

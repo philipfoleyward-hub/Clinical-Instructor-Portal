@@ -849,7 +849,7 @@ function evaluationDocument_lookupStudent_(
 ) {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    ccmsPortalWorkbook_();
 
   const studentsSheet =
     appGetSheet_(
@@ -2589,3 +2589,4 @@ function testGenerateLatestEvaluationDocument() {
 
   return result;
 }
+

@@ -39,7 +39,7 @@
  * MAIN ENTRY POINT
  * =====================================================================
  */
-function clinicalTracking_addRecord(record) {
+function clinicalTracking_addRecord(record, workbook) {
 
   if (!record) {
     throw new Error(
@@ -47,8 +47,7 @@ function clinicalTracking_addRecord(record) {
     );
   }
 
-  const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+  const ss = workbook || SpreadsheetApp.getActiveSpreadsheet();
 
   const trackingSheet =
     appGetSheet_(

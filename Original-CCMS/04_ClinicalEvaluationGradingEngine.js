@@ -54,7 +54,7 @@ function gradeClinicalEvaluation(formResponse) {
   }
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    ccmsPortalWorkbook_();
 
   const form =
     FormApp.openById(
@@ -2380,3 +2380,4 @@ function testLatestClinicalEvaluationAutomaticFailure() {
 
   return summary;
 }
+

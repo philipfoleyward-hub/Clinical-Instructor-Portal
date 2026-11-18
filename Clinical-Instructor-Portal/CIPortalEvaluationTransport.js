@@ -53,6 +53,10 @@ function ciPortalEvaluationTrustedPayload_(token,request) {
   // ciHWAccess_ verifies this session once; do not call ciR1Require_ twice.
   const day=String(request.date||'');
   const access=ciHWAccess_(token,request.siteId,day);
+  if (ScriptApp.getScriptId() === '19M0PNJjgtnaFLrKzCcFNV3CSbSRvaIdG_RLbKPP60OPoOPu189XFTR-c' &&
+      (access.evaluator.evaluatorId !== 'EV-999' || request.studentId !== 'TEST-001' || request.siteId !== 'SITE-004')) {
+    throw Error('Evaluation outside TEST-001 scope');
+  }
   const evaluator=access.evaluator;
   if(String(evaluator.evaluatorType||'').trim().toLowerCase()!=='college ci')throw new Error('Hospital instructor evaluation access is not yet configured');
   if(!ciHWGetStudent_(access,request.studentId))throw new Error('Student access unavailable');
@@ -189,11 +193,38 @@ function ciR1EvaluationStop(token,request){
  * matching, reconstructed prerequisites, or silent enrollment decisions.
  * Unmatched items are labelled REVIEW, never assumed eligible or completed.
  */
+function ciPortalStudentRequirements_(book, studentId) {
+  const sheet = book.getSheetByName('Student Requirement Status');
+  if (!sheet) throw Error('Missing Student Requirement Status');
+  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(h => String(h).trim());
+  const required = ['Student ID', 'Status Type', 'Requirement Scope', 'Requirement ID', 'Remaining Count', 'Requirement Timing'];
+  for (const name of required) if (!header.includes(name)) throw Error('Missing requirement column: ' + name);
+  const size = sheet.getLastRow() - 1;
+  if (size <= 0) return [];
+  const col = header.indexOf('Student ID');
+  const ids = sheet.getRange(2, col + 1, size, 1).getValues();
+  const target = ciDataNorm_(studentId);
+  let first = -1, last = -1;
+  ids.forEach(([id], index) => {
+    if (ciDataNorm_(id) !== target) return;
+    if (first < 0) first = index;
+    last = index;
+  });
+  if (first < 0) return [];
+  return sheet.getRange(first + 2, 1, last - first + 1, header.length).getValues()
+    .filter(row => ciDataNorm_(row[col]) === target)
+    .map(row => Object.fromEntries(header.map((name, i) => [name, row[i]])));
+}
+
 function ciR1EvaluationExamOptions(token,siteId,date,studentId) {
+  const started=Date.now();
   const access=ciHWAccess_(token,siteId,date);
   if(!ciHWGetStudent_(access,studentId))throw new Error('Student is not available');
+  const authorizedAt=Date.now();
   const rows=ciDataRows_(access.book,'Examinations',['Examination ID','Examination','Active','College CI Allowed']);
-  const requirements=ciDataRows_(access.book,'Student Requirement Status',['Student ID','Status Type','Requirement Scope','Requirement ID','Remaining Count','Requirement Timing']);
+  const catalogAt=Date.now();
+  const requirements=ciPortalStudentRequirements_(access.book,studentId);
+  console.info(JSON.stringify({phase:'exam options',authorizationMs:authorizedAt-started,catalogMs:catalogAt-authorizedAt,requirementsMs:Date.now()-catalogAt}));
   const studentRequirements=requirements.filter(r=>ciDataNorm_(r['Student ID'])===ciDataNorm_(studentId) &&
     ciDataNorm_(r['Status Type'])==='detail' && ciDataNorm_(r['Requirement Scope'])==='program');
   const requirementById=new Map();
@@ -238,20 +269,27 @@ function ciR1EvaluationExamOptions(token,siteId,date,studentId) {
  * draft write is returned visibly, never misrepresented as saved.
  */
 function ciR1EvaluationInitialize(token,request){
+  const started=Date.now();
   const verified=ciPortalEvaluationTrustedPayload_(token,request);
+  const authorizedAt=Date.now();
   const book=ciDataBook_();
   const authorized=ciDataRows_(book,'Examinations',['Examination ID','Active','College CI Allowed']).some(r=>
     ciDataNorm_(r['Examination ID'])===ciDataNorm_(verified.examinationId) && ciDataTrue_(r.Active)&&ciDataTrue_(r['College CI Allowed']));
   if(!authorized)throw new Error('Examination is no longer authorized for this clinical instructor.');
   verified.submissionId=verified.submissionId||'CI-PORTAL-'+Utilities.getUuid();
+  const examAt=Date.now();
   const schema=ciPortalLoadOfficialFormSchema_(false);
+  const schemaAt=Date.now();
   const views=ciPortalViewCatalog_();
+  const viewsAt=Date.now();
   const html=HtmlService.createHtmlOutputFromFile('CI_Portal_Competency_Approved_Inner').getContent();
+  const htmlAt=Date.now();
   let initialDraft={success:true,notCreated:Boolean(request.submissionId)};
   if(!request.submissionId){
     try{initialDraft=ciDraftSave_(verified,{answers:{},uiState:null,currentSection:0,reviewPending:true});}
     catch(e){initialDraft={success:false,error:String(e.message||e)};}
   }
+  console.info(JSON.stringify({phase:"initialize",authorizationMs:authorizedAt-started,examMs:examAt-authorizedAt,schemaMs:schemaAt-examAt,viewsMs:viewsAt-schemaAt,htmlMs:htmlAt-viewsAt,draftMs:Date.now()-htmlAt}));
   return {success:true,submissionId:verified.submissionId,formItems:schema.formItems,
     schemaLoadedAt:schema.loadedAt,views,html,initialDraft};
 }
@@ -279,4 +317,5 @@ function ciR1EvaluationReleaseStatus(token,studentId){
  return {success:true,submitEnabled:connected,
    reason:connected?'':'Official submission requires a separately authorized CCMS connection.'};
 }
+
 

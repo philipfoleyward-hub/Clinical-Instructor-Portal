@@ -77,7 +77,8 @@ const APP_CONFIG = {
   },
 
   NOTIFICATIONS: {
-    COORDINATOR_RECIPIENTS: [
+    COORDINATOR_RECIPIENTS: ScriptApp.getScriptId() === '1AChtkkIwGg1B3rQdxYVZwu3AMAb_KHSQzguhi0GBSBSWAtsUH372QE7Z'
+      ? ['philipfoleyward@sunyorange.edu'] : [
       'philipfoleyward@sunyorange.edu','nicolemurray@sunyorange.edu','micheleterracino@sunyorange.edu'
     ],
     DASHBOARD_URL: '',
@@ -125,3 +126,4 @@ const APP_CONFIG = {
     HISTORICAL_IMPORT_REQUIRES_LIVE_REVIEW: false
   }
 };
+
