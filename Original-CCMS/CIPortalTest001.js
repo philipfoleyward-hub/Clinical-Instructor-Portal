@@ -170,6 +170,22 @@ function ciLink_draftList_(data) {
   return {success: true, drafts: drafts.sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt))).slice(0, 100)};
 }
 function ciLink_commitTest001_(data) {
+  // Never let TEST-001 mutate the real master workbook or live script.
+  const sandboxWorkbookId = '1QnKQEKFipHvDz7xitjOoVu1IhlHcBCI1Z_SBQUaJF6Y';
+  const liveWorkbookId = '1YAPUuZ4Es4dzOk1AGsUsc-QC7ECcocBFl4Zy1-IOx80';
+  const activeBook = SpreadsheetApp.getActiveSpreadsheet();
+  if (!activeBook || activeBook.getId() !== sandboxWorkbookId ||
+      activeBook.getId() === liveWorkbookId ||
+      ciLink_prop_('CI_PORTAL_QA_WORKBOOK_ID') !== sandboxWorkbookId) {
+    throw Error('TEST-001 requires the dedicated, explicitly configured sandbox workbook');
+  }
+  if (ScriptApp.getScriptId() === '1d_dO1Oh8fpWIXfJZDx8LHw4etJxSrGLJTCPdb-CpLbf0tB2VTbj7buY_') {
+    throw Error('TEST-001 cannot execute from the live Original CCMS project');
+  }
+  if (ciLink_prop_('CI_PORTAL_QA_EVALUATIONS_FOLDER_ID') !==
+      '1lWav9VPbat6yj2K2Xx_gAWC6qAQy0BfZ') {
+    throw Error('TEST-001 must file documents only in its isolated Evaluations folder');
+  }
   // Recheck release at the closest point to irreversible effects.
   const mailbox = ciLink_testOnly_(data);
   const id = ciLink_draftId_(data.submissionId);
