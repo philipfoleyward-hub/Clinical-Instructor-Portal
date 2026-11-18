@@ -189,29 +189,87 @@ function ciLink_commitTest001_(data) {
     throw Error('Official evaluation Drive root is not the approved cohort/student root');
   if (typeof gradeClinicalEvaluationFromPortalPayload !== 'function')
     throw Error('Native grading adapter missing');
+  if (ciLink_prop_('CI_PORTAL_DOCUMENT_PAIR_MODE') !== 'test_only') {
+    throw Error('Dual-document QA output is not enabled');
+  }
+  const qaFolderId = ciLink_prop_('CI_PORTAL_QA_EVALUATIONS_FOLDER_ID');
+  if (!qaFolderId) throw Error('Approved TEST-001 Evaluations folder is required');
+  if (typeof ccmsStudentReview_generate_ !== 'function' ||
+      typeof driveService_copySubmissionCompanion_ !== 'function') {
+    throw Error('Dual-document source dependencies are not installed');
+  }
   const outcome = gradeClinicalEvaluationFromPortalPayload(data);
+  // TEST-001 always targets the approved isolated QA folder; never create
+  // a name-derived student folder or run synthetic comprehensive body asserts.
+  outcome.grade.qaOutput = true;
+  outcome.grade.qaComprehensive = false;
+  outcome.grade.qaOutputFolderId = qaFolderId;
   if (outcome.identity.studentId !== identity.studentId ||
       outcome.identity.evaluatorId !== identity.evaluatorId) throw Error('Grade identity mismatch');
 
   const lock = LockService.getScriptLock(); lock.waitLock(30000);
-  let doc, track, record;
+  let doc, reviewDoc, track, record, submittedAt;
   const key = 'CI_TEST001_DOC_' + Utilities.base64EncodeWebSafe(
     Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, id)
   ).replace(/=+$/, '');
   try {
-    if (ciLink_duplicate_(id))
-      return {success: true, duplicate: true, submissionId: id,
-        message: 'TEST-001 was already committed; no repeat documents, ledger entry or email'};
     const props = PropertiesService.getScriptProperties();
-    try {doc = JSON.parse(props.getProperty(key) || 'null');} catch (e) {doc = null;}
-    if (!doc || doc.submissionId !== id || !doc.docUrl || !doc.pdfUrl) {
-      // Official approved document generator and DriveService remain owners.
-      doc = evaluationDocument_generate(outcome.grade);
-      if (!doc || !doc.success || !doc.docUrl || !doc.pdfUrl)
-        throw Error('Official Doc/PDF output not confirmed; no Tracking append');
-      props.setProperty(key, JSON.stringify({submissionId: id, docUrl: doc.docUrl,
-        pdfUrl: doc.pdfUrl, docId: doc.docId || '', pdfId: doc.pdfId || ''}));
+    let receipt;
+    try { receipt = JSON.parse(props.getProperty(key) || 'null'); }
+    catch (e) { throw Error('Existing submission receipt is corrupt; manual reconciliation required'); }
+    if (receipt && receipt.submissionId !== id)
+      throw Error('Submission receipt identity conflict');
+    if (ciLink_duplicate_(id)) {
+      return {success: true, duplicate: true, submissionId: id, testOnly: true,
+        document: receipt && receipt.officialDocument || null,
+        reviewDocument: receipt && receipt.reviewDocument || null,
+        message: 'TEST-001 was already committed; no repeat documents, ledger entry or email'};
     }
+    // One server timestamp survives retry, and the client cannot replace it.
+    if (!receipt) {
+      receipt = {submissionId: id, submittedAt: new Date().toISOString(),
+        stage: 'started', officialDocument: null, reviewDocument: null};
+      props.setProperty(key, JSON.stringify(receipt));
+    }
+    submittedAt = receipt.submittedAt;
+    if (!submittedAt || !Number.isFinite(Date.parse(submittedAt)))
+      throw Error('Persisted server submission time is invalid');
+
+    doc = receipt.officialDocument;
+    if (!doc || !doc.docId || !doc.pdfId || !doc.docUrl || !doc.pdfUrl) {
+      // Existing authoritative V5.2 generator; do not change grading.
+      const generated = evaluationDocument_generate(outcome.grade);
+      if (!generated || !generated.success || !generated.docId || !generated.pdfId ||
+          !generated.docUrl || !generated.pdfUrl)
+        throw Error('Official Doc/PDF output not confirmed; no Tracking append');
+      doc = {docId: generated.docId, pdfId: generated.pdfId,
+        docUrl: generated.docUrl, pdfUrl: generated.pdfUrl};
+      receipt.officialDocument = doc;
+      receipt.stage = 'official_generated';
+      props.setProperty(key, JSON.stringify(receipt));
+    }
+    reviewDoc = receipt.reviewDocument;
+    if (!reviewDoc || !reviewDoc.docId || !reviewDoc.pdfId ||
+        !reviewDoc.docUrl || !reviewDoc.pdfUrl) {
+      // Test-only DriveService extension checks that official Doc/PDF are
+      // already in an approved QA Evaluations folder. Fails closed otherwise.
+      const generatedReview = ccmsStudentReview_generate_({
+        identity: identity,
+        submissionId: id,
+        submittedAt: submittedAt,
+        review: review,
+        officialDocument: doc
+      });
+      if (!generatedReview || !generatedReview.success || !generatedReview.docId ||
+          !generatedReview.pdfId || !generatedReview.docUrl || !generatedReview.pdfUrl)
+        throw Error('Student Review Doc/PDF output not confirmed; no Tracking append');
+      reviewDoc = {docId: generatedReview.docId, pdfId: generatedReview.pdfId,
+        docUrl: generatedReview.docUrl, pdfUrl: generatedReview.pdfUrl};
+      receipt.reviewDocument = reviewDoc;
+      receipt.stage = 'pair_generated';
+      props.setProperty(key, JSON.stringify(receipt));
+    }
+
     const attributed = clinicalTerm_getForDate(outcome.grade.evaluation.date);
     record = digitalEvaluation_buildTrackingRecord_({
       submissionId: id, grade: outcome.grade, attributedClinicalTerm: attributed,
@@ -223,10 +281,16 @@ function ciLink_commitTest001_(data) {
       'Examination ID': identity.examinationId, 'Entered By': 'CI Portal — TEST-001',
       'Source': 'CI Portal', 'Submission Method': 'CI Portal'
     });
+    // Source Document remains V5.2, NOT the student-review companion.
+    // The unrelated Tracking Supporting Document columns are NOT repurposed.
     track = clinicalTracking_addRecord(record);
     if (!track || !track.success) throw Error('Original ClinicalTrackingService failed to confirm write');
-    if (track.duplicate) return {success: true, duplicate: true, submissionId: id};
-    props.deleteProperty(key);
+    if (track.duplicate) return {success: true, duplicate: true, submissionId: id,
+      testOnly: true, document: doc, reviewDocument: reviewDoc};
+    receipt.stage = 'tracked';
+    // Retained only for bounded TEST-001 integration; not a production
+    // artifact registry. Production needs an authoritative durable reference.
+    props.setProperty(key, JSON.stringify(receipt));
     record = Object.assign({}, track.record || record, {'PDF Document': doc.pdfUrl,
       'Evaluator Email': ''});
   } finally { lock.releaseLock(); }
@@ -242,12 +306,16 @@ function ciLink_commitTest001_(data) {
       body: 'This is a TEST submission, not a real student evaluation.\n' +
         'Submission ID: ' + id + '\nResult: ' + String(outcome.grade.result || '') +
         '\nFinal Score: ' + String(outcome.grade.finalScore) +
-        '\nGoogle Doc: ' + doc.docUrl + '\nPDF: ' + doc.pdfUrl});
+        '\nOfficial Google Doc: ' + doc.docUrl + '\nOfficial PDF: ' + doc.pdfUrl +
+        '\nStudent Review Doc: ' + reviewDoc.docUrl +
+        '\nStudent Review PDF: ' + reviewDoc.pdfUrl});
     notice = {success: true, recipient: mailbox, testOnly: true};
   } catch (err) {notice = {success: false, error: err.message};}
   return {success: true, duplicate: false, testOnly: true, submissionId: id,
     document: {docId: doc.docId || '', docUrl: doc.docUrl || '',
       pdfId: doc.pdfId || '', pdfUrl: doc.pdfUrl || ''},
+    reviewDocument: {docId: reviewDoc.docId || '', docUrl: reviewDoc.docUrl || '',
+      pdfId: reviewDoc.pdfId || '', pdfUrl: reviewDoc.pdfUrl || ''},
     requirements: req, notifications: notice,
     grade: {finalScore: outcome.grade.finalScore, result: outcome.grade.result}};
 }
