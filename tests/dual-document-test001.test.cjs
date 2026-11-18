@@ -26,6 +26,15 @@ assert(testSection.indexOf('receipt.officialDocument = doc') < testSection.index
 assert(testSection.indexOf('receipt.reviewDocument = reviewDoc') < testSection.indexOf('clinicalTracking_addRecord('));
 assert(testSection.includes('reviewDocument: reviewDoc'));
 assert(testSection.includes('ciLink_duplicate_(id)'));
+// The test-only commit must validate the dedicated QA folder and its exact parent,
+// not depend on the live clinical evaluations root.
+assert(testSection.includes("qaFolder.getName() !== 'Evaluations'"));
+assert(testSection.includes("qaParent.next().getId() !== '1B3MD_gvDZZS338cfNMkDeOceGt3TXgFZ'"));
+assert(!testSection.includes('driveService_getClinicalEvaluationsRoot_()'));
+// Only the authenticated, explicitly named submit action can reach a commit.
+const route = gateway.slice(gateway.indexOf('function doPost(e) {'));
+assert(route.includes("} else if (a === 'submit') {"));
+assert(route.includes("throw Error('Unsupported gateway action')"));
 assert(filing.includes("CI_PORTAL_QA_EVALUATIONS_FOLDER_ID"));
 assert(review.includes("'{{SUBMISSION_ID}}': submissionId"));
 
