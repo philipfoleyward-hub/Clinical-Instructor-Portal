@@ -949,7 +949,7 @@ function digitalEvaluation_lookupStudent_(
 
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    typeof ccmsPortalWorkbook_ === 'function' ? ccmsPortalWorkbook_() : SpreadsheetApp.getActiveSpreadsheet();
 
 
   const sheet =
