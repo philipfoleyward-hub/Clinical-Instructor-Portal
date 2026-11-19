@@ -126,7 +126,8 @@ function evaluationDocument_generate(grade) {
   const documentFile = qaOutput
     ? evaluationDocument_copyTemplateForQa_(
         masterFile,
-        fileName
+        fileName,
+        grade.qaOutputFolderId || ''
       )
     : driveService_copyTemplateToStudentFolder({
         templateId: templateId,
@@ -770,7 +771,7 @@ function evaluationDocument_generate(grade) {
    * Synthetic QA value gate.
    * This verifies the populated Google Doc body before PDF export.
    */
-  if (qaOutput) {
+  if (qaOutput && grade.qaComprehensive !== false) {
     evaluationDocument_assertComprehensiveQaBody_(
       body,
       grade
@@ -794,7 +795,8 @@ function evaluationDocument_generate(grade) {
   const pdfFile = qaOutput
     ? evaluationDocument_saveBlobForQa_(
         pdfBlob,
-        fileName + '.pdf'
+        fileName + '.pdf',
+        grade.qaOutputFolderId || ''
       )
     : driveService_saveBlob({
         blob: pdfBlob,
@@ -847,7 +849,7 @@ function evaluationDocument_lookupStudent_(
 ) {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    ccmsPortalWorkbook_();
 
   const studentsSheet =
     appGetSheet_(
@@ -1744,7 +1746,20 @@ function evaluationDocument_assertComprehensiveQaBody_(
  * QA OUTPUT FOLDER
  * =====================================================================
  */
-function evaluationDocument_getQaFolder_() {
+function evaluationDocument_getQaFolder_(qaFolderId) {
+  if (qaFolderId) {
+    const props = PropertiesService.getScriptProperties();
+    const approved = String(props.getProperty('CI_PORTAL_QA_EVALUATIONS_FOLDER_ID') || '').trim();
+    if (String(props.getProperty('CI_PORTAL_DOCUMENT_PAIR_MODE') || '') !== 'test_only' ||
+        !approved || String(qaFolderId) !== approved) {
+      throw new Error('Dedicated TEST-001 output folder is not authorized');
+    }
+    const folder = DriveApp.getFolderById(approved);
+    if (folder.getName() !== 'Evaluations') {
+      throw new Error('TEST-001 output folder must be named Evaluations');
+    }
+    return folder;
+  }
 
   const name =
     'Generated Document QA - TEST-001';
@@ -1762,13 +1777,14 @@ function evaluationDocument_getQaFolder_() {
 
 function evaluationDocument_copyTemplateForQa_(
   masterFile,
-  fileName
+  fileName,
+  qaFolderId
 ) {
 
   const copy =
     masterFile.makeCopy(
       fileName,
-      evaluationDocument_getQaFolder_()
+      evaluationDocument_getQaFolder_(qaFolderId)
     );
 
   return {
@@ -1781,11 +1797,12 @@ function evaluationDocument_copyTemplateForQa_(
 
 function evaluationDocument_saveBlobForQa_(
   blob,
-  fileName
+  fileName,
+  qaFolderId
 ) {
 
   const file =
-    evaluationDocument_getQaFolder_()
+    evaluationDocument_getQaFolder_(qaFolderId)
       .createFile(
         blob.setName(fileName)
       );
@@ -2572,3 +2589,4 @@ function testGenerateLatestEvaluationDocument() {
 
   return result;
 }
+

@@ -135,10 +135,25 @@ const REQUIREMENTS_STATUS_HEADERS = [
 
 function rebuildStudentRequirementStatus() {
 
-  const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+  return reqRunUpdate_(SpreadsheetApp.getActiveSpreadsheet(), '');
+}
 
+function reqUpdateStudent_(ss, studentId) {
+  if (!ss || !String(studentId || '').trim()) throw Error('Student ID and workbook required');
+  return reqRunUpdate_(ss, String(studentId).trim());
+}
 
+function reqRunUpdate_(ss, studentId) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    return reqCalculateAndWrite_(ss, studentId);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function reqCalculateAndWrite_(ss, studentId) {
   // ===================================================================
   // AUTHORITATIVE SHEETS
   // ===================================================================
@@ -333,9 +348,10 @@ function rebuildStudentRequirementStatus() {
   // ===================================================================
 
   const activeStudents =
-    reqGetUniqueActiveStudents_(
-      students
-    );
+    reqGetUniqueActiveStudents_(studentId
+      ? students.filter(row => String(row['Student ID']).trim() === studentId)
+      : students);
+  if (studentId && activeStudents.length !== 1) throw Error('Active student not found');
 
 
   const output = [];
@@ -368,28 +384,12 @@ function rebuildStudentRequirementStatus() {
   // WRITE OUTPUT
   // ===================================================================
 
-  reqClearStatusData_(
-    statusSheet,
-    REQUIREMENTS_STATUS_HEADERS.length
-  );
-
-
-  if (
-    output.length > 0
-  ) {
-
-    statusSheet
-      .getRange(
-        2,
-        1,
-        output.length,
-        REQUIREMENTS_STATUS_HEADERS.length
-      )
-      .setValues(
-        output
-      );
+  if (studentId) {
+    reqWriteStudentRows_(statusSheet, studentId, output);
+  } else {
+    reqClearStatusData_(statusSheet, REQUIREMENTS_STATUS_HEADERS.length);
+    if (output.length) statusSheet.getRange(2, 1, output.length, REQUIREMENTS_STATUS_HEADERS.length).setValues(output);
   }
-
 
   SpreadsheetApp.flush();
 
@@ -421,6 +421,35 @@ function rebuildStudentRequirementStatus() {
  * PROCESS ONE STUDENT
  * =====================================================================
  */
+
+function reqWriteStudentRows_(sheet, studentId, output) {
+  const width = REQUIREMENTS_STATUS_HEADERS.length;
+  const key = row => JSON.stringify([row[2], row[3], row[4], row[5]]);
+  const pending = new Map();
+  for (const row of output) {
+    if (row[0] !== studentId || !row[5] || pending.has(key(row))) throw Error('Ambiguous student requirement identity');
+    pending.set(key(row), row);
+  }
+  const last = sheet.getLastRow();
+  const keys = last > 1 ? sheet.getRange(2, 1, last - 1, 6).getValues() : [];
+  let block = [], start = 0;
+  function flush() {
+    if (block.length) sheet.getRange(start, 1, block.length, width).setValues(block);
+    block = [];
+  }
+  keys.forEach((row, index) => {
+    if (String(row[0]).trim() !== studentId) { flush(); return; }
+    if (!block.length) start = index + 2;
+    block.push(pending.get(key(row)) || Array(width).fill(''));
+    pending.delete(key(row));
+  });
+  flush();
+  if (pending.size) {
+    const needed = last + pending.size - sheet.getMaxRows();
+    if (needed > 0) sheet.insertRowsAfter(sheet.getMaxRows(), needed);
+    sheet.getRange(last + 1, 1, pending.size, width).setValues([...pending.values()]);
+  }
+}
 
 function reqProcessStudent_(args) {
 
@@ -3330,3 +3359,4 @@ function testRequirementsSemesterAttributionRegression() {
     results: results
   };
 }
+

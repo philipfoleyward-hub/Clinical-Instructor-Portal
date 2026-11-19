@@ -17,6 +17,15 @@ function ciDraftFolder_() {
   const props=PropertiesService.getScriptProperties();
   const key='CI_PORTAL_DRAFT_FOLDER_ID';
   const configured=String(props.getProperty(key)||'').trim();
+  if (ScriptApp.getScriptId() === '19M0PNJjgtnaFLrKzCcFNV3CSbSRvaIdG_RLbKPP60OPoOPu189XFTR-c') {
+    if (!configured) throw Error('TEST-001 draft folder is required');
+    const folder = DriveApp.getFolderById(configured), parents = folder.getParents();
+    if (folder.getName() !== 'Drafts' || !parents.hasNext() ||
+        parents.next().getId() !== '1B3MD_gvDZZS338cfNMkDeOceGt3TXgFZ' || parents.hasNext()) {
+      throw Error('Draft folder is outside the TEST-001 sandbox');
+    }
+    return folder;
+  }
   if(configured){
     if(!/^[A-Za-z0-9_-]{20,}$/.test(configured))throw new Error(key+' must contain a valid Drive folder ID');
     return DriveApp.getFolderById(configured);
@@ -116,3 +125,4 @@ function ciDraftList_(evaluatorId){
   result.sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));
   return {success:true,drafts:result.slice(0,100),count:result.length};
 }
+

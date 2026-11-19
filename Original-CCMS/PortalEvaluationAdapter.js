@@ -49,7 +49,7 @@ function ccmsPortal_resolveIdentity_(data) {
   if(ccmsPortal_norm_(data.evaluationType)!=='competency')throw new Error('Only Competency evaluations are authorized');
   const claimed=ccmsPortal_clean_(data.authenticatedEvaluatorId);
   if(!claimed||claimed!==ccmsPortal_clean_(data.evaluatorId))throw new Error('Authenticated evaluator mismatch');
-  const book=SpreadsheetApp.getActiveSpreadsheet();
+  const book=ccmsPortalWorkbook_();
   if(!book)throw new Error('Original CCMS workbook context unavailable');
   const student=ccmsPortal_reference_(book,APP_CONFIG.SHEETS.STUDENTS,'Student ID',data.studentId,['Student','Active']);
   if(!ccmsPortal_true_(student.Active))throw new Error('Student is not active');
@@ -246,3 +246,4 @@ function gradeClinicalEvaluationFromPortalPayload(data) {
     throw new Error('Grade identity does not agree with authoritative CCMS references');
   return {grade:grade,identity:identity};
 }
+
