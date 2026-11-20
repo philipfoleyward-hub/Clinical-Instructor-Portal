@@ -1260,7 +1260,7 @@ if(msg.type==='release_status'){
    if(toolbar){let summary=document.getElementById('ci-eval-confirmation');if(!summary){summary=document.createElement('div');summary.id='ci-eval-confirmation';summary.setAttribute('role','status');summary.style.cssText='padding:12px;border:1px solid #a3cfaa;background:#ebf8ed;border-radius:8px;flex:1 0 100%';toolbar.append(summary);}
      summary.replaceChildren();const title=document.createElement('strong');title.textContent='Official evaluation recorded';const note=document.createElement('p');note.textContent='Submission ID: '+String(msg.payload?.submissionId||'')+' · '+(msg.payload?.duplicate?'Previously committed (no duplicate created)':'New submission');summary.append(title,note);
      const doc=msg.payload?.document||{};
-     for(const [label,url] of [['Open evaluation document',doc.docUrl],['Open evaluation PDF',doc.pdfUrl]]){
+     for(const [label,url] of [['Open evaluation document',doc.docUrl],['Open evaluation PDF',doc.pdfUrl],['Open Student Review document',msg.payload?.reviewDocument?.docUrl],['Open Student Review PDF',msg.payload?.reviewDocument?.pdfUrl]]){
        if(typeof url==='string'&&/^https:\/\/docs\.google\.com\//.test(url)||typeof url==='string'&&/^https:\/\/drive\.google\.com\//.test(url)){
          const a=document.createElement('a');a.textContent=label;a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.style.cssText='margin-right:12px;color:#0969b5';summary.append(a);
        }

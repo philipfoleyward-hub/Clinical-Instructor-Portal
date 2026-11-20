@@ -41,7 +41,7 @@
  */
 
 
-function evaluationDocument_generate(grade) {
+function evaluationDocument_generate(grade, verifiedStudentId) {
 
   if (!grade) {
     throw new Error(
@@ -75,7 +75,7 @@ function evaluationDocument_generate(grade) {
         student: studentName,
         cohort: 'TEST'
       }
-    : evaluationDocument_lookupStudent_(studentName);
+    : evaluationDocument_lookupStudent_(studentName, verifiedStudentId);
 
   if (!studentRecord) {
     throw new Error(
@@ -840,11 +840,10 @@ function evaluationDocument_generate(grade) {
  * =====================================================================
  */
 function evaluationDocument_lookupStudent_(
-  studentName
+  studentName, verifiedStudentId
 ) {
 
-  const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+  const ss = verifiedStudentId ? ciDataBook_() : SpreadsheetApp.getActiveSpreadsheet();
 
   const studentsSheet =
     appGetSheet_(
@@ -866,6 +865,13 @@ function evaluationDocument_lookupStudent_(
         row['Student']
       ) === target
     );
+
+  if (verifiedStudentId) {
+    const activeMatches = matches.filter(row => appIsTrue_(row.Active));
+    if (activeMatches.length !== 1 || String(activeMatches[0]['Student ID']).trim() !== String(verifiedStudentId).trim()) {
+      throw new Error('Official evaluation filing requires a unique active student matching the verified Student ID.');
+    }
+  }
 
   if (!matches.length) {
     return null;
