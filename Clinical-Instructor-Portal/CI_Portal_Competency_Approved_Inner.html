@@ -897,7 +897,8 @@ function ciFinalPaint_(){
  const banner=document.getElementById('ci-final-result');
  if(banner){banner.className='pass-banner '+(!grade?'pending':String(grade.result).toUpperCase()==='PASS'?'':'fail');banner.textContent=grade?(grade.automaticFailure?.occurred?'FAIL · AUTOMATIC FAILURE':String(grade.result).toUpperCase()==='PASS'?'✓ PASS':'FAIL'):p.complete?'Official grade requested':'Evaluation incomplete';}
  set('ci-final-complete-label',autoFail.occurred?'Automatic failure recorded · review for submission':p.complete?'All selected sections complete':'Incomplete · complete required criteria and selected images');
- set('ci-final-details','');
+ // Keep the post-submission confirmation (document links) once shown.
+ if(!document.getElementById('ci-eval-confirmation'))set('ci-final-details','');
  set('ci-final-grade-error',ciGradeError||(!grade&&!p.complete?'Finish all applicable performance criteria and select, score and mark at least one image view.':''));
  const retry=document.getElementById('ci-final-grade-retry');if(retry)retry.hidden=!(ciPreviewFailedSignature===ciScoreSignature_());
  set('ci-final-review-status',(studentReview.status==='reviewed'?'Reviewed with Student':'Review Pending')+' · Student Review & Feedback is optional for submission.');
