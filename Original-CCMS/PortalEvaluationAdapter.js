@@ -70,6 +70,7 @@ function ccmsPortal_resolveIdentity_(data) {
     evaluatorId:ccmsPortal_clean_(evaluator['Evaluator ID']),evaluator:ccmsPortal_clean_(evaluator.Evaluator),
     evaluatorType:ccmsPortal_clean_(evaluator['Evaluator Type']),
     examinationId:ccmsPortal_clean_(examination['Examination ID']),examination:ccmsPortal_clean_(examination.Examination),
+    examinationCategory:ccmsPortal_clean_(examination['Examination Category']||examination.Category||''),
     date:ccmsPortal_date_(data.date)
   };
 }
@@ -155,6 +156,33 @@ function ccmsPortal_responseMap_(form,data,identity) {
     'date':identity.date,'evaluation date':identity.date
   };
   const found={student:0,site:0,evaluator:0,exam:0,date:0};
+  // The official Form selects the exam through "Examination Category" plus one
+  // "Examination - <Category>" dropdown per category (the grading engine reads
+  // any title starting with "examination" other than the category). Answer the
+  // single category dropdown that lists this exam, and its category.
+  const examItems=items.filter(item=>{
+    const t=ccmsPortal_norm_(item.getTitle());
+    return t!=='examination'&&t.startsWith('examination')&&t!=='examination category'&&
+      [types.LIST,types.MULTIPLE_CHOICE].includes(item.getType());
+  });
+  if(examItems.length){
+    let hits=examItems.filter(item=>(ccmsPortal_choices_(item)||[]).includes(String(identity.examination)));
+    const wanted=ccmsPortal_norm_(identity.examinationCategory||'');
+    if(hits.length>1&&wanted)hits=hits.filter(item=>ccmsPortal_norm_(item.getTitle()).endsWith(wanted));
+    if(hits.length!==1)throw new Error('Examination "'+identity.examination+'" must appear in exactly one official Form category list (found '+hits.length+')');
+    const examItem=hits[0];
+    for(const other of examItems)delete map[String(other.getId())];
+    map[String(examItem.getId())]=identity.examination;
+    found.exam++;
+    const categoryItem=items.find(item=>ccmsPortal_norm_(item.getTitle())==='examination category'&&
+      [types.LIST,types.MULTIPLE_CHOICE].includes(item.getType()));
+    if(categoryItem){
+      const examTitle=ccmsPortal_norm_(examItem.getTitle());
+      const category=(ccmsPortal_choices_(categoryItem)||[]).filter(c=>examTitle.endsWith(ccmsPortal_norm_(c)))
+        .sort((a,b)=>b.length-a.length)[0];
+      if(category)map[String(categoryItem.getId())]=category;
+    }
+  }
   for(const item of items) {
     const title=ccmsPortal_norm_(item.getTitle()),id=String(item.getId());
     if(!Object.prototype.hasOwnProperty.call(identityByTitle,title))continue;
