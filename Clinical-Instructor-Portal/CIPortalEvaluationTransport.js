@@ -1,8 +1,9 @@
 /**
  * Server-side-only transport for approved future CCMS portal evaluation calls.
  * Never place credentials, evaluator names, or student records into HTML.
- * Requires CI_PORTAL_CCMS_GATEWAY_URL + CI_PORTAL_GATEWAY_SECRET Script Properties,
- * and a separately authorized/approved CCMS gateway deployment.
+ * Requires the CI_PORTAL_CCMS_GATEWAY_URL Script Property. Authentication is the
+ * project owner's own OAuth token (this Portal web app executes as the owner);
+ * the CCMS web app is deployed "Only myself", so Google admits only that token.
  */
 /**
  * Single read-only configuration inspection reused by requests and release status.
@@ -12,14 +13,11 @@
 function ciPortalEvaluationGatewayConfig_() {
   const props=PropertiesService.getScriptProperties();
   const url=String(props.getProperty('CI_PORTAL_CCMS_GATEWAY_URL')||'').trim();
-  const secret=String(props.getProperty('CI_PORTAL_GATEWAY_SECRET')||'');
   const issues=[];
   if(!url) issues.push('CI_PORTAL_CCMS_GATEWAY_URL is missing in the Clinical Instructor Portal Script Properties');
   else if(!/^https:\/\/script\.google\.com\/(?:a\/macros\/[a-z0-9.-]+\/|macros\/)s\/[A-Za-z0-9_-]+\/exec\/?$/.test(url))
     issues.push('CI_PORTAL_CCMS_GATEWAY_URL must be the original CCMS Web app /exec URL (standard or institutional format)');
-  if(secret.length<48)
-    issues.push('CI_PORTAL_GATEWAY_SECRET is absent or shorter than 48 characters in the Clinical Instructor Portal Script Properties');
-  return {url:url,secret:secret,issues:issues};
+  return {url:url,issues:issues};
 }
 
 function ciPortalEvaluationTransport_(action,verifiedPayload) {
@@ -27,12 +25,11 @@ function ciPortalEvaluationTransport_(action,verifiedPayload) {
   if(gateway.issues.length)
     throw new Error('Portal connection configuration: '+gateway.issues.join('; ')+'. No evaluation was submitted.');
   const timestamp=Date.now(),nonce=Utilities.getUuid(),payloadJson=JSON.stringify(verifiedPayload);
-  const signed=action+'\n'+timestamp+'\n'+nonce+'\n'+payloadJson;
-  const signature=Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(signed,gateway.secret)).replace(/=+$/,'');
   let res;
   try {
     res=UrlFetchApp.fetch(gateway.url,{
-      method:'post',contentType:'application/json',payload:JSON.stringify({timestamp,nonce,action,payloadJson,signature}),
+      method:'post',contentType:'application/json',payload:JSON.stringify({timestamp,nonce,action,payloadJson}),
+      headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken()},
       muteHttpExceptions:true,followRedirects:true
     });
   } catch(err) {

@@ -8,7 +8,10 @@
  * document and requirements services. It does not replace them or form triggers.
  *
  * Wire to existing standalone portal's CIPortalEvaluationTransport.js.
- * The HMAC secret is a SERVER script property only. No browsing client secret.
+ * Caller authentication: this web app is deployed "Execute as: Me" with
+ * "Who has access: Only myself". Google rejects any request that does not
+ * carry the owner's own OAuth token, which the Portal (also running as the
+ * owner) sends server-to-server. No shared secret is used.
  * No student other than TEST-001 can commit through this version, ever.
  * Installing this file does not enable a request or commit.
  */
@@ -16,12 +19,13 @@
 function ciLink_prop_(name) {
   return String(PropertiesService.getScriptProperties().getProperty(name) || '').trim();
 }
-function ciLink_secret_() {
+function ciLink_enabled_() {
   if (ciLink_prop_('CI_PORTAL_GATEWAY_ENABLED') !== 'true')
     throw Error('CCMS evaluation service is not enabled');
-  const secret = ciLink_prop_('CI_PORTAL_GATEWAY_SECRET');
-  if (secret.length < 48) throw Error('CCMS gateway secret is missing or too short');
-  return secret;
+  // Defence in depth on top of Google's "Only myself" web-app access.
+  const caller = String(Session.getActiveUser().getEmail() || '').toLowerCase();
+  const owner = String(Session.getEffectiveUser().getEmail() || '').toLowerCase();
+  if (caller && owner && caller !== owner) throw Error('Unauthorized gateway caller');
 }
 function ciLink_signature_(msg, key) {
   return Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(msg, key))
@@ -35,7 +39,7 @@ function ciLink_equal_(a, b) {
   return diff === 0;
 }
 function ciLink_verify_(message) {
-  const key = ciLink_secret_();
+  ciLink_enabled_();
   if (!message || typeof message !== 'object' || Array.isArray(message))
     throw Error('Malformed signed request');
   const action = String(message.action || '');
@@ -46,9 +50,6 @@ function ciLink_verify_(message) {
       !/^[a-f\d-]{36}$/i.test(nonce)) throw Error('Expired or malformed gateway request');
   if (typeof message.payloadJson !== 'string' || message.payloadJson.length > 260000)
     throw Error('Invalid gateway payload');
-  const signed = action + '\n' + ms + '\n' + nonce + '\n' + message.payloadJson;
-  if (!ciLink_equal_(message.signature, ciLink_signature_(signed, key)))
-    throw Error('Gateway signature verification failed');
   // Replay lock prevents concurrent use of the same signed nonce.
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
@@ -276,20 +277,40 @@ function ciLink_commitProduction_(data) {
       outcome.identity.examinationId !== identity.examinationId)
     throw Error('Official grading identity mismatch');
   const lock = LockService.getScriptLock(); lock.waitLock(30000);
-  let doc, record, track;
+  let doc, reviewDoc, record, track;
   const key = 'CI_PROD_DOC_' + Utilities.base64EncodeWebSafe(
     Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, id)).replace(/=+$/, '');
   try {
-    if (ciLink_duplicate_(id)) return {success:true,duplicate:true,submissionId:id,
-      message:'Already recorded; no second document or notification was sent'};
     const props = PropertiesService.getScriptProperties();
-    try {doc = JSON.parse(props.getProperty(key) || 'null');} catch (e) {doc=null;}
-    if (!doc || doc.submissionId !== id || !doc.docUrl || !doc.pdfUrl) {
-      doc = evaluationDocument_generate(outcome.grade);
-      if (!doc || !doc.success || !doc.docUrl || !doc.pdfUrl)
+    // Receipt survives a retry so a resubmission never duplicates documents.
+    let receipt;
+    try {receipt = JSON.parse(props.getProperty(key) || 'null');} catch (e) {receipt = null;}
+    if (!receipt || receipt.submissionId !== id)
+      receipt = {submissionId:id, submittedAt:new Date().toISOString(), doc:null, reviewDoc:null};
+    if (ciLink_duplicate_(id)) return {success:true,duplicate:true,submissionId:id,
+      document:receipt.doc||null, reviewDocument:receipt.reviewDoc||null,
+      message:'Already recorded; no second document or notification was sent'};
+    doc = receipt.doc;
+    if (!doc || !doc.docId || !doc.pdfId || !doc.docUrl || !doc.pdfUrl) {
+      const generated = evaluationDocument_generate(outcome.grade);
+      if (!generated || !generated.success || !generated.docUrl || !generated.pdfUrl ||
+          !generated.docId || !generated.pdfId)
         throw Error('Evaluation document generation did not complete');
-      props.setProperty(key,JSON.stringify({submissionId:id,docUrl:doc.docUrl,
-        pdfUrl:doc.pdfUrl,docId:doc.docId||'',pdfId:doc.pdfId||''}));
+      doc = {docId:generated.docId, docUrl:generated.docUrl, pdfId:generated.pdfId, pdfUrl:generated.pdfUrl};
+      receipt.doc = doc;
+      props.setProperty(key, JSON.stringify(receipt));
+    }
+    reviewDoc = receipt.reviewDoc;
+    if (!reviewDoc || !reviewDoc.docUrl || !reviewDoc.pdfUrl) {
+      const generatedReview = ccmsStudentReview_generate_({
+        identity: identity, submissionId: id, submittedAt: receipt.submittedAt,
+        review: review, officialDocument: doc});
+      if (!generatedReview || !generatedReview.success || !generatedReview.docUrl || !generatedReview.pdfUrl)
+        throw Error('Student Review document generation did not complete');
+      reviewDoc = {docId:generatedReview.docId, docUrl:generatedReview.docUrl,
+        pdfId:generatedReview.pdfId, pdfUrl:generatedReview.pdfUrl};
+      receipt.reviewDoc = reviewDoc;
+      props.setProperty(key, JSON.stringify(receipt));
     }
     const term = clinicalTerm_getForDate(outcome.grade.evaluation.date);
     // Evaluator identity and address come from the authoritative Evaluators row.
@@ -323,6 +344,7 @@ function ciLink_commitProduction_(data) {
   return {success:true,duplicate:false,submissionId:id,
     grade:{finalScore:outcome.grade.finalScore,result:outcome.grade.result},
     document:{docId:doc.docId||'',docUrl:doc.docUrl,pdfId:doc.pdfId||'',pdfUrl:doc.pdfUrl},
+    reviewDocument:reviewDoc,
     tracking:{success:true},requirements:requirements,notifications:notifications};
 }
 /** Original CCMS web app POST, no standalone doGet replacement. */
