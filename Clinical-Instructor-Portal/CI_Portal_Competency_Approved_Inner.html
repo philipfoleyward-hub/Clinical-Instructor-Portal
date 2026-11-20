@@ -1078,12 +1078,20 @@ function exportAnswers(){
   if(match){group=Number(match[1]);return}
   if(!group)return;const v=images[group-1];if(!v)return;
   const title=String(q.title).trim().toLowerCase();
+  // Official Form choices are full labels ("2 - SATISFACTORY ...", "N/A AEC Utilized ...",
+  // "Marker Correct"). Resolve the UI value to the exact official choice text.
+  const official=value=>{
+   const v0=String(value),choices=Array.isArray(q.choices)?q.choices.map(String):null;
+   if(!choices||choices.includes(v0))return v0;
+   const hit=choices.find(c=>c.trim().startsWith(v0+' '))||choices.find(c=>c.trim().toLowerCase()===('marker '+v0).toLowerCase());
+   return hit===undefined?v0:hit;
+  };
   const index={positioning:0,equipment:1,'radiation protection':2,exposure:3}[title];
-  if(index!==undefined&&v.scores&&v.scores[index]!==undefined)answers[q.itemId]=String(v.scores[index]);
-  if(title==='view/projection'&&v.name)answers[q.itemId]=v.name;
+  if(index!==undefined&&v.scores&&v.scores[index]!==undefined)answers[q.itemId]=official(v.scores[index]);
+  if(title==='view/projection'&&v.name)answers[q.itemId]=official(v.name);
   if(title.includes('exposure index')&&v.ei)answers[q.itemId]=v.ei;
   if((title==='marker placement'||title==='marker evaluation')&&v.present) {
-    answers[q.itemId]=v.present==='Missing'?'Missing Marker':v.side==='Wrong'?'Wrong Marker':v.legible==='Illegible'?'Illegible Marker':'Correct';
+    answers[q.itemId]=official(v.present==='Missing'?'Missing Marker':v.side==='Wrong'?'Wrong Marker':v.legible==='Illegible'?'Illegible Marker':'Correct');
   }
   if(title==='view '+group+' comments'&&v.comment)answers[q.itemId]=v.comment;
  });
