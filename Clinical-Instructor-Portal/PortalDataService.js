@@ -1,11 +1,29 @@
 /** Read-only direct CCMS workbook access. Preserves stable IDs and published scheduling rules. */
-function ciDataBook_(){return SpreadsheetApp.openById(ciPortalWorkbookId_());}
+// One workbook handle and one read per sheet per request; small reference
+// sheets are also shared across requests for 2 minutes (read-only data).
+let ciDataBookMemo_=null;const ciDataRowsMemo_=Object.create(null);
+const CI_DATA_CACHEABLE_=new Set(['Clinical Sites','Students','Evaluators','Examinations','Clinical Calendar','CI Assignments']);
+function ciDataBook_(){return ciDataBookMemo_||(ciDataBookMemo_=SpreadsheetApp.openById(ciPortalWorkbookId_()));}
 function ciDataRows_(book,name,required){
- const sh=book.getSheetByName(name);if(!sh)throw new Error('Missing CCMS sheet: '+name);
- const values=sh.getDataRange().getValues();if(!values.length)throw new Error('Empty CCMS sheet: '+name);
- const headers=values.shift().map(v=>String(v).trim());
- (required||[]).forEach(h=>{if(!headers.includes(h))throw new Error('Missing '+name+' header: '+h);});
- return values.filter(r=>r.some(v=>v!==''&&v!==null)).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]])));
+ const key='ciRows2:'+book.getId()+':'+name;
+ let entry=ciDataRowsMemo_[key];
+ if(!entry&&CI_DATA_CACHEABLE_.has(name)){
+  try{const hit=CacheService.getScriptCache().get(key);
+   if(hit)entry=JSON.parse(hit,(k,v)=>v&&typeof v==='object'&&v.$d!==undefined?new Date(v.$d):v);}catch(e){entry=null;}
+ }
+ if(!entry){
+  const sh=book.getSheetByName(name);if(!sh)throw new Error('Missing CCMS sheet: '+name);
+  const values=sh.getDataRange().getValues();if(!values.length)throw new Error('Empty CCMS sheet: '+name);
+  const headers=values.shift().map(v=>String(v).trim());
+  entry={headers,rows:values.filter(r=>r.some(v=>v!==''&&v!==null))};
+  if(CI_DATA_CACHEABLE_.has(name)){
+   try{const text=JSON.stringify(entry,function(k,v){return this[k] instanceof Date?{$d:this[k].getTime()}:v;});
+    if(text.length<95000)CacheService.getScriptCache().put(key,text,120);}catch(e){}
+  }
+ }
+ ciDataRowsMemo_[key]=entry;
+ (required||[]).forEach(h=>{if(!entry.headers.includes(h))throw new Error('Missing '+name+' header: '+h);});
+ return entry.rows.map(r=>Object.fromEntries(entry.headers.map((h,i)=>[h,r[i]])));
 }
 function ciDataNorm_(v){return String(v==null?'':v).trim().toLowerCase();}
 function ciDataTrue_(v){return v===true||['true','yes','1'].includes(ciDataNorm_(v));}

@@ -740,7 +740,7 @@ window.ieMarker=(k,x)=>{imageViews[active][k]=x;refreshImageSelection();document
     <section class="simple-panel"><div class="simple-head"><h4>Final Evaluator Comments</h4><small>Optional · preserved from the historical evaluation workflow</small></div>
      <div class="simple-body"><div class="final-comment-head"><b>Overall comments</b><button type="button" class="final-dictate" id="ci-final-dictate">🎙 Dictate</button></div>
      <textarea id="ci-final-comment" class="final-comment" placeholder="Add final comments about this competency evaluation..."></textarea></div></section>
-    <div id="ci-final-grade-error" role="status" aria-live="polite"></div><button type="button" id="ci-final-grade-retry" hidden onclick="ciRetryGrade_()" style="display:block;margin:8px auto;padding:9px 15px;border:1px solid #0877dc;border-radius:8px;color:#0877dc;background:#fff;cursor:pointer">Retry Grade Calculation</button>
+    <div id="ci-final-missing"></div><div id="ci-final-grade-error" role="status" aria-live="polite"></div><button type="button" id="ci-final-grade-retry" hidden onclick="ciRetryGrade_()" style="display:block;margin:8px auto;padding:9px 15px;border:1px solid #0877dc;border-radius:8px;color:#0877dc;background:#fff;cursor:pointer">Retry Grade Calculation</button>
     <div class="simple-actions"><button type="button" class="review-button" id="ci-final-review">Student Review & Feedback</button>
      <button type="button" class="submit-button" id="ci-final-submit" disabled>Finalize & Submit Competency</button></div>
     <div class="simple-note" id="ci-final-review-status">Student Review & Feedback is optional and does not block competency submission.</div>
@@ -802,7 +802,7 @@ window.ieMarker=(k,x)=>{imageViews[active][k]=x;refreshImageSelection();document
 (function(){
 // Presentation-only pagination: no changes to the original criterion data, score handlers, or score-button CSS.
 const criteria=document.getElementById('criteria');if(!criteria)return;
-let page=0,capacity=3,lastSection=-1,scheduled=false;
+let page=0,capacity=1000,lastSection=-1,scheduled=false; // parts disabled: one list per section
 const bar=document.createElement('div');bar.id='ccms-page-bar';
 criteria.parentNode.insertBefore(bar,criteria);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -849,6 +849,7 @@ update();
 'use strict';
 let context=null,formItems=[],draftId='',saving=false,timer=null,dirty=false;
 let sectionComments={},autoFail={occurred:false,reasons:[],comments:''};
+let ciEvalType='Competency';const CI_EVAL_TYPES=['Competency','ISO','SSO'];
 let studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null};
 // Submission is OFF until server authorization plus the original CCMS gate agree.
 let ciSubmitAllowed=false,ciSubmitBusy=false,ciSubmitDone=false,ciAwaitingSubmitPreview=false;
@@ -899,6 +900,7 @@ function ciFinalPaint_(){
  set('ci-final-complete-label',autoFail.occurred?'Automatic failure recorded · review for submission':p.complete?'All selected sections complete':'Incomplete · complete required criteria and selected images');
  // Keep the post-submission confirmation (document links) once shown.
  if(!document.getElementById('ci-eval-confirmation'))set('ci-final-details','');
+ ciRenderMissing_();
  set('ci-final-grade-error',ciGradeError||(!grade&&!p.complete?'Finish all applicable performance criteria and select, score and mark at least one image view.':''));
  const retry=document.getElementById('ci-final-grade-retry');if(retry)retry.hidden=!(ciPreviewFailedSignature===ciScoreSignature_());
  set('ci-final-review-status',(studentReview.status==='reviewed'?'Reviewed with Student':'Review Pending')+' · Student Review & Feedback is optional for submission.');
@@ -928,7 +930,7 @@ function ciFinalPaint_(){
    row.append(title,rating,pct);results.append(row);
  }
  const submit=document.getElementById('ci-final-submit');
- if(submit){submit.disabled=!ciSubmitAllowed||ciSubmitBusy||ciSubmitDone||!grade||!(p.complete||(autoFail.occurred&&autoFail.reasons.length&&autoFail.comments.trim()));submit.textContent=ciSubmitDone?'Evaluation Submitted':ciSubmitBusy?'Submitting…':'Finalize & Submit Competency';}
+ if(submit){submit.disabled=!ciSubmitAllowed||ciSubmitBusy||ciSubmitDone||!grade||!(p.complete||(autoFail.occurred&&autoFail.reasons.length&&autoFail.comments.trim()));submit.textContent=ciSubmitDone?'Evaluation Submitted':ciSubmitBusy?'Submitting…':'Finalize & Submit '+ciEvalType;}ciEvalTypePaint_();
  ciRenderHighlights_(grade);
  ciProgressRefresh_();
 }
@@ -1006,11 +1008,11 @@ function ciResetSubmitAfterError_(message){
  ciSetSubmitState_(ciSubmitAllowed);notify(message||'Submission not confirmed; save your draft and contact the coordinator before retrying.');
 }
 
-const post=(type,payload={})=>parent.postMessage({source:'ci-eval-inner',type,payload},'*');
+const post=(type,payload={})=>parent.postMessage({source:'ci-eval-inner',type,payload:(payload&&typeof payload==='object'&&!Array.isArray(payload))?{...payload,evaluationType:ciEvalType}:payload},'*');
 const byTitle=t=>formItems.filter(x=>String(x.title||'').trim().toLowerCase()===String(t||'').trim().toLowerCase());
 const notify=text=>{let e=document.getElementById('ci-live-message');if(!e){e=document.createElement('div');e.id='ci-live-message';e.setAttribute('role','status');e.style.cssText='position:fixed;top:9px;right:12px;z-index:500;padding:8px 14px;background:#fff;border:1px solid #cadceb;border-radius:8px;color:#173653';document.body.append(e)}e.textContent=text;};
-const UI=()=>({section:typeof current==='number'?current:0,scores:Object.assign({},scores),images:JSON.parse(JSON.stringify(window.ciEvalImageViews||[])),sectionComments:{...sectionComments},autoFail:{...autoFail},studentReview:{...studentReview},examId:context?.examinationId||''});
-function restoreUI(st){if(!st)return;sectionComments={...(st.sectionComments||{})};autoFail={occurred:false,reasons:[],comments:'',...(st.autoFail||{})};studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null,...(st.studentReview||{})};Object.keys(scores).forEach(k=>delete scores[k]);Object.assign(scores,st.scores||{});
+const UI=()=>({section:typeof current==='number'?current:0,scores:Object.assign({},scores),images:JSON.parse(JSON.stringify(window.ciEvalImageViews||[])),sectionComments:{...sectionComments},autoFail:{...autoFail},studentReview:{...studentReview},examId:context?.examinationId||'',evaluationType:ciEvalType});
+function restoreUI(st){if(!st)return;if(CI_EVAL_TYPES.includes(st.evaluationType))ciEvalType=st.evaluationType;sectionComments={...(st.sectionComments||{})};autoFail={occurred:false,reasons:[],comments:'',...(st.autoFail||{})};studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null,...(st.studentReview||{})};Object.keys(scores).forEach(k=>delete scores[k]);Object.assign(scores,st.scores||{});
  const imgs=window.ciEvalImageViews||[];(st.images||[]).forEach((v,i)=>{if(imgs[i])Object.assign(imgs[i],v)});
  for(const img of imgs){
    const choices=(window.ciEvalViewOptions||[]).filter(x=>String(x.name).toLowerCase()===String(img.name||'').toLowerCase());
@@ -1106,7 +1108,19 @@ function bindEvaluationIdentity(ctx){
  if(avatar)avatar.textContent=String(ctx.student||'').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('');
  if(name)name.textContent=ctx.student||'Student';if(meta)meta.textContent=ctx.studentId||'';
  const labels=[...info.querySelectorAll('.ctx')];
- const lookup={"today's site":ctx.site,"date":ctx.date,"evaluator":ctx.evaluator,"evaluation type":'Competency'};
+ if(CI_EVAL_TYPES.includes(ctx.evaluationType))ciEvalType=ctx.evaluationType;
+ const lookup={"today's site":ctx.site,"date":ctx.date,"evaluator":ctx.evaluator};
+ for(const node of [...info.querySelectorAll('.ctx')]){
+  if(node.querySelector('label')?.textContent?.toLowerCase().trim()!=='evaluation type')continue;
+  const b=node.querySelector('b');let sel=node.querySelector('#ci-eval-type');
+  if(!sel){sel=document.createElement('select');sel.id='ci-eval-type';sel.setAttribute('aria-label','Evaluation type');
+   sel.style.cssText='font:inherit;font-weight:800;padding:5px 8px;border:2px solid #17679e;border-radius:6px;color:#17679e;background:#fff';
+   CI_EVAL_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.append(o);});
+   sel.onchange=()=>{ciEvalType=sel.value;ciEvalTypePaint_();scheduleSave();};
+   if(b)b.replaceWith(sel);else node.append(sel);}
+  sel.value=ciEvalType;
+ }
+ ciEvalTypePaint_();
  for(const node of labels){const label=node.querySelector('label')?.textContent?.toLowerCase().trim();if(Object.prototype.hasOwnProperty.call(lookup,label)){const b=node.querySelector('b');if(b)b.textContent=lookup[label]||''}}
 }
 function autoFailModal(){
@@ -1134,7 +1148,7 @@ function scheduleSave(){
  if(!context||ciSubmitBusy||ciSubmitDone)return;
  ciProgressSchedule_();dirty=true;
  const el=document.querySelector('.rbox.quick .saved');if(el)el.textContent='● Unsaved changes';
- clearTimeout(timer);timer=setTimeout(()=>save(false),850);
+ clearTimeout(timer);timer=setTimeout(()=>save(false),12000);
 }
 function save(stopping){
  if(!context||ciSubmitBusy||ciSubmitDone)return;
@@ -1252,7 +1266,7 @@ if(msg.type==='release_status'){
      const grade=msg.payload||{};
      const score=grade.finalScore===undefined?'not available':String(grade.finalScore);
      const review=studentReview.status==='reviewed'?'Reviewed with Student':'Review Pending';
-     const summary='Finalize '+(context?.examination||'this examination')+' for '+(context?.student||'the selected student')+'?\n\nOfficial result: '+(grade.result||'Pending')+' · score '+score+'\nStudent review: '+review+'\n\nThis creates an official Clinical Tracking record, document/PDF and coordinator notification. Continue?';
+     const summary='Finalize '+ciEvalType+' · '+(context?.examination||'this examination')+' for '+(context?.student||'the selected student')+'?\n\nOfficial result: '+(grade.result||'Pending')+' · score '+score+'\nStudent review: '+review+'\n\nThis creates an official Clinical Tracking record, document/PDF and coordinator notification. Continue?';
      if(!confirm(summary)){ciResetSubmitAfterError_('Finalization canceled; draft preserved');return;}
      ciSubmitBusy=true;ciSetSubmitState_(true);notify('Submitting official evaluation · do not close this page…');
      post('submit',ciPreparedSubmit);ciPreparedSubmit=null;
@@ -1290,10 +1304,10 @@ document.addEventListener('ci-eval-ui-change',()=>{scheduleSave();ciProgressSche
 let ciLastSection=-1;const titleNode=document.getElementById('commentTitle');if(titleNode){new MutationObserver(()=>{if(typeof current==='number'&&current!==ciLastSection){ciLastSection=current;hydrateSectionComment();}}).observe(titleNode,{characterData:true,childList:true,subtree:true});}
 /** Only the approved Overall Competency action can submit. Never enable here. */
 function ciFinalizeSubmit_(){
-   if(!ciSubmitAllowed||ciSubmitBusy||ciSubmitDone){notify('Official submission is unavailable or already in progress');return;}
+   if(!ciSubmitAllowed||ciSubmitBusy||ciSubmitDone||ciAwaitingSubmitPreview){notify('Official submission is unavailable or already in progress');return;}
    if(!context||!context.submissionId){notify('Missing stable submission ID');return;}
    try{
-     const data=exportAnswers();if(!data.complete)throw new Error('Complete every required criterion or record an official Auto-Fail first');
+     const data=exportAnswers();if(!data.complete){ciRenderMissing_();ciFlash_(document.getElementById('ci-final-missing'));throw new Error('Some items are not finished yet. Use the links under "Still to complete" to go straight to each one.');}
      if(autoFail.occurred&&(!autoFail.reasons.length||!autoFail.comments.trim()))throw new Error('Auto-Fail requires an official reason and explanation');
      if(!autoFail.occurred){
        const views=window.ciEvalImageViews||[];
@@ -1329,6 +1343,51 @@ function ciWireQuickActions_(){
     rows,images,comments:{...sectionComments},reviewStatus:studentReview.status});
  });
 }
+
+/** Lists exactly what still blocks Finalize, each with a link to that item. */
+function ciMissingItems_(){
+ if(autoFail.occurred)return (autoFail.reasons.length&&autoFail.comments.trim())?[]:[{section:'Automatic Failure',items:[{label:'Add reason and explanation',go:()=>document.querySelector('.fail')?.click()}]}];
+ const out=[];
+ sections.forEach((section,si)=>{
+  const items=[];section.criteria.forEach((_,ci)=>{if(scores[si+'-'+ci]===undefined)items.push({label:(si+1)+'.'+(ci+1),go:()=>ciJumpToCriterion_(si,ci)});});
+  if(items.length)out.push({section:(si+1)+'. '+section.name,items});
+ });
+ const views=window.ciEvalImageViews||[];
+ const used=views.map((v,i)=>({v,i})).filter(({v})=>String(v.name||'').trim()||Object.keys(v.scores||{}).length||v.present||v.side||v.legible||v.ei||v.comment);
+ const imageItems=[];
+ if(!used.length)imageItems.push({label:'Add and score at least one view',go:()=>ciJumpToView_(0)});
+ used.forEach(({v,i})=>{
+  const need=[];if(!String(v.name||'').trim())need.push('projection');
+  const n=4-Object.keys(v.scores||{}).length;if(n>0)need.push(n+' score'+(n>1?'s':''));
+  if(!v.present||!v.side||!v.legible)need.push('marker checks');
+  if(need.length)imageItems.push({label:'View '+(i+1)+': '+need.join(', '),go:()=>ciJumpToView_(i)});
+ });
+ if(imageItems.length)out.push({section:'8. Image Evaluation',items:imageItems});
+ return out;
+}
+function ciFlash_(el){if(!el)return;el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('ci-flash');setTimeout(()=>el.classList.remove('ci-flash'),2200);}
+function ciJumpToCriterion_(si,ci){window.go(si);setTimeout(()=>ciFlash_(document.querySelectorAll('#criteria .criterion')[ci]),120);}
+function ciJumpToView_(i){window.go(7);setTimeout(()=>{window.ieSelect?.(i);setTimeout(()=>ciFlash_(document.querySelector('.ie-main')||document.querySelector('.ie-wrap')),80);},120);}
+function ciRenderMissing_(){
+ const host=document.getElementById('ci-final-missing');if(!host)return;
+ host.replaceChildren();if(ciSubmitDone)return;
+ const groups=ciMissingItems_();if(!groups.length)return;
+ const box=document.createElement('div');box.className='ci-missing';
+ const head=document.createElement('strong');const count=groups.reduce((n,g)=>n+g.items.length,0);
+ head.textContent='Still to complete before submitting ('+count+')';box.append(head);
+ groups.forEach(g=>{const row=document.createElement('div');row.className='ci-missing-row';const name=document.createElement('span');name.textContent=g.section;row.append(name);
+  g.items.forEach(it=>{const a=document.createElement('button');a.type='button';a.className='ci-missing-link';a.textContent=it.label;a.onclick=it.go;row.append(a);});box.append(row);});
+ host.append(box);
+}
+window.ciMissingItems_=ciMissingItems_;window.ciJumpToCriterion_=ciJumpToCriterion_;window.ciJumpToView_=ciJumpToView_;
+window.ciSaveIfDirty_=()=>{if(dirty&&!saving)save(false);};
+
+function ciEvalTypePaint_(){
+ const sel=document.getElementById('ci-eval-type');if(sel){sel.value=ciEvalType;sel.disabled=!!ciSubmitDone;}
+ const btn=document.getElementById('ci-final-submit');if(btn&&!ciSubmitDone&&!ciSubmitBusy)btn.textContent='Finalize & Submit '+ciEvalType;
+ const t=document.getElementById('title');if(t&&current===8)t.textContent='Overall · '+ciEvalType;
+}
+window.ciEvalTypePaint_=ciEvalTypePaint_;
 window.ciOpenStudentReview_=ciOpenStudentReview;window.ciFinalizeSubmit_=ciFinalizeSubmit_;
 ciWireQuickActions_();ciSetSubmitState_(false);
 setupDictation();
@@ -1342,4 +1401,80 @@ const ciGradingPriorGo_=window.go;
  if(Number(section)===8)ciQueueGradePreview_();
 };
 })();
-</script></body></html>
+</script>
+<style id="ci-nav-colors-2026-11">
+/* Score scale colours: 0 red, 1 yellow, 2–3 green (hint when unselected, solid when selected). */
+.scores button:nth-child(1){border-top:4px solid #d64545!important}
+.scores button:nth-child(2){border-top:4px solid #e9b200!important}
+.scores button:nth-child(3),.scores button:nth-child(4){border-top:4px solid #2e9d5b!important}
+.scores button:nth-child(1).selected{background:#d64545!important;border-color:#b52f2f!important;color:#fff!important}
+.scores button:nth-child(2).selected{background:#f4c20d!important;border-color:#c99a00!important;color:#3b2c00!important}
+.scores button:nth-child(3).selected,.scores button:nth-child(4).selected{background:#2e9d5b!important;border-color:#237a46!important;color:#fff!important}
+.scores button.selected small{color:inherit!important}
+.ie-radio{width:30px!important;height:30px!important;font-weight:800;font-size:12px}
+.ie-radio[data-score="0"]{border:2px solid #d64545!important;color:#b52f2f}
+.ie-radio[data-score="1"]{border:2px solid #e9b200!important;color:#8a6a00}
+.ie-radio[data-score="2"],.ie-radio[data-score="3"]{border:2px solid #2e9d5b!important;color:#237a46}
+.ie-radio[data-score="0"].sel{background:#d64545!important;color:#fff!important}
+.ie-radio[data-score="1"].sel{background:#f4c20d!important;color:#3b2c00!important}
+.ie-radio[data-score="2"].sel,.ie-radio[data-score="3"].sel{background:#2e9d5b!important;color:#fff!important}
+/* One navigation system: stepper on top, one sticky bar at the bottom. */
+#sectionList{display:none!important}
+.layout{grid-template-columns:minmax(0,1fr) 286px!important}
+@media(max-width:1200px){.layout{grid-template-columns:minmax(0,1fr)!important}.right{grid-column:1/-1!important}}
+#ccms-page-bar{display:none!important}
+#ci-stepper{position:sticky;top:0;z-index:120;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:#fff;border-bottom:1px solid #d5e2eb;scrollbar-width:thin}
+#ci-stepper button{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1px solid #c9d9e6;background:#f7fbfe;border-radius:999px;padding:6px 11px;font:inherit;font-size:12px;color:#183a5a;cursor:pointer;white-space:nowrap}
+#ci-stepper button .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#dce8f1;font-weight:800;font-size:11px}
+#ci-stepper button small{color:#5b7388;font-size:11px}
+#ci-stepper button.active{background:#17679e;border-color:#17679e;color:#fff}
+#ci-stepper button.active small{color:#d8ebf8}#ci-stepper button.active .n{background:#fff;color:#17679e}
+#ci-stepper button.done .n{background:#2e9d5b;color:#fff}
+.nav{position:sticky!important;bottom:0!important;z-index:120!important;display:flex!important;align-items:center;gap:10px;background:#fff;border-top:1px solid #d5e2eb;box-shadow:0 -4px 12px #173b5c14;padding:9px 12px!important;margin:0!important}
+.nav .prev,.nav .next{flex:0 1 auto}
+#ci-nav-status{flex:1 1 auto;text-align:center;font-size:12px;font-weight:700;color:#194a70}
+.ci-flash{outline:3px solid #f4c20d!important;outline-offset:2px;transition:outline-color .3s}
+.ci-missing{border:1px solid #e9b200;background:#fff8e1;border-radius:8px;padding:10px 12px;margin:10px 14px;text-align:left}
+.ci-missing strong{display:block;color:#6b5200;margin-bottom:6px}
+.ci-missing-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:5px 0;font-size:12px}
+.ci-missing-row span{font-weight:700;color:#183a5a;margin-right:4px}
+.ci-missing-link{border:1px solid #c99a00;background:#fff;border-radius:6px;padding:4px 8px;font:inherit;font-size:12px;color:#6b5200;cursor:pointer}
+.ci-missing-link:hover{background:#f4c20d;color:#3b2c00}
+</style>
+<script id="ci-nav-2026-11">
+(function(){
+ const main=document.querySelector('main.card');if(!main)return;
+ const names=sections.map(s=>s.name).concat(['Image Evaluation','Final Review']);
+ const stepper=document.createElement('nav');stepper.id='ci-stepper';stepper.setAttribute('aria-label','Evaluation sections');
+ main.insertBefore(stepper,main.firstChild);
+ const nav=document.querySelector('.nav');let status=document.getElementById('ci-nav-status');
+ if(nav&&!status){status=document.createElement('div');status.id='ci-nav-status';nav.insertBefore(status,document.getElementById('next'));}
+ function counts(i){
+  if(i<sections.length){const t=sections[i].criteria.length,d=sections[i].criteria.filter((_,c)=>scores[i+'-'+c]!==undefined).length;return {d,t,done:t>0&&d===t,text:d+'/'+t};}
+  if(i===7){const v=(window.ciEvalImageViews||[]).filter(x=>String(x.name||'').trim()||Object.keys(x.scores||{}).length);const f=v.filter(x=>String(x.name||'').trim()&&Object.keys(x.scores||{}).length===4&&x.present&&x.side&&x.legible).length;return {done:v.length>0&&f===v.length,text:v.length?f+'/'+v.length+' views':'no views'};}
+  const m=window.ciMissingItems_?window.ciMissingItems_():[];return {done:false,text:m.length?'':'ready'};
+ }
+ function refresh(){
+  if(typeof current!=='number')return;
+  stepper.replaceChildren();
+  names.forEach((name,i)=>{const c=counts(i);const b=document.createElement('button');b.type='button';
+   b.className=(i===current?'active ':'')+(c.done?'done':'');
+   b.innerHTML='<span class="n">'+(c.done?'✓':(i+1))+'</span><span></span>'+(c.text?'<small></small>':'');
+   b.children[1].textContent=name;if(c.text)b.children[2].textContent=c.text;
+   b.onclick=()=>window.go(i);stepper.append(b);});
+  stepper.querySelector('.active')?.scrollIntoView({block:'nearest',inline:'center'});
+  const prev=document.getElementById('prev'),next=document.getElementById('next');
+  if(prev){prev.disabled=current===0;if(prev.firstChild&&prev.firstChild.nodeType===3)prev.firstChild.textContent='← Back';const l=document.getElementById('prevLabel');if(l)l.textContent=current>0?names[current-1]:'';}
+  if(next){next.disabled=current>=8;if(next.firstChild&&next.firstChild.nodeType===3)next.firstChild.textContent='Next →';const l=document.getElementById('nextLabel');if(l)l.textContent=current<8?names[current+1]:'';}
+  if(status){const c=counts(current);status.textContent=current<sections.length?c.d+' of '+c.t+' scored':current===7?'Image Evaluation · '+c.text:'';}
+ }
+ const priorGo=window.go,priorMove=window.move;
+ const after=()=>{window.ciSaveIfDirty_?.();window.scrollTo(0,0);setTimeout(refresh,60);};
+ window.go=function(i){priorGo(i);after();};
+ window.move=function(d){priorMove(d);after();};
+ document.addEventListener('click',()=>setTimeout(refresh,120));
+ window.ciNavRefresh_=refresh;
+ setTimeout(refresh,300);
+})();
+</script>
+</body></html>

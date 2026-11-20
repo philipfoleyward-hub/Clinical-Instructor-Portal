@@ -46,7 +46,8 @@ function ccmsPortal_date_(raw) {
 /** Resolves ALL academic identity text from trusted CCMS reference rows. */
 function ccmsPortal_resolveIdentity_(data) {
   if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Evaluation data is required');
-  if(ccmsPortal_norm_(data.evaluationType)!=='competency')throw new Error('Only Competency evaluations are authorized');
+  const evaluationType={competency:'Competency',iso:'ISO',sso:'SSO'}[ccmsPortal_norm_(data.evaluationType)];
+  if(!evaluationType)throw new Error('Evaluation type must be Competency, ISO or SSO');
   const claimed=ccmsPortal_clean_(data.authenticatedEvaluatorId);
   if(!claimed||claimed!==ccmsPortal_clean_(data.evaluatorId))throw new Error('Authenticated evaluator mismatch');
   const book=SpreadsheetApp.getActiveSpreadsheet();
@@ -71,6 +72,7 @@ function ccmsPortal_resolveIdentity_(data) {
     evaluatorType:ccmsPortal_clean_(evaluator['Evaluator Type']),
     examinationId:ccmsPortal_clean_(examination['Examination ID']),examination:ccmsPortal_clean_(examination.Examination),
     examinationCategory:ccmsPortal_clean_(examination['Examination Category']||examination.Category||''),
+    evaluationType:evaluationType,
     date:ccmsPortal_date_(data.date)
   };
 }
@@ -152,7 +154,7 @@ function ccmsPortal_responseMap_(form,data,identity) {
   }
   const identityByTitle={
     'student':identity.student,'clinical site':identity.site,'evaluator':identity.evaluator,
-    'examination':identity.examination,'evaluation type':'Competency',
+    'examination':identity.examination,'evaluation type':identity.evaluationType||'Competency',
     'date':identity.date,'evaluation date':identity.date
   };
   const found={student:0,site:0,evaluator:0,exam:0,date:0};
@@ -269,7 +271,7 @@ function gradeClinicalEvaluationFromPortalPayload(data) {
   if(ccmsPortal_norm_(evalInfo.student)!==ccmsPortal_norm_(identity.student)||
       ccmsPortal_norm_(evalInfo.clinicalSite)!==ccmsPortal_norm_(identity.site)||
       ccmsPortal_norm_(evalInfo.evaluator)!==ccmsPortal_norm_(identity.evaluator)||
-      ccmsPortal_norm_(evalInfo.evaluationType)!=='competency'||
+      ccmsPortal_norm_(evalInfo.evaluationType)!==ccmsPortal_norm_(identity.evaluationType||'Competency')||
       ccmsPortal_norm_(evalInfo.examination)!==ccmsPortal_norm_(identity.examination))
     throw new Error('Grade identity does not agree with authoritative CCMS references');
   return {grade:grade,identity:identity};

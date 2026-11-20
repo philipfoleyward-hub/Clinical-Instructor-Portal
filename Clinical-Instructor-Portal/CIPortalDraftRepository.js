@@ -70,7 +70,7 @@ function ciDraftSave_(identity,payload){
       version:1,submissionId:id,studentId:String(identity.studentId),
       siteId:String(identity.siteId),evaluatorId:String(identity.evaluatorId),
       examinationId:String(identity.examinationId),date:String(identity.date),
-      evaluationType:'Competency',answers:payload.answers||{},
+      evaluationType:String(identity.evaluationType||'Competency'),answers:payload.answers||{},
       uiState:payload.uiState||null,
       currentSection:Math.max(0,Math.min(8,Number(payload.currentSection)||0)),
       reviewPending:Boolean(payload.reviewPending),savedAt:new Date().toISOString()

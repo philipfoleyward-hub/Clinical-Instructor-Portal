@@ -45,6 +45,13 @@ function ciPortalEvaluationTransport_(action,verifiedPayload) {
     throw new Error(String(value&&value.error||'Original CCMS gateway rejected the request'));
   return value;
 }
+/** Evaluation types the Portal may submit (official Form choices). */
+function ciPortalEvaluationType_(value){
+  const v=String(value||'Competency').trim().toLowerCase();
+  const t={competency:'Competency',iso:'ISO',sso:'SSO'}[v];
+  if(!t)throw new Error('Evaluation type must be Competency, ISO or SSO');
+  return t;
+}
 function ciPortalEvaluationTrustedPayload_(token,request) {
   // Retain the original portal's session and site authorization checks.
   // ciHWAccess_ verifies this session once; do not call ciR1Require_ twice.
@@ -59,7 +66,7 @@ function ciPortalEvaluationTrustedPayload_(token,request) {
     studentId:String(request.studentId||''),siteId:String(access.site.siteId),
     evaluatorId:id,authenticatedEvaluatorId:id,
     examinationId:String(request.examinationId||''),date:day,
-    evaluationType:'Competency',submissionId:String(request.submissionId||''),
+    evaluationType:ciPortalEvaluationType_(request.evaluationType),submissionId:String(request.submissionId||''),
     answers:request.answers||{}
   };
   if(!/^CI-PORTAL-[a-f0-9-]{36}$/i.test(result.submissionId)&&result.submissionId)throw new Error('Invalid submission ID');

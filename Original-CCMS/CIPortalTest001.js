@@ -335,7 +335,10 @@ function ciLink_commitProduction_(data) {
       'PDF Document':doc.pdfUrl,'Source Document':doc.docUrl});
   } finally {lock.releaseLock();}
   let requirements, notifications;
-  try {requirements=rebuildStudentRequirementStatus();}
+  // Recalculate only this student's requirement rows (full rebuild as fallback).
+  try {requirements=typeof reqUpdateStudent_==='function'
+    ? reqUpdateStudent_(SpreadsheetApp.getActiveSpreadsheet(), identity.studentId)
+    : rebuildStudentRequirementStatus();}
   catch(e){requirements={success:false,error:String(e.message||e)};}
   // Reuse the exact existing coordinator/evaluator email templates and routing.
   try {notifications=notification_sendEvaluationNotificationsSafely(record);}
