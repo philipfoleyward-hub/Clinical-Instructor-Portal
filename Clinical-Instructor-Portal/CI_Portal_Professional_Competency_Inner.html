@@ -451,7 +451,7 @@ function notify(t){const n=$('pc-toast');n.textContent=t;n.style.display='block'
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FINAL=()=>sections.length;
 function buildSections(){
- const n=criteria.length,cuts=schema.family==='Clinical 1-2'?[[0,9],[9,n]]:[[0,9],[9,20],[20,n]];
+ const n=criteria.length,cuts=schema.family==='Clinical 1-2'?[[0,9],[9,n]]:[[0,9],[9,21],[21,n]];
  sections=cuts.map(([a,b])=>({name:'Criteria '+(a+1)+'–'+b,from:a,to:b}));
 }
 const items=s=>criteria.slice(s.from,s.to).map((c,k)=>({c,i:s.from+k}));

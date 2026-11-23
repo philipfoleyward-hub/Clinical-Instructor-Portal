@@ -73,7 +73,7 @@ function pcV2_buildDocument_(input,priorId) {
   if(!sheet)throw new Error('Copied Professional Competency sheet is missing Sheet1.');
   const rows=input.score.family==='Clinical 1-2'
     ? input.score.details.map(function(_,i){return i<9?13+i:15+i;})
-    : input.score.details.map(function(_,i){return i<9?13+i:i<20?15+i:16+i;});
+    : input.score.details.map(function(_,i){return i<9?13+i:i<21?15+i:16+i;});
   if(rows.length!==input.score.criterionCount)throw new Error('Template/rubric row count mismatch.');
   const token=sheet.getRange(rows[0],7).getDisplayValue();
   if(token.indexOf('{{PC_')!==0 && token!==input.score.details[0].rating)
@@ -97,12 +97,12 @@ function pcV2_buildDocument_(input,priorId) {
     sheet.getRange('A41').setValue(input.strengths);
     sheet.getRange('A44').setValue(input.improvements);
   }else{
-    sheet.getRange('A49').setValue(input.strengths);
-    sheet.getRange('A52').setValue(input.improvements);
+    sheet.getRange('A50').setValue(input.strengths);
+    sheet.getRange('A53').setValue(input.improvements);
   }
   SpreadsheetApp.flush();
-  const totalRow=input.score.family==='Clinical 1-2'?34:42;
-  const gradeRow=input.score.family==='Clinical 1-2'?36:44;
+  const totalRow=input.score.family==='Clinical 1-2'?34:43;
+  const gradeRow=input.score.family==='Clinical 1-2'?36:45;
   const output=Number(sheet.getRange(gradeRow,7).getValue())*100;
   const applied=Number(sheet.getRange(totalRow,10).getValue());
   if(!isFinite(output)||Math.abs(output-input.score.percentGrade)>0.011 ||

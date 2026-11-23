@@ -196,6 +196,12 @@ const PC_V2_RUBRICS = {
       "unverified": false
     },
     {
+      "id": 2092034758,
+      "weight": 4,
+      "title": "RADIATION SAFETY CONSCIOUSNESS: Assess possibility of pregnancy, use of accurate technique book, uses calipers correctly, effective shielding, and accurate collimation.",
+      "unverified": false
+    },
+    {
       "id": 253887405,
       "weight": 4,
       "title": "Demonstrates ability to PERFORM RADIOGRAPHIC PROCEDURE INDEPENDENTLY, CONSISTENTLY and EFFECTIVELY with limited repeats.",
