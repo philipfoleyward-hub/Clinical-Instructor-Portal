@@ -87,6 +87,9 @@ const ciRun=(name,...args)=>new Promise((resolve,reject)=>{
   ciR1EvaluationSubmit:()=>runner.ciR1EvaluationSubmit(...args),
   ciR1EvaluationDraftList:()=>runner.ciR1EvaluationDraftList(...args),
   ciR1EvaluationReleaseStatus:()=>runner.ciR1EvaluationReleaseStatus(...args),
+  ciR1ResourceDocument:()=>runner.ciR1ResourceDocument(...args),
+  ciR1ResourcePdf:()=>runner.ciR1ResourcePdf(...args),
+  ciR1ScoringGuide:()=>runner.ciR1ScoringGuide(...args),
   ciR1Logout:()=>runner.ciR1Logout(...args),
   ciR1LoginHtml:()=>runner.ciR1LoginHtml(...args)
  };
