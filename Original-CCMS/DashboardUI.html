@@ -1373,35 +1373,139 @@
 @media(max-width:720px){.attendance-entry-grid{grid-template-columns:1fr}.attendance-modal-history-row{grid-template-columns:1fr 1fr}}
 </style>
 
+<style id="ccms-v2-shell">
+
+:root{
+ --v2navy:#082a50;--v2navy2:#0d3764;--v2blue:#2786ee;--v2ink:#102d52;--v2muted:#6b7b8e;
+ --v2bg:#f5f7fa;--v2line:#dce5ef;--v2red:#ef4148;--v2amber:#f6ad16;--v2green:#25a954;
+ --v2shadow:0 6px 18px rgba(21,45,76,.12)
+}
+
+.v2-app{min-height:100vh;display:grid;grid-template-columns:205px 1fr}.v2-sidebar{height:100vh;position:sticky;top:0;background:linear-gradient(#0b315b,#082746);color:#fff;padding:20px 8px;display:flex;flex-direction:column}
+.v2-nav{display:grid;gap:7px}.v2-nav button,.v2-help{border:0;color:#fff;background:transparent;border-radius:9px;min-height:54px;display:flex;align-items:center;gap:14px;padding:0 17px;text-align:left;font-size:14px}.v2-nav button.active,.v2-nav button:hover,.v2-help:hover{background:linear-gradient(90deg,#5aa7f5,#337dcc)}.v2-icon{width:26px;height:26px;display:inline-grid;place-items:center;flex:0 0 26px}.v2-icon svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2.35;stroke-linecap:round;stroke-linejoin:round}.v2-help{margin-top:auto}.v2-shell{min-width:0}
+.v2-brand strong{font-size:18px;white-space:nowrap}.v2-brand small{white-space:nowrap}.v2-topbar{height:72px;background:#fff;border-bottom:1px solid #e4e9ef;display:grid;grid-template-columns:360px minmax(300px,1fr) 285px;gap:20px;align-items:center;padding:0 24px}
+.v2-brand{display:flex;align-items:center;gap:12px}.v2-xray{width:66px;height:52px;border-radius:6px;background:#092e57;overflow:hidden;display:grid;place-items:center;box-shadow:0 1px 3px rgba(8,42,80,.16)}.v2-xray svg{width:50px;height:50px}.v2-brand strong{font-size:20px;display:block}.v2-brand small{font-size:14px;color:#315477}.v2-search{position:relative;max-width:570px;width:100%;justify-self:center}.v2-search input{width:100%;background:#edf1f5;border:1px solid #d5dde6;border-radius:23px;padding:12px 18px 12px 46px;color:#30455e;outline:none}.v2-search .v2-icon{position:absolute;left:14px;top:9px;color:#687d93}.v2-profile{justify-self:end;display:flex;align-items:center;gap:12px}.v2-bell{position:relative}.v2-bell .v2-bubble{position:absolute;right:-7px;top:-8px;background:var(--v2red);color:#fff;border-radius:50%;font-size:10px;font-weight:800;padding:3px 5px}.v2-avatar{width:43px;height:43px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 0 0 1px #d8e0e8}.v2-pname{font-weight:800;font-size:14px}.v2-prole{font-size:12px;color:#718196}
+.v2-hero{height:155px;position:relative;background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");background-position:center;background-size:cover;overflow:visible}
+.v2-hero:before{content:"";position:absolute;inset:0;background:transparent}
+.v2-hero-copy{position:relative;z-index:2;padding:24px 31px;color:#0b315a;text-shadow:0 1px 0 rgba(255,255,255,.35)}.v2-hero h1{font-size:38px;letter-spacing:-1px;margin:0 0 2px;font-weight:850}.v2-hero h1 .v2-sun{color:#f7a400}.v2-hero p{font-size:20px;margin:0 0 10px 52px}.v2-meta{margin-left:52px;display:flex;align-items:center;gap:13px;font-size:13px;font-weight:650}.v2-meta .v2-divider{height:18px;width:1px;background:rgba(25,62,94,.45)}.v2-meta .v2-mi{display:flex;align-items:center;gap:7px}.v2-meta .v2-mi svg{width:18px;height:18px;stroke-width:2}.v2-motto{position:absolute;right:21%;top:27px;z-index:2;font-family:"Segoe Print","Comic Sans MS",cursive;font-size:21px;line-height:1.2;transform:rotate(-5deg);text-align:center;color:#163a5e}
+.v2-status-grid{position:absolute;left:24px;right:24px;bottom:-145px;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.v2-status{height:145px;border:1px solid #dbe3ec;border-radius:13px;background:#fff;overflow:hidden;position:relative;text-align:left;box-shadow:var(--v2shadow);padding:0}.v2-status-img{height:78px;background-size:cover;background-position:center;position:relative}.v2-status-img:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,40,73,.15),transparent)}.v2-s1{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-s2{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-s3{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-s4{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-status .v2-circle{display:none}.v2-flag .v2-circle{background:var(--v2red)}.v2-wait .v2-circle{background:var(--v2amber)}.v2-done .v2-circle{background:var(--v2green)}.v2-sched .v2-circle{background:#2583e8}.v2-circle svg{width:23px;height:23px;stroke:#fff}.v2-status-copy{padding:8px 18px 7px}.v2-status-copy strong{font-size:17px;display:block;letter-spacing:-.15px}.v2-status-copy span{font-size:12px;color:#4f6884}.v2-status .v2-arrow{position:absolute;right:17px;bottom:14px;font-size:25px;color:#45617d}.v2-flag{background:linear-gradient(#fff,#fff0f1)}.v2-wait{background:linear-gradient(#fff,#fff8e8)}.v2-done{background:linear-gradient(#fff,#eff9f2)}.v2-sched{background:linear-gradient(#fff,#eef7ff)}
+.v2-content{padding:164px 23px 0}.v2-grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(350px,1fr);gap:13px}.v2-panel{background:#fff;border:1px solid #e0e6ed;border-radius:13px;box-shadow:0 3px 12px rgba(22,45,75,.06);overflow:hidden}.v2-panel-head{display:flex;justify-content:space-between;align-items:center;padding:13px 18px 8px}.v2-panel-title{display:flex;align-items:center;gap:8px;font-size:19px;font-weight:850}.v2-panel-title .v2-icon{color:#294f77}.v2-link{border:0;background:transparent;color:#0870dd}.v2-chips{display:flex;gap:8px;padding:0 18px 10px}.v2-chip{border:0;background:#eff4f9;border-radius:7px;padding:8px 13px;color:#36536f;font-size:11px}.v2-chip.active{background:#2d85ee;color:#fff}.v2-day{font-size:12px;font-weight:850;padding:0 18px 6px}.v2-day span{font-weight:400;color:#718196;margin-left:18px}.v2-rows{padding:0 14px 11px}.v2-row{min-height:53px;border:1px solid #e1e7ee;border-radius:9px;margin:2px 0;display:grid;grid-template-columns:45px minmax(0,1fr) 95px;align-items:center;padding:5px 8px}.v2-row .v2-action{width:88px;justify-self:end;white-space:nowrap}.v2-row.alert{background:#fffafa;border-color:#f4d6d8}.v2-eventicon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff}.v2-eventicon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.15}.v2-r{background:#df6268}.v2-y{background:#dca94d}.v2-p{background:#9a69b7}.v2-b{background:#5a91d2}.v2-g{background:#58a873}.v2-rmain{font-size:12px}.v2-rmain strong{display:flex;align-items:center;gap:8px;font-size:13px}.v2-received-time{font-size:10px;font-weight:600;color:#8996a6;white-space:nowrap}.v2-rmeta{display:flex;gap:20px;flex-wrap:wrap;color:#62768d;margin-top:3px}.v2-rmeta a{color:#086bd6;text-decoration:underline}.v2-inline-meta-icon{display:inline-flex;align-items:center;gap:4px}.v2-inline-meta-icon svg{width:13px;height:13px;stroke:#718196;fill:none;stroke-width:2}.v2-action{border:0;border-radius:8px;background:#e9f4ff;color:#086bd6;padding:9px 10px;font-weight:700}.v2-action.red{background:#ffe8ea;color:#dc3037}.v2-action.green{background:#e9f8ee;color:#17873c;padding-left:7px;padding-right:7px;font-size:11px}
+.v2-right{display:grid;gap:10px;align-content:start}.v2-entry{padding:7px;background:#fffdfb}.v2-entrytop{background:linear-gradient(135deg,#5799ec,#3779ce);color:#fff;border-radius:10px;padding:10px 17px}.v2-entrytop strong{font-size:24px;display:flex;align-items:center;gap:8px}.v2-entrytop span{font-size:12px}.v2-entrygrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px}.v2-entrybtn{min-height:45px;border:1px solid #e4e9ef;border-radius:7px;background:#fff;display:grid;grid-template-columns:30px 1fr 14px;gap:7px;align-items:center;text-align:left;padding:4px 7px;color:#14365e;font-size:10.5px;font-weight:800;box-shadow:0 1px 2px rgba(23,48,79,.035)}.v2-entrybtn:nth-child(1){background:#fff7e8;border-color:#f1dfbd}
+.v2-entrybtn:nth-child(2){background:#edf6ff;border-color:#d7e6f5}
+.v2-entrybtn:nth-child(3){background:#f7effb;border-color:#e6d7ee}
+.v2-entrybtn:nth-child(4){background:#edf6ff;border-color:#d7e6f5}
+.v2-entrybtn:nth-child(5){background:#edf8f1;border-color:#d6e9dc}
+.v2-entrybtn:nth-child(6){background:#fff0ef;border-color:#efd8d6}
+.v2-entrybtn:nth-child(7){background:#fff0ef;border-color:#efd8d6}.v2-eicon{width:29px;height:29px;border-radius:7px;display:grid;place-items:center;color:#fff}.v2-eicon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.15}.v2-eo{background:#e8a13b}.v2-eb{background:#4c93d8}.v2-ep{background:#a66ac5}.v2-eg{background:#56ad72}.v2-er{background:#df6b68}
+.v2-snapshot{padding:12px 15px}.v2-snapshot h3{font-size:18px;margin:0 0 6px;display:flex;gap:8px;align-items:center}.v2-snaprow{display:grid;grid-template-columns:27px 28px 1fr 15px;align-items:center;min-height:27px;border-bottom:1px solid #edf1f5;font-size:12px}.v2-snaprow:last-child{border:0}.v2-snapico{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff}.v2-snapico svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.2}.v2-sg{background:#58ad73;color:#fff}.v2-sb{background:#5792cf;color:#fff}.v2-sy{background:#dfa847;color:#fff}
+.v2-quick{margin:8px -23px 0;background:#fff;border-top:1px solid #dfe5ec;padding:10px 31px;display:grid;grid-template-columns:205px repeat(6,minmax(125px,1fr));gap:17px;align-items:center}.v2-qintro{display:grid;grid-template-columns:42px 1fr;gap:8px}.v2-qstar{font-size:34px;color:#183d68}.v2-qintro strong{font-size:18px}.v2-qintro span{display:block;color:#718196;font-size:11px;margin-top:3px}.v2-qcard{height:116px;border:1px solid #dce3ea;border-radius:7px;background:#fff;overflow:hidden;text-align:left;padding:0;position:relative}.v2-qphoto{height:58px;background-size:cover;background-position:center}.v2-q1{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-q2{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-q3{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-q4{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-q5{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-q6{background-image:url("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}.v2-qcopy{padding:5px 9px}.v2-qcopy{position:relative}.v2-qcopy strong{font-size:11px;display:block;padding-right:13px}.v2-qcopy strong:after{content:'›';position:absolute;right:9px;font-size:17px;color:#496986}.v2-qcopy span{font-size:9px;color:#718196;display:block;margin-top:2px}.v2-note{text-align:right;font-size:9px;color:#8b97a6;padding:5px 0}
+@media(max-width:1200px){.v2-topbar{grid-template-columns:320px 1fr 230px}.v2-quick{grid-template-columns:180px repeat(3,1fr)}.v2-grid{grid-template-columns:1fr}.v2-status-grid{grid-template-columns:repeat(2,1fr);bottom:-225px}.v2-hero{margin-bottom:150px}}
+
+/* V2 shell integration with the working dashboard pages */
+#content.page{max-width:1500px}
+#content.v2-homepage{max-width:none;padding:0;margin:0}
+.v2-shell{min-width:0}
+.v2-nav button,.v2-help{cursor:pointer}
+.v2-avatar{display:grid;place-items:center;background:#e2edf5;color:#1e4a6d;font-weight:800;font-size:15px}
+.v2-bellwrap{position:relative}
+.v2-bell{border:0;background:transparent;color:#28476a;cursor:pointer;position:relative;padding:4px}
+.v2-bell .v2-bubble{position:absolute;right:-6px;top:-6px;background:#ef4148;color:#fff;border-radius:10px;font-size:10px;font-weight:800;padding:2px 6px}
+.v2-pop{position:absolute;z-index:500;background:#fff;border:1px solid #d7e1ea;border-radius:10px;box-shadow:0 12px 32px rgba(16,45,82,.18);max-height:420px;overflow:auto}
+.v2-search .v2-pop{left:0;right:0;top:48px}
+.v2-bell-pop{right:-10px;top:42px;width:360px}
+.v2-pop button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #eef2f6;background:#fff;padding:10px 14px;cursor:pointer;color:#14365e}
+.v2-pop button:hover{background:#f3f8fd}
+.v2-pop button b{display:block;font-size:13px}.v2-pop button span{display:block;font-size:11px;color:#62768d;margin-top:2px}
+.v2-pop button.unread{background:#f2f8ff}.v2-pop button.unread b:before{content:'● ';color:#2786ee}
+.v2-bp-head{padding:10px 14px;font-weight:800;border-bottom:1px solid #e4ebf2}.v2-bp-empty{padding:14px;color:#6b7b8e;font-size:12px}
+.v2-hero{background-color:#ffeedd;background-position:right center;background-repeat:no-repeat}
+.v2-hero-copy{display:block}
+.v2-status{cursor:pointer}
+.v2-status .v2-count{position:absolute;right:14px;top:12px;z-index:2;min-width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:850;font-size:17px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.v2-flag .v2-count{background:#ef4148}.v2-wait .v2-count{background:#f6ad16}.v2-done .v2-count{background:#25a954}
+.v2-status-img{background-color:#dfe9f3}
+.v2-row .v2-action{cursor:pointer}
+.v2-entrybtn,.v2-qcard,.v2-chip,.v2-link{cursor:pointer}
+#homeAttendanceActions .home-attendance-item{display:block;width:100%;text-align:left;border:1px solid #e4ebf2;border-radius:8px;background:#fff;padding:7px 9px;margin-top:5px;cursor:pointer;font-size:12px}
+#homeAttendanceActions .home-attendance-item span{display:block;color:#62768d;font-size:11px}
+#homeAttendanceActions .home-attendance-item.action{border-color:#f4d6d8;background:#fffafa}
+.v2-modal{position:fixed;inset:0;z-index:1000;background:rgba(10,30,55,.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 12px;overflow:auto}
+.v2-dialog{background:#fff;border-radius:12px;width:min(760px,100%);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.v2-dhead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e4ebf2;font-size:16px}
+.v2-dhead button{border:0;background:none;font-size:24px;cursor:pointer;color:#456}
+.v2-dbody{padding:16px 18px}
+.v2-dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.v2-dgrid small{display:block;color:#6b7b8e;font-size:11px}.v2-dgrid b{font-size:13px}
+.v2-dlinks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.v2-dlabel{display:block;font-weight:700;margin:10px 0 6px}
+#v2-review-notes{width:100%;border:1px solid #c9d6e3;border-radius:8px;padding:9px;font:inherit}
+.v2-dactions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}
+.v2-btn-red{border:1px solid #dc3037;background:#fff;color:#c4262d;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer}
+.v2-btn-red:disabled{opacity:.5;cursor:not-allowed}
+.v2-thread{margin:6px 0 4px}.v2-msg{border:1px solid #e1e8ef;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
+.v2-msg small{display:block;color:#6b7b8e;font-size:11px;margin-bottom:3px}.v2-msg.ci{background:#f4fbf6}.v2-msg.co{background:#f7f9fc}
+.v2-resp{margin-top:6px;padding-top:6px;border-top:1px dashed #d6e0ea}
+@media(max-width:900px){.v2-app{grid-template-columns:1fr}.v2-sidebar{position:static;height:auto;flex-direction:row;overflow:auto}.v2-nav{display:flex}.v2-topbar{grid-template-columns:1fr}.v2-dgrid{grid-template-columns:1fr 1fr}}
+
+</style>
 </head>
 
 
 <body>
 
-<header class="topbar">
-  <div class="brand-wrap">
-    <div class="brand">Clinical Coordinator Command Center</div>
-    <div class="brand-subtitle">Clinical Competency Management System</div>
-  </div>
-  <nav class="nav">
-    <button class="nav-button active" data-page="home" onclick="showPage('home')">Home</button>
-    <button class="nav-button" data-page="students" onclick="showPage('students')">Students</button>
-    <button class="nav-button" data-page="instructors" onclick="showPage('instructors')">Clinical Instructors</button>
-    <button class="nav-button" data-page="sites" onclick="showPage('sites')">Clinical Sites</button>
-    <button class="nav-button" data-page="schedules" onclick="showPage('schedules')">Schedules</button>
-    <button class="nav-button" data-page="administration" onclick="showPage('administration')">Administration</button>
-  </nav>
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="v2i-home" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></symbol>
+ <symbol id="v2i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.5-4 2.7-6 6-6s5.5 2 6 6"/><path d="M15 15c3 0 5 1.7 5.5 5"/></symbol>
+ <symbol id="v2i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+ <symbol id="v2i-hospital" viewBox="0 0 24 24"><path d="M4 21V5h16v16M8 21v-4h8v4"/><path d="M9 9h6M12 6v6"/></symbol>
+ <symbol id="v2i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
+ <symbol id="v2i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+ <symbol id="v2i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1A7 7 0 0 0 15 6l-.4-2.6h-4L10 6a7 7 0 0 0-1.5.9l-2.4-1-2 3.4L6.1 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1A7 7 0 0 0 10 18l.5 2.6h4L15 18a7 7 0 0 0 1.5-.9l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z"/></symbol>
+ <symbol id="v2i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 4.3 1.5c-1.2 1.1-2 1.5-2 3M12 17h.01"/></symbol>
+ <symbol id="v2i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+ <symbol id="v2i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 8H3c0-1 3-1 3-8M10 21h4"/></symbol>
+ <symbol id="v2i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+ <symbol id="v2i-cap" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11v5c3 3 9 3 12 0v-5M22 9v6"/></symbol>
+ <symbol id="v2i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 5c5-3 8 3 14 0v9c-6 3-9-3-14 0"/></symbol>
+ <symbol id="v2i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+ <symbol id="v2i-chart" viewBox="0 0 24 24"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7"/></symbol>
+ <symbol id="v2i-clipboard" viewBox="0 0 24 24"><path d="M7 5H5v16h14V5h-2"/><rect x="8" y="3" width="8" height="4" rx="2"/><path d="M8 12h8M8 16h6"/></symbol>
+ <symbol id="v2i-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20z"/><path d="M12 9v5M12 18h.01"/></symbol>
+<symbol id="v2i-phone" viewBox="0 0 24 24"><path d="M7 3h4l2 5-3 2c1.5 3 3.5 5 6 6l2-3 4 2v4c0 1-1 2-2 2C10 21 3 14 3 5c0-1 1-2 2-2z"/></symbol><symbol id="v2i-xray" viewBox="0 0 24 24">
+<rect x="4" y="3" width="16" height="18" rx="2"/>
+<path d="M12 5v14"/>
+<path d="M11 8c-3-3-5 0-5 4s2 6 5 5M13 8c3-3 5 0 5 4s-2 6-5 5"/>
+</symbol></svg>
+<div class="v2-app">
+<aside class="v2-sidebar">
+ <nav class="v2-nav" aria-label="Coordinator navigation">
+  <button data-v2="home" class="active" onclick="v2Go('home')"><span class="v2-icon"><svg><use href="#v2i-home"/></svg></span><span>Home</span></button>
+  <button data-v2="students" onclick="v2Go('students')"><span class="v2-icon"><svg><use href="#v2i-users"/></svg></span><span>Students</span></button>
+  <button data-v2="instructors" onclick="v2Go('instructors')"><span class="v2-icon"><svg><use href="#v2i-plus"/></svg></span><span>Clinical Instructors</span></button>
+  <button data-v2="sites" onclick="v2Go('sites')"><span class="v2-icon"><svg><use href="#v2i-hospital"/></svg></span><span>Clinical Sites</span></button>
+  <button data-v2="schedules" onclick="v2Go('schedules')"><span class="v2-icon"><svg><use href="#v2i-calendar"/></svg></span><span>Scheduling</span></button>
+  <button data-v2="paperwork" onclick="v2Go('paperwork')"><span class="v2-icon"><svg><use href="#v2i-file"/></svg></span><span>Reports &amp; Paperwork</span></button>
+  <button data-v2="system" onclick="v2Go('system')"><span class="v2-icon"><svg><use href="#v2i-gear"/></svg></span><span>System &amp; Setup</span></button>
+ </nav>
+ <button class="v2-help" onclick="v2Go('help')"><span class="v2-icon"><svg><use href="#v2i-help"/></svg></span><span>Help &amp; Support</span></button>
+</aside>
+<section class="v2-shell">
+<header class="v2-topbar">
+ <div class="v2-brand" style="cursor:pointer" onclick="v2Go('home')">
+  <div class="v2-xray"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-asset-img="BRAND_XRAY" alt="" style="width:100%;height:100%;object-fit:cover"></div><div><strong>Clinical Management System</strong><small>Radiologic Technology</small></div>
+ </div>
+ <div class="v2-search"><span class="v2-icon"><svg><use href="#v2i-search"/></svg></span><input id="v2-search-input" placeholder="Search students by name or ID..." oninput="v2Search(this.value)" onfocus="v2Search(this.value)" autocomplete="off"><div id="v2-search-results" class="v2-pop" hidden></div></div>
+ <div class="v2-profile">
+  <div class="v2-bellwrap"><button class="v2-bell" onclick="v2ToggleBell(event)" aria-label="Notifications"><span class="v2-icon"><svg><use href="#v2i-bell"/></svg></span><span class="v2-bubble" id="v2-bell-count" hidden>0</span></button><div id="v2-bell-panel" class="v2-pop v2-bell-pop" hidden></div></div>
+  <div class="v2-avatar" id="v2-avatar"></div><div><div class="v2-pname" id="v2-pname">Coordinator</div><div class="v2-prole">Clinical Coordinator</div></div>
+ </div>
 </header>
-
-
-<main
-  id="content"
-  class="page"
->
-  <div class="loading">
-    Loading...
-  </div>
+<main id="content" class="page v2-homepage">
+  <div class="loading">Loading...</div>
 </main>
+</section>
+</div>
+
 
 
 <script>
@@ -6436,5 +6540,414 @@ function attendanceModalBackdropCancel(event) {
 </script>
 
 
+<script id="ccms-v2-shell-script">
+
+/* =====================================================================
+ * CCMS COORDINATOR V2 SHELL — wires the approved V2 visual design to the
+ * existing, working Dashboard pages and services. Real data only.
+ * ===================================================================== */
+const V2 = {
+  map: {home: 'home', students: 'students', instructors: 'instructors', sites: 'sites', schedules: 'schedules',
+    paperwork: 'administration', system: 'system', help: 'help'},
+  home: null, homeLoading: false, homeError: '', assets: null, pcs: null, attendance: null,
+  chip: 'all', pendingEntry: '', review: null, reviewBusy: false, reviewMsg: ''
+};
+function v2Ico(id) {return '<span class="v2-icon"><svg><use href="#v2i-' + id + '"/></svg></span>';}
+function v2Esc(v) {return escapeHtml(v == null ? '' : String(v));}
+function v2Run(fn, args, ok, fail) {
+  const r = google.script.run.withSuccessHandler(ok).withFailureHandler(fail || function(e) {alert(errorMessage(e));});
+  r[fn].apply(r, args || []);
+}
+
+/* ---------- navigation ---------- */
+const v2OriginalShowPage = showPage;
+showPage = function(page) {
+  v2OriginalShowPage(page);
+  v2SetActive(page);
+  window.scrollTo(0, 0);
+};
+function v2SetActive(page) {
+  const key = {administration: 'paperwork', reports: 'paperwork', newEntry: 'paperwork', clinicalReview: 'paperwork',
+    attendance: 'schedules', review: 'home'}[page] || page;
+  document.querySelectorAll('.v2-nav button[data-v2]').forEach(function(b) {b.classList.toggle('active', b.dataset.v2 === key);});
+  const help = document.querySelector('.v2-help');
+  if (help) help.classList.toggle('active', page === 'help');
+  const c = document.getElementById('content');
+  if (c) c.classList.toggle('v2-homepage', page === 'home');
+}
+function v2Go(key) {showPage(V2.map[key] || key);}
+const v2OriginalRender = render;
+render = function() {
+  if (APP.page === 'system') return v2RenderSystem();
+  if (APP.page === 'help') return v2RenderHelp();
+  return v2OriginalRender();
+};
+
+/* ---------- data ---------- */
+function v2LoadHome(force) {
+  if (V2.homeLoading || (V2.home && !force)) return;
+  V2.homeLoading = true; V2.homeError = '';
+  v2Run('dashboardV2GetHome', [], function(h) {
+    V2.homeLoading = false; V2.home = h || {}; v2PaintTop();
+    if (APP.page === 'home') renderHome();
+  }, function(e) {
+    V2.homeLoading = false; V2.homeError = errorMessage(e);
+    if (APP.page === 'home') renderHome();
+  });
+  if (!V2.attendance) v2Run('dashboardGetAttendanceActionItems', [], function(r) {
+    V2.attendance = r || {}; if (APP.page === 'home') renderHome();
+  }, function() {V2.attendance = {error: true};});
+}
+function v2RefreshAll() {
+  v2Run('getDashboardBootstrap', [], function(data) {
+    APP.students = data.students || []; APP.reviewStats = data.reviewStats || {};
+    APP.addNewCapabilities = data.addNew || {}; APP.documentCapabilities = data.documents || {};
+    V2.pcs = null; v2LoadHome(true);
+    if (APP.page === 'review') loadReviewQueue(); else render();
+  });
+}
+function v2LoadAssets() {
+  if (V2.assets) return v2ApplyAssets();
+  v2Run('dashboardHomeV2GetAssets', [], function(a) {V2.assets = a || {}; v2ApplyAssets();}, function() {});
+}
+function v2ApplyAssets() {
+  const a = V2.assets || {};
+  document.querySelectorAll('[data-asset-bg]').forEach(function(el) {
+    const k = el.getAttribute('data-asset-bg');
+    if (a[k]) el.style.backgroundImage = (k === 'HOME_HERO'
+      ? 'linear-gradient(90deg,rgba(255,240,226,.97) 0%,rgba(255,238,222,.93) 52%,rgba(255,236,220,.55) 68%,rgba(255,236,220,0) 78%),'
+      : '') + 'url("' + a[k] + '")';
+  });
+  document.querySelectorAll('[data-asset-img]').forEach(function(el) {
+    const k = el.getAttribute('data-asset-img'); if (a[k]) el.src = a[k];
+  });
+}
+
+/* ---------- top bar ---------- */
+function v2PaintTop() {
+  const h = V2.home || {}, u = h.user || {};
+  const name = u.name || 'Coordinator';
+  const el = document.getElementById('v2-pname'); if (el) el.textContent = name;
+  const av = document.getElementById('v2-avatar');
+  if (av) av.textContent = name.split(/[\s.]+/).filter(Boolean).map(function(x) {return x[0];}).join('').slice(0, 2).toUpperCase();
+  const s = APP.reviewStats || {};
+  const count = Number(h.inboxUnread || 0) + Number(s.flagged || 0);
+  const b = document.getElementById('v2-bell-count');
+  if (b) {b.textContent = String(count); b.hidden = !count;}
+}
+function v2ToggleBell(ev) {
+  if (ev) ev.stopPropagation();
+  const box = document.getElementById('v2-bell-panel');
+  if (!box.hidden) {box.hidden = true; return;}
+  const h = V2.home || {}, s = APP.reviewStats || {};
+  const inbox = (h.inbox || []).slice(0, 10);
+  box.innerHTML = '<div class="v2-bp-head">Notifications</div>' +
+    (Number(s.flagged || 0) ? '<button class="v2-bp-item" onclick="v2CloseBell();showPage(\'review\');loadReviewQueue(\'flagged\')"><b>' +
+      Number(s.flagged) + ' flagged evaluation' + (s.flagged == 1 ? '' : 's') + '</b><span>Open the flagged review queue</span></button>' : '') +
+    (Number(s.awaitingReview || 0) ? '<button class="v2-bp-item" onclick="v2CloseBell();showPage(\'review\');loadReviewQueue(\'pending\')"><b>' +
+      Number(s.awaitingReview) + ' awaiting review</b><span>New submissions</span></button>' : '') +
+    inbox.map(function(n) {
+      return '<button class="v2-bp-item ' + (n.status === 'Unread' ? 'unread' : '') + '" onclick="v2OpenInbox(\'' + escapeJs(n.id) + '\')"><b>' +
+        v2Esc(n.title || 'Instructor reply') + '</b><span>' + v2Esc(n.from) + ' · ' + v2Esc(n.student) + ' · ' +
+        v2Esc(String(n.createdAt).slice(0, 10)) + '</span><span>' + v2Esc(String(n.message).slice(0, 140)) + '</span></button>';
+    }).join('') +
+    (!inbox.length && !Number(s.flagged || 0) && !Number(s.awaitingReview || 0) ? '<div class="v2-bp-empty">You are all caught up.</div>' : '');
+  box.hidden = false;
+}
+function v2CloseBell() {const b = document.getElementById('v2-bell-panel'); if (b) b.hidden = true;}
+document.addEventListener('click', function(e) {if (!e.target.closest('.v2-bellwrap')) v2CloseBell(); if (!e.target.closest('.v2-search')) v2CloseSearch();});
+function v2OpenInbox(id) {
+  v2CloseBell();
+  const n = ((V2.home || {}).inbox || []).filter(function(x) {return x.id === id;})[0];
+  if (!n) return;
+  if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
+  if (n.itemId) v2OpenReview(n.itemKind || 'evaluation', n.itemId);
+}
+function v2Search(q) {
+  const box = document.getElementById('v2-search-results');
+  q = String(q || '').trim().toLowerCase();
+  if (!q) {box.hidden = true; return;}
+  const hits = (APP.students || []).filter(function(s) {
+    return (String(s.student || '') + ' ' + String(s.studentId || '') + ' ' + String(s.cohort || '')).toLowerCase().indexOf(q) >= 0;
+  }).slice(0, 8);
+  box.innerHTML = hits.length ? hits.map(function(s) {
+    return '<button onclick="v2OpenStudent(\'' + escapeJs(s.studentId) + '\')"><b>' + v2Esc(s.student) + '</b><span>' +
+      v2Esc(s.studentId) + (s.cohort ? ' · ' + v2Esc(s.cohort) : '') + '</span></button>';
+  }).join('') : '<div class="v2-bp-empty">No matching students</div>';
+  box.hidden = false;
+}
+function v2CloseSearch() {const b = document.getElementById('v2-search-results'); if (b) b.hidden = true;}
+function v2OpenStudent(id) {
+  v2CloseSearch(); const i = document.getElementById('v2-search-input'); if (i) i.value = '';
+  showPage('students'); selectStudent(id);
+}
+
+/* ---------- Home ---------- */
+renderHome = function() {
+  const c = document.getElementById('content');
+  c.classList.add('v2-homepage');
+  v2LoadHome(false);
+  const h = V2.home || {}, s = APP.reviewStats || {}, u = h.user || {};
+  const pc = h.pc || {pending: 0, returned: 0};
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const today = new Date().toLocaleDateString(undefined, {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'});
+  const first = String(u.name || '').trim();
+  const flagged = Number(s.flagged || 0) + Number(pc.returned || 0);
+  const waiting = Number(s.awaitingReview || 0) + Number(pc.pending || 0);
+  const att = V2.attendance || {}, attCount = (att.actionRequired || []).length;
+  c.innerHTML =
+  '<section class="v2-hero" data-asset-bg="HOME_HERO"><div class="v2-hero-copy">' +
+    '<h1><span class="v2-sun">☀</span> ' + greet + (first ? ', ' + v2Esc(first) : '') + '</h1>' +
+    '<p>Here’s what’s happening in your clinical program today.</p><div class="v2-meta">' +
+    '<span class="v2-mi"><svg><use href="#v2i-calendar"/></svg>' + v2Esc(today) + '</span>' +
+    (h.clinicalTerm ? '<span class="v2-divider"></span><span class="v2-mi"><svg><use href="#v2i-cap"/></svg>' + v2Esc(h.clinicalTerm) + '</span>' : '') +
+    '<span class="v2-divider"></span><span class="v2-mi"><svg><use href="#v2i-users"/></svg>' + (APP.students || []).length + ' Students Active</span></div></div>' +
+    '<div class="v2-status-grid">' +
+    v2Status('flag', 'HOME_FLAGGED', flagged, 'Flagged', 'Needs your attention', "showPage('review');loadReviewQueue('flagged')") +
+    v2Status('wait', 'HOME_WAITING_REVIEW', waiting, 'Waiting for Review', 'New submissions', "showPage('review');loadReviewQueue('pending')") +
+    v2Status('done', 'HOME_REVIEWED', Number(s.reviewedToday || 0), 'Reviewed', 'Completed today', "showPage('review');loadReviewQueue('reviewedToday')") +
+    v2Status('sched', 'HOME_TODAYS_SCHEDULE', '', 'Today’s Schedule', 'View site assignments', "showPage('schedules')") +
+  '</div></section>' +
+  '<div class="v2-content"><div class="v2-grid"><section class="v2-panel">' +
+    '<div class="v2-panel-head"><div class="v2-panel-title">' + v2Ico('clock') + 'Recent Activity</div>' +
+    '<button class="v2-link" onclick="showPage(\'review\');loadReviewQueue(\'all\')">View All →</button></div>' +
+    '<div class="v2-chips">' + [['all', 'All Activity'], ['evaluation', 'Competencies'], ['professional', 'Professional Competency'],
+      ['pending', 'Awaiting Review'], ['flagged', 'Flagged']].map(function(x) {
+      return '<button class="v2-chip ' + (V2.chip === x[0] ? 'active' : '') + '" onclick="V2.chip=\'' + x[0] + '\';renderHome()">' + x[1] + '</button>';
+    }).join('') + '</div>' + v2Activity() + '</section>' +
+  '<aside class="v2-right"><section class="v2-panel v2-entry"><div class="v2-entrytop"><strong><span style="font-size:25px;line-height:1;color:#fff">✦</span>New Entry</strong><span>Add a new record to the clinical program.</span></div><div class="v2-entrygrid">' +
+    v2EntryBtn('eo', 'clipboard', 'Competency<br>Evaluation', 'competencyEvaluation') +
+    v2EntryBtn('eb', 'file', 'Clinical<br>Test', 'clinicalTest') +
+    v2EntryBtn('ep', 'file', 'Quiz', 'quizzes') +
+    v2EntryBtn('eb', 'clipboard', 'Case<br>Presentation', 'casePresentation') +
+    v2EntryBtn('eg', 'check', 'Professional<br>Competency', 'professional') +
+    v2EntryBtn('er', 'alert', 'Grade Points<br>Reduction', 'deduction') +
+    '<button class="v2-entrybtn" onclick="showPage(\'attendance\')"><span class="v2-eicon v2-er"><svg><use href="#v2i-calendar"/></svg></span><span>Attendance<br>Event</span><span>›</span></button>' +
+  '</div></section>' +
+  '<section class="v2-panel v2-snapshot"><h3>' + v2Ico('chart') + 'Program Snapshot</h3>' +
+    v2Snap('sg', 'users', (APP.students || []).length, 'Active Students', "showPage('students')") +
+    v2Snap('sy', 'clipboard', Number(s.awaitingReview || 0), 'Evaluations Awaiting Review', "showPage('review');loadReviewQueue('pending')") +
+    v2Snap('sb', 'check', Number(pc.pending || 0), 'Professional Competencies to Review', "V2.chip='professional';renderHome()") +
+    v2Snap('sb', 'alert', V2.attendance ? attCount : '…', 'Attendance Concerns', "showPage('attendance')") +
+    v2Snap('sy', 'flag', Number(s.failed || 0), 'Failed Evaluations', "showPage('review');loadReviewQueue('failed')") +
+  '</section>' +
+  '<section class="v2-panel v2-snapshot" id="homeAttendanceActions"><div class="muted small">Loading attendance…</div></section>' +
+  '</aside></div>' +
+  '<section class="v2-quick"><div class="v2-qintro"><div class="v2-qstar">★</div><div><strong>Quick Access</strong><span>Jump to a section or view key information.</span></div></div>' +
+    v2Quick('QUICK_STUDENTS', 'Students', 'View and manage student records', 'students') +
+    v2Quick('QUICK_INSTRUCTORS', 'Clinical Instructors', 'Manage CI information and availability', 'instructors') +
+    v2Quick('QUICK_SITES', 'Clinical Sites', 'Site details and placement information', 'sites') +
+    v2Quick('QUICK_SCHEDULING', 'Scheduling', 'View rotations and assignments', 'schedules') +
+    v2Quick('QUICK_PAPERWORK', 'Clinical Paperwork', 'Generate and print forms and reports', 'paperwork') +
+    v2Quick('QUICK_SYSTEM_SETUP', 'System & Setup', 'Manage program settings and data', 'system') +
+  '</section></div>';
+  v2LoadAssets();
+  setTimeout(loadHomeAttendanceActions, 0);
+};
+function v2Status(cls, asset, n, title, sub, onclick) {
+  return '<button class="v2-status v2-' + cls + '" onclick="' + onclick + '"><div class="v2-status-img" data-asset-bg="' + asset + '"></div>' +
+    (n !== '' ? '<span class="v2-count">' + v2Esc(n) + '</span>' : '') +
+    '<div class="v2-status-copy"><strong>' + title + '</strong><span>' + sub + '</span></div><span class="v2-arrow">›</span></button>';
+}
+function v2EntryBtn(color, icon, label, category) {
+  return '<button class="v2-entrybtn" onclick="v2NewEntry(\'' + category + '\')"><span class="v2-eicon v2-' + color + '"><svg><use href="#v2i-' + icon + '"/></svg></span><span>' + label + '</span><span>›</span></button>';
+}
+function v2Snap(cls, icon, n, label, onclick) {
+  return '<div class="v2-snaprow" style="cursor:pointer" onclick="' + onclick + '"><span class="v2-snapico v2-' + cls + '"><svg><use href="#v2i-' + icon + '"/></svg></span><strong>' + v2Esc(n) + '</strong><span>' + v2Esc(label) + '</span><span>›</span></div>';
+}
+function v2Quick(asset, title, sub, key) {
+  return '<button class="v2-qcard" onclick="v2Go(\'' + key + '\')"><div class="v2-qphoto" data-asset-bg="' + asset + '"></div><div class="v2-qcopy"><strong>' + title + '</strong><span>' + sub + '</span></div></button>';
+}
+function v2Activity() {
+  if (V2.homeError) return '<div class="v2-rows"><div class="entry-message error">Recent activity could not be loaded: ' + v2Esc(V2.homeError) + ' <button class="secondary-button" onclick="v2LoadHome(true)">Retry</button></div></div>';
+  if (!V2.home) return '<div class="v2-rows"><div class="muted small" style="padding:14px">Loading recent activity…</div></div>';
+  let items = (V2.home.recent || []).filter(function(x) {
+    const st = String(x.coordinatorReviewStatus || '').toLowerCase();
+    if (V2.chip === 'evaluation') return x.kind === 'evaluation';
+    if (V2.chip === 'professional') return x.kind === 'professional';
+    if (V2.chip === 'pending') return st !== 'reviewed' && !x.flagged;
+    if (V2.chip === 'flagged') return x.flagged;
+    return true;
+  }).slice(0, 25);
+  if (!items.length) return '<div class="v2-rows"><div class="muted small" style="padding:14px">Nothing here right now.</div></div>';
+  let day = '', out = '';
+  items.forEach(function(x) {
+    const d = String(x.date || '').slice(0, 10);
+    if (d !== day) {day = d; out += (out ? '</div>' : '') + '<div class="v2-day">' + v2Esc(v2DayLabel(d)) + '</div><div class="v2-rows">';}
+    const reviewed = String(x.coordinatorReviewStatus || '').toLowerCase() === 'reviewed';
+    const color = x.flagged ? 'r' : reviewed ? 'g' : x.kind === 'professional' ? 'p' : 'y';
+    const label = x.kind === 'professional' ? 'Professional Competency' : (x.evaluationType || 'Evaluation');
+    const title = x.flagged ? label + ' flagged' : reviewed ? label + ' reviewed' : label + ' received';
+    out += '<div class="v2-row ' + (x.flagged ? 'v2-alert' : '') + '"><div class="v2-eventicon v2-' + color + '"><svg><use href="#v2i-' +
+      (x.flagged ? 'flag' : reviewed ? 'check' : 'clipboard') + '"/></svg></div><div class="v2-rmain"><strong>' + v2Esc(title) +
+      (x.result ? '<span class="v2-received-time">' + v2Esc(x.result) + (x.gradeDisplay ? ' · ' + v2Esc(x.gradeDisplay) : '') + '</span>' : '') +
+      '</strong><div class="v2-rmeta"><a onclick="v2OpenStudent(\'' + escapeJs(x.studentId) + '\')" style="cursor:pointer">' + v2Esc(x.student) + '</a>' +
+      (x.examination && x.kind !== 'professional' ? '<span>' + v2Esc(x.examination) + '</span>' : '') +
+      (x.anatomicalArea && x.kind === 'professional' ? '<span>' + v2Esc(x.anatomicalArea) + '</span>' : '') +
+      (x.clinicalSite ? '<span>' + v2Esc(x.clinicalSite) + '</span>' : '') +
+      (x.evaluator ? '<span>' + v2Esc(x.evaluator) + '</span>' : '') + '</div></div>' +
+      '<button class="v2-action ' + (x.flagged ? 'red' : reviewed ? 'green' : '') + '" onclick="v2OpenReview(\'' + x.kind + '\',\'' + escapeJs(x.itemId) + '\')">' +
+      (reviewed ? 'Open' : 'Review') + '</button></div>';
+  });
+  return out + '</div>';
+}
+function v2DayLabel(d) {
+  if (!d) return 'Undated';
+  const t = new Date(), y = new Date(Date.now() - 864e5);
+  const k = function(x) {return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0');};
+  if (d === k(t)) return 'Today';
+  if (d === k(y)) return 'Yesterday';
+  const p = new Date(d + 'T12:00:00');
+  return isNaN(p) ? d : p.toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'});
+}
+
+/* ---------- New Entry shortcuts ---------- */
+function v2NewEntry(category) {V2.pendingEntry = category; showNewEntry(); v2SetActive('newEntry');}
+const v2OriginalRenderNewEntry = renderNewEntry;
+renderNewEntry = function() {
+  v2OriginalRenderNewEntry();
+  const sel = document.getElementById('entryCategory');
+  if (V2.pendingEntry && sel && [].some.call(sel.options, function(o) {return o.value === V2.pendingEntry;})) {
+    sel.value = V2.pendingEntry; V2.pendingEntry = '';
+    if (typeof updateGradeEntryFields === 'function') updateGradeEntryFields();
+  }
+};
+
+/* ---------- Review page: per-row Review + Professional Competency list ---------- */
+const v2OriginalRenderReview = renderReview;
+renderReview = function() {
+  v2OriginalRenderReview();
+  const rows = document.querySelectorAll('#content table tbody tr');
+  rows.forEach(function(tr, i) {
+    const item = APP.reviewQueue[i], cell = tr.querySelector('.review-actions');
+    if (!item || !cell) return;
+    const b = document.createElement('button');
+    b.className = 'action-button primary'; b.textContent = 'Review / Return';
+    b.onclick = function() {v2OpenReview('evaluation', item.submissionId);};
+    cell.insertBefore(b, cell.firstChild);
+  });
+  const host = document.createElement('div'); host.className = 'section'; host.id = 'v2-pc-review';
+  document.getElementById('content').appendChild(host);
+  v2PaintPcReview();
+};
+function v2PaintPcReview() {
+  const host = document.getElementById('v2-pc-review'); if (!host) return;
+  if (!V2.pcs) {
+    host.innerHTML = '<div class="section-title">Professional Competency submissions</div><div class="muted small">Loading…</div>';
+    v2Run('dashboardV2ProfessionalCompetencies', [], function(list) {V2.pcs = list || []; v2PaintPcReview();},
+      function(e) {host.innerHTML = '<div class="section-title">Professional Competency submissions</div><div class="entry-message error">' + v2Esc(errorMessage(e)) + '</div>';});
+    return;
+  }
+  const f = APP.reviewFilter;
+  const list = V2.pcs.filter(function(p) {
+    const reviewed = p.coordinatorReviewStatus === 'Reviewed';
+    if (f === 'pending') return !reviewed && !p.flagged;
+    if (f === 'flagged') return p.flagged;
+    if (f === 'failed') return /fail/i.test(p.result);
+    if (f === 'reviewedToday') return false;
+    return true;
+  });
+  host.innerHTML = '<div class="section-title">Professional Competency submissions</div>' + (list.length ?
+    '<table><thead><tr><th>Student</th><th>Version</th><th>Site</th><th>Evaluator</th><th>Date</th><th>Grade</th><th>Result</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
+    list.map(function(p) {
+      return '<tr><td><strong>' + v2Esc(p.student) + '</strong><div class="muted small">' + v2Esc(p.clinicalTerm) + '</div></td><td>' + v2Esc(p.anatomicalArea) +
+        '</td><td>' + v2Esc(p.clinicalSite) + '</td><td>' + v2Esc(p.evaluator) + '</td><td>' + v2Esc(p.date) + '</td><td>' + v2Esc(p.gradeDisplay) +
+        '</td><td>' + v2Esc(p.result) + '</td><td>' + (p.flagged ? 'Returned to CI' : v2Esc(p.coordinatorReviewStatus)) + '</td><td><div class="review-actions">' +
+        '<button class="action-button primary" onclick="v2OpenReview(\'professional\',\'' + escapeJs(p.itemId) + '\')">Review / Return</button>' +
+        (p.sourceDocument ? '<button class="action-button" onclick="openReviewDocument(\'' + escapeJs(p.sourceDocument) + '\')">View</button>' : '') +
+        '</div></td></tr>';
+    }).join('') + '</tbody></table>' : '<div class="empty">No Professional Competency submissions for this filter.</div>');
+}
+
+/* ---------- Review modal: accept / return to CI with notes ---------- */
+function v2OpenReview(kind, itemId) {
+  V2.review = {kind: kind, itemId: itemId, loading: true}; V2.reviewMsg = ''; v2PaintReview();
+  v2Run('dashboardV2ReviewDetail', [kind, itemId], function(d) {V2.review = d; v2PaintReview();},
+    function(e) {V2.review = {kind: kind, itemId: itemId, error: errorMessage(e)}; v2PaintReview();});
+}
+function v2CloseReview() {V2.review = null; const m = document.getElementById('v2-review-modal'); if (m) m.remove();}
+function v2PaintReview() {
+  let m = document.getElementById('v2-review-modal');
+  if (!V2.review) {if (m) m.remove(); return;}
+  if (!m) {m = document.createElement('div'); m.id = 'v2-review-modal'; m.className = 'v2-modal'; document.body.appendChild(m);
+    m.addEventListener('click', function(e) {if (e.target === m) v2CloseReview();});}
+  const d = V2.review;
+  if (d.loading || d.error) {
+    m.innerHTML = '<div class="v2-dialog"><div class="v2-dhead"><b>Review</b><button onclick="v2CloseReview()">×</button></div><div class="v2-dbody">' +
+      (d.error ? '<div class="entry-message error">' + v2Esc(d.error) + '</div>' : 'Loading…') + '</div></div>';
+    return;
+  }
+  const reviewed = String(d.coordinatorReviewStatus || '').toLowerCase() === 'reviewed';
+  const rows = [['Student', d.student + (d.studentId ? ' (' + d.studentId + ')' : '')],
+    [d.kind === 'professional' ? 'Form version' : 'Examination', d.kind === 'professional' ? d.anatomicalArea : d.examination],
+    ['Type', d.evaluationType], ['Clinical site', d.clinicalSite], ['Evaluator', d.evaluator + (d.evaluatorId ? ' · ' + d.evaluatorId : '')],
+    ['Date', d.date], ['Grade', d.gradeDisplay], ['Result', d.result],
+    ['Status', d.flagged ? 'Flagged / returned to CI' : (d.coordinatorReviewStatus || 'Pending')]];
+  m.innerHTML = '<div class="v2-dialog" role="dialog" aria-modal="true"><div class="v2-dhead"><b>' +
+    v2Esc(d.kind === 'professional' ? 'Professional Competency' : (d.examination + ' · ' + (d.evaluationType || 'Evaluation'))) +
+    '</b><button onclick="v2CloseReview()" aria-label="Close">×</button></div><div class="v2-dbody">' +
+    '<div class="v2-dgrid">' + rows.filter(function(r) {return r[1];}).map(function(r) {return '<div><small>' + r[0] + '</small><b>' + v2Esc(r[1]) + '</b></div>';}).join('') + '</div>' +
+    '<div class="v2-dlinks">' + (d.sourceDocument ? '<button class="secondary-button" onclick="openReviewDocument(\'' + escapeJs(d.sourceDocument) + '\')">Open evaluation document</button>' : '') +
+    (d.studentId ? '<button class="secondary-button" onclick="v2CloseReview();v2OpenStudent(\'' + escapeJs(d.studentId) + '\')">Open student</button>' : '') + '</div>' +
+    ((d.thread || []).length ? '<div class="v2-thread"><div class="section-title">Conversation with the instructor</div>' + d.thread.map(function(n) {
+      return '<div class="v2-msg ' + (n.recipientType === 'Coordinator' ? 'ci' : 'co') + '"><small>' + v2Esc(n.type) + ' · ' + v2Esc(n.from) + ' · ' +
+        v2Esc(String(n.createdAt).replace('T', ' ').slice(0, 16)) + '</small><div>' + v2Esc(n.message || '(no note)') + '</div>' +
+        (n.response ? '<div class="v2-resp"><small>Instructor response · ' + v2Esc(String(n.respondedAt).slice(0, 10)) + '</small>' + v2Esc(n.response) + '</div>' : '') + '</div>';
+    }).join('') + '</div>' : '') +
+    '<label class="v2-dlabel" for="v2-review-notes">Coordinator notes' + (d.kind === 'professional' ? '' : ' (saved on the evaluation record)') + '</label>' +
+    '<textarea id="v2-review-notes" rows="5" maxlength="4000" placeholder="What should the instructor review or correct?">' + v2Esc(d.coordinatorNotes || '') + '</textarea>' +
+    (V2.reviewMsg ? '<div class="entry-message ' + (/^✓/.test(V2.reviewMsg) ? 'success' : 'error') + '">' + v2Esc(V2.reviewMsg) + '</div>' : '') +
+    '<div class="v2-dactions">' +
+    (d.kind !== 'professional' ? '<button class="secondary-button" ' + (V2.reviewBusy ? 'disabled' : '') + ' onclick="v2ReviewAction(\'notes\')">Save notes</button>' : '') +
+    '<button class="v2-btn-red" ' + (V2.reviewBusy || !d.evaluatorId ? 'disabled' : '') + ' onclick="v2ReviewAction(\'return\')" title="' + (d.evaluatorId ? '' : 'No Evaluator ID on this record') + '">Return to CI with notes</button>' +
+    '<button class="primary-button" ' + (V2.reviewBusy ? 'disabled' : '') + ' onclick="v2ReviewAction(\'accept\')">' + (reviewed ? 'Accept again' : 'Accept') + '</button>' +
+    '</div>' + (!d.evaluatorId ? '<div class="muted small">This record has no Evaluator ID (older or imported record), so it cannot be routed to an instructor.</div>' : '') +
+    '</div></div>';
+}
+function v2ReviewAction(action) {
+  const d = V2.review; if (!d || V2.reviewBusy) return;
+  const notes = (document.getElementById('v2-review-notes') || {}).value || '';
+  if (action === 'return' && !notes.trim()) {V2.reviewMsg = 'Write a note so the instructor knows what to review.'; v2PaintReview(); return;}
+  if (action === 'return' && !confirm('Return this ' + (d.kind === 'professional' ? 'Professional Competency' : 'evaluation') + ' to ' + (d.evaluator || 'the instructor') + ' with your notes? They will see it on their Portal home and notifications.')) return;
+  V2.reviewBusy = true; V2.reviewMsg = ''; v2PaintReview();
+  const fn = action === 'notes' ? 'dashboardV2SaveNotes' : action === 'return' ? 'dashboardV2SendBack' : 'dashboardV2Accept';
+  v2Run(fn, [{kind: d.kind, itemId: d.itemId, notes: notes}], function() {
+    V2.reviewBusy = false;
+    V2.reviewMsg = action === 'notes' ? '✓ Notes saved' : action === 'return' ? '✓ Returned to the instructor' : '✓ Accepted' + (d.evaluatorId ? ' · instructor notified' : '');
+    const keep = V2.reviewMsg; v2RefreshAll();
+    v2Run('dashboardV2ReviewDetail', [d.kind, d.itemId], function(x) {V2.review = x; V2.reviewMsg = keep; v2PaintReview();});
+  }, function(e) {V2.reviewBusy = false; V2.reviewMsg = errorMessage(e); v2PaintReview();});
+}
+
+/* ---------- System & Setup, Help ---------- */
+function v2RenderSystem() {
+  const c = document.getElementById('content');
+  c.innerHTML = '<h1 class="page-title">System &amp; Setup</h1><div class="page-subtitle">Program data lives in the CCMS workbook. Open a tab to maintain reference data.</div><div class="section" id="v2-system">Loading…</div>';
+  v2Run('dashboardV2SystemLinks', [], function(r) {
+    const el = document.getElementById('v2-system'); if (!el) return;
+    el.innerHTML = '<p><a class="primary-button" target="_blank" rel="noopener" href="' + v2Esc(r.workbook) + '">Open CCMS workbook</a></p><div class="landing-grid">' +
+      (r.sheets || []).map(function(s) {return '<a class="landing-card" style="text-decoration:none;color:inherit" target="_blank" rel="noopener" href="' + v2Esc(s.url) + '"><h3>' + v2Esc(s.name) + '</h3><p>Open tab ›</p></a>';}).join('') + '</div>';
+  }, function(e) {const el = document.getElementById('v2-system'); if (el) el.innerHTML = '<div class="entry-message error">' + v2Esc(errorMessage(e)) + '</div>';});
+}
+function v2RenderHelp() {
+  document.getElementById('content').innerHTML = '<h1 class="page-title">Help &amp; Support</h1><div class="page-subtitle">Where things are in the Coordinator Dashboard.</div><div class="landing-grid">' +
+    [['Home', 'Flagged, waiting and reviewed counts, recent submissions from the Clinical Instructor Portal and Google Forms, New Entry shortcuts and the program snapshot.'],
+     ['Review / Return', 'Open any submission to accept it or return it to the clinical instructor with notes. The instructor sees returns and acceptances on their Portal home and notifications; their replies appear under the bell.'],
+     ['Students', 'Student summary, clinical history, requirements, grades and documents.'],
+     ['Scheduling', 'Semester planning, room rotations and attendance / ETO.'],
+     ['Reports & Paperwork', 'Records & documents, New Entry, and Assessment (clinical review analysis).'],
+     ['System & Setup', 'Links to the CCMS workbook tabs that hold reference data.']].map(function(x) {
+      return '<div class="landing-card"><h3>' + x[0] + '</h3><p>' + x[1] + '</p></div>';
+    }).join('') + '</div>';
+}
+
+/* ---------- start ---------- */
+(function() {
+  const go = function() {v2SetActive(APP.page || 'home'); v2LoadHome(false); v2LoadAssets();};
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+
+</script>
 </body>
 </html>

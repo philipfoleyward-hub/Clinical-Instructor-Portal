@@ -78,9 +78,12 @@ function doGet(e) {
   // Existing production default.
   // =====================================================
 
+  // Working coordinator dashboard in the approved V2 design
+  // (DashboardUI + ccms-v2-shell). ?ui=mock shows the original visual study.
+  const ui = String(e && e.parameter && e.parameter.ui || '').trim().toLowerCase();
   return HtmlService
     .createHtmlOutputFromFile(
-      'DashboardrunV2'
+      ui === 'mock' ? 'DashboardrunV2' : 'DashboardUI'
     )
     .setTitle(
       'Clinical Competency Tracker'

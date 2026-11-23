@@ -21,12 +21,10 @@
 <section id="ci-workspace-view" hidden class="ci-secondary-panel" aria-label="My CI Workspace">
  <div class="ci-secondary-head"><button type="button" class="ci-secondary-back" onclick="ciGoHome()" aria-label="Back to Home">‹</button><span>MY CI WORKSPACE</span></div>
  <div class="ci-secondary-list" id="ci-workspace-items">
-  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Notifications"><span>Notifications</span><span class="ci-secondary-chevron" aria-hidden="true">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Notifications"><span>Notifications <span class="ci-secondary-tag" id="ci-ws-unread" hidden>0</span></span><span class="ci-secondary-chevron" aria-hidden="true">›</span></button>
   <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="My Submissions"><span>My Submissions</span><span class="ci-secondary-chevron">›</span></button>
   <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Mileage Submission"><span>Mileage Submission</span><span class="ci-secondary-chevron">›</span></button>
-  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Program Requests"><span>Program Requests</span><span class="ci-secondary-chevron">›</span></button>
   <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Survey Responses"><span>Survey Responses</span><span class="ci-secondary-chevron">›</span></button>
-  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Email Coordinator / Program"><span>Email Coordinator / Program</span><span class="ci-secondary-chevron">›</span></button>
  </div>
  <div id="ci-workspace-detail" hidden></div>
 </section>
@@ -43,9 +41,9 @@
 </section>
 <script>
 (function(){
- const allowed={workspace:['Notifications','My Submissions','Mileage Submission','Program Requests','Survey Responses','Email Coordinator / Program'],resources:['Program Handbook','Clinical Syllabus','Evaluation & Scoring Guide']};
+ const allowed={workspace:['Notifications','My Submissions','Mileage Submission','Survey Responses'],resources:['Program Handbook','Clinical Syllabus','Evaluation & Scoring Guide']};
  window.ciSecondaryBack=function(group){const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(items&&detail){items.hidden=false;detail.hidden=true;detail.replaceChildren();}};
- window.ciSecondaryOpen=function(group,feature){if(!allowed[group]?.includes(feature))return;if(group==='resources'&&window.ciResourceOpen_){window.ciResourceOpen_(feature);return;}const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(!items||!detail)return;
+ window.ciSecondaryOpen=function(group,feature){if(!allowed[group]?.includes(feature))return;if(group==='resources'&&window.ciResourceOpen_){window.ciResourceOpen_(feature);return;}if(group==='workspace'&&window.ciWorkspaceOpen_&&window.ciWorkspaceOpen_(feature))return;const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(!items||!detail)return;
   items.hidden=true;detail.hidden=false;detail.replaceChildren();const back=document.createElement('button');back.className='ci-secondary-back';back.type='button';back.textContent='‹';back.setAttribute('aria-label','Back to '+group);back.onclick=()=>ciSecondaryBack(group);
   const box=document.createElement('div');box.className='ci-secondary-detail';const h=document.createElement('h2');h.textContent=feature;const p=document.createElement('p');p.textContent='This section is part of the approved portal navigation. Its data, permissions and actions will be connected in a dedicated implementation pass; no records or notifications are generated from this screen.';box.append(h,p);detail.append(back,box);
  };
@@ -121,5 +119,135 @@
   }).catch(e=>fail(status,e));
  }
  window.ciResourceOpen_=function(feature){if(DOCS[feature])openDoc(feature,DOCS[feature]);else if(feature==='Evaluation & Scoring Guide')openGuide();};
+})();
+</script>
+
+<style id="ci-notifications-style">
+.ci-nt-wrap{max-width:900px}.ci-nt-bar{display:flex;align-items:center;gap:10px;margin:0 0 12px}.ci-nt-bar h2{margin:0;font-size:20px;color:#112944;flex:1}
+.ci-nt-list{display:flex;flex-direction:column;gap:8px}
+.ci-nt-item{display:block;width:100%;text-align:left;border:1px solid #d7e5f0;border-radius:10px;background:#fff;padding:12px 14px;cursor:pointer;color:#173653;font:inherit}
+.ci-nt-item.unread{border-color:#9fc8ed;background:#f3f9ff}.ci-nt-item.returned{border-left:5px solid #dc3037}.ci-nt-item.accepted{border-left:5px solid #25a954}
+.ci-nt-item b{display:block;font-size:14px}.ci-nt-item small{display:block;color:#5e7288;font-size:12px;margin-top:3px}.ci-nt-item p{margin:6px 0 0;font-size:13px;color:#33506b;white-space:pre-wrap}
+.ci-nt-chip{display:inline-block;border-radius:99px;padding:2px 9px;font-size:11px;font-weight:800;margin-left:6px}
+.ci-nt-chip.Returned{background:#ffe8ea;color:#c4262d}.ci-nt-chip.Accepted{background:#e6f5ec;color:#17733a}.ci-nt-chip.Submitted{background:#eaf3fc;color:#0a63b4}
+.ci-nt-detail{border:1px solid #d7e5f0;border-radius:11px;background:#fff;padding:18px}.ci-nt-detail h3{margin:0 0 6px;font-size:17px;color:#112944}
+.ci-nt-note{background:#fff6f6;border:1px solid #f4d0d3;border-radius:9px;padding:12px;white-space:pre-wrap;margin:10px 0;font-size:14px;color:#33263a}
+.ci-nt-note.ok{background:#f2fbf5;border-color:#cfe9d8}
+.ci-nt-detail textarea{width:100%;min-height:100px;border:1px solid #bcd0e2;border-radius:8px;padding:9px;font:inherit}
+.ci-nt-btn{border:1px solid #0878e5;background:#0878e5;color:#fff;border-radius:8px;padding:9px 14px;font:inherit;font-weight:700;cursor:pointer}.ci-nt-btn.ghost{background:#fff;color:#0878e5}
+.ci-nt-table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}.ci-nt-table th,.ci-nt-table td{border-bottom:1px solid #e3ecf3;padding:8px;text-align:left;vertical-align:top}.ci-nt-table th{color:#5e7288;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.ci-nt-filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}.ci-nt-filters button{border:1px solid #c9dce9;background:#fff;color:#426989;border-radius:99px;padding:5px 11px;font:inherit;font-size:12px;cursor:pointer}.ci-nt-filters button.on{background:#0878e5;border-color:#0878e5;color:#fff}
+#ci-bell-pop{position:absolute;right:0;top:42px;z-index:60;width:340px;max-height:420px;overflow:auto;background:#fff;color:#173653;border:1px solid #d7e5f0;border-radius:10px;box-shadow:0 12px 30px rgba(6,43,74,.25);text-align:left}
+#ci-bell-pop .h{padding:10px 14px;font-weight:800;border-bottom:1px solid #e6eef5}#ci-bell-pop button{display:block;width:100%;border:0;border-bottom:1px solid #eef3f7;background:#fff;text-align:left;padding:10px 14px;cursor:pointer;font:inherit;color:#173653}
+#ci-bell-pop button.unread{background:#f3f9ff}#ci-bell-pop small{display:block;color:#5e7288;font-size:11px}#ci-bell-pop .e{padding:14px;color:#5e7288;font-size:13px}
+</style>
+<script id="ci-notifications-script">
+(function(){
+ const tok=()=>{try{return ciToken||'';}catch(e){return '';}},home=()=>{try{return ciHome;}catch(e){return null;}},page=()=>{try{return ciPage;}catch(e){return '';}};
+ const S={list:null,unread:0,subs:null,filter:'all',loading:false,subsLoading:false};
+ const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const when=v=>{const d=new Date(v);return isNaN(d)?String(v||''):d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});};
+ const isCollegeCi=()=>String(home()?.evaluator?.evaluatorType||'').trim().toLowerCase()==='college ci';
+ window.ciOpenWorkspaceFeature_=function(f){if(typeof ciGoWorkspace==='function')ciGoWorkspace();if(page()==='workspace')ciSecondaryOpen('workspace',f);};
+ function paintBadges(){
+  const b=document.getElementById('ci-bell-count');if(b){b.textContent=String(S.unread);b.hidden=!S.unread;}
+  const w=document.getElementById('ci-ws-unread');if(w){w.textContent=String(S.unread);w.hidden=!S.unread;}
+ }
+ function paintHome(){
+  const sec=document.getElementById('ci-home-updates'),host=document.getElementById('ci-home-updates-list');
+  if(sec&&host){
+   const items=(S.list||[]).filter(n=>n.status==='Unread'||(n.type==='Returned'&&!n.response)).slice(0,4);
+   sec.hidden=!items.length;host.replaceChildren();
+   items.forEach(n=>host.append(itemButton(n)));
+  }
+  const rec=document.getElementById('ci-home-recent');
+  if(rec&&S.subs){
+   const top=S.subs.slice(0,5);
+   if(!top.length){rec.className='empty';rec.textContent='No submissions yet.';}
+   else{rec.className='';rec.style.padding='0 14px 12px';rec.innerHTML='<table class="ci-nt-table"><tbody>'+top.map(x=>'<tr><td><b>'+esc(x.student)+'</b><div style="color:#5e7288;font-size:12px">'+esc(x.title)+(x.kind==='evaluation'&&x.evaluationType?' · '+esc(x.evaluationType):'')+'</div></td><td>'+esc(x.date)+'</td><td>'+esc(x.result)+'</td><td><span class="ci-nt-chip '+esc(x.status)+'">'+esc(x.status==='Submitted'?'Awaiting review':x.status)+'</span></td></tr>').join('')+'</tbody></table>';}
+  }
+ }
+ function itemButton(n){
+  const b=document.createElement('button');b.type='button';
+  b.className='ci-nt-item'+(n.status==='Unread'?' unread':'')+(n.type==='Returned'?' returned':n.type==='Accepted'?' accepted':'');
+  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(n.type==='Returned'?'Returned':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
+  b.onclick=()=>openNotification(n.id);return b;
+ }
+ window.ciNtRefresh_=async function(){
+  if(!tok()||S.loading||!isCollegeCi())return;S.loading=true;
+  try{const r=await ciRun('ciR1Notifications',tok());S.list=r.notifications||[];S.unread=Number(r.unread||0);}catch(e){console.warn('Notifications unavailable',e);}
+  S.loading=false;paintBadges();paintHome();
+  if(!S.subsLoading){S.subsLoading=true;try{const s=await ciRun('ciR1MySubmissions',tok());S.subs=s.submissions||[];}catch(e){console.warn('Submissions unavailable',e);}S.subsLoading=false;paintHome();}
+ };
+ window.ciBellToggle_=function(ev){
+  ev&&ev.stopPropagation();let pop=document.getElementById('ci-bell-pop');
+  if(pop){pop.remove();return;}
+  const bell=document.getElementById('ci-bell');pop=document.createElement('div');pop.id='ci-bell-pop';
+  const items=(S.list||[]).slice(0,8);
+  pop.innerHTML='<div class="h">Notifications</div>'+(S.list===null?'<div class="e">Loading…</div>':items.length?'':'<div class="e">No notifications from the coordinator yet.</div>');
+  items.forEach(n=>{const b=document.createElement('button');b.type='button';b.className=n.status==='Unread'?'unread':'';b.innerHTML='<b>'+esc(n.title)+'</b><small>'+esc(n.student)+' · '+esc(when(n.createdAt))+'</small>';b.onclick=e=>{e.stopPropagation();pop.remove();openNotification(n.id);};pop.append(b);});
+  const all=document.createElement('button');all.type='button';all.innerHTML='<b style="color:#0878e5">See all notifications ›</b>';all.onclick=e=>{e.stopPropagation();pop.remove();ciOpenWorkspaceFeature_('Notifications');};pop.append(all);
+  bell.append(pop);if(S.list===null)ciNtRefresh_();
+ };
+ document.addEventListener('click',e=>{if(!e.target.closest('#ci-bell')){const p=document.getElementById('ci-bell-pop');if(p)p.remove();}});
+ function shell(title){
+  const items=document.getElementById('ci-workspace-items'),detail=document.getElementById('ci-workspace-detail');
+  items.hidden=true;detail.hidden=false;detail.replaceChildren();
+  const wrap=document.createElement('div');wrap.className='ci-nt-wrap';const bar=document.createElement('div');bar.className='ci-nt-bar';
+  const back=document.createElement('button');back.className='ci-secondary-back';back.type='button';back.textContent='‹';back.setAttribute('aria-label','Back to My CI Workspace');back.onclick=()=>ciSecondaryBack('workspace');
+  const h=document.createElement('h2');h.textContent=title;bar.append(back,h);wrap.append(bar);detail.append(wrap);return {wrap,bar};
+ }
+ async function showNotifications(){
+  const {wrap}=shell('Notifications');const list=document.createElement('div');list.className='ci-nt-list';wrap.append(list);
+  list.innerHTML='<div class="ci-res-status">Loading notifications…</div>';await ciNtRefresh_();
+  list.replaceChildren();if(!(S.list||[]).length){list.innerHTML='<div class="ci-res-status">No notifications yet. When the clinical coordinator accepts or returns one of your submissions, it appears here.</div>';return;}
+  S.list.forEach(n=>list.append(itemButton(n)));
+ }
+ async function openNotification(id){
+  if(page()!=='workspace'){if(typeof ciGoWorkspace==='function')ciGoWorkspace();}
+  const n=(S.list||[]).find(x=>x.id===id);if(!n)return;
+  const {wrap}=shell('Notification');const box=document.createElement('div');box.className='ci-nt-detail';
+  const back=wrap.querySelector('.ci-secondary-back');back.onclick=()=>showNotifications();
+  box.innerHTML='<h3>'+esc(n.title)+'</h3><div style="color:#5e7288;font-size:13px">'+esc(n.student)+(n.studentId?' ('+esc(n.studentId)+')':'')+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</div>'+
+   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
+   (n.message?'<div class="ci-nt-note'+(n.type==='Returned'?'':' ok')+'">'+esc(n.message)+'</div>':'')+
+   (n.response?'<p style="font-weight:700;margin-bottom:4px">Your reply · '+esc(when(n.respondedAt))+'</p><div class="ci-nt-note ok">'+esc(n.response)+'</div>':'');
+  if(!n.response){
+   const lab=document.createElement('label');lab.textContent=n.type==='Returned'?'Reply to the coordinator (what you checked or corrected, or questions):':'Reply (optional):';lab.style.cssText='display:block;font-weight:700;margin:12px 0 6px';lab.htmlFor='ci-nt-reply';
+   const ta=document.createElement('textarea');ta.id='ci-nt-reply';ta.maxLength=4000;
+   const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;justify-content:flex-end;margin-top:10px';
+   const send=document.createElement('button');send.type='button';send.className='ci-nt-btn';send.textContent='Send reply';
+   const msg=document.createElement('div');msg.setAttribute('role','status');msg.style.cssText='font-size:13px;margin-top:8px';
+   send.onclick=async()=>{const t=ta.value.trim();if(!t){msg.textContent='Write a reply first.';return;}send.disabled=true;send.textContent='Sending…';
+    try{await ciRun('ciR1NotificationReply',tok(),n.id,t);n.response=t;n.respondedAt=new Date().toISOString();n.status='Read';msg.textContent='✓ Reply sent to the coordinator.';send.textContent='Sent';S.list=null;ciNtRefresh_();}
+    catch(e){send.disabled=false;send.textContent='Send reply';msg.textContent='Reply not sent: '+String(e?.message||e);}};
+   row.append(send);box.append(lab,ta,row,msg);
+  }
+  wrap.append(box);
+  if(n.status==='Unread'){try{await ciRun('ciR1NotificationRead',tok(),n.id);n.status='Read';S.unread=Math.max(0,S.unread-1);paintBadges();paintHome();}catch(e){}}
+ }
+ async function showSubmissions(){
+  const {wrap,bar}=shell('My Submissions');const filters=document.createElement('div');filters.className='ci-nt-filters';
+  const host=document.createElement('div');wrap.append(filters,host);host.innerHTML='<div class="ci-res-status">Loading your submissions…</div>';
+  try{const s=await ciRun('ciR1MySubmissions',tok());S.subs=s.submissions||[];}catch(e){host.innerHTML='<div class="ci-res-status">Could not load submissions: '+esc(e?.message||e)+'</div>';return;}
+  const draw=()=>{
+   filters.innerHTML='';[['all','All'],['Submitted','Awaiting review'],['Returned','Returned to me'],['Accepted','Accepted']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l+' ('+(k==='all'?S.subs.length:S.subs.filter(x=>x.status===k).length)+')';b.className=S.filter===k?'on':'';b.onclick=()=>{S.filter=k;draw();};filters.append(b);});
+   const rows=S.subs.filter(x=>S.filter==='all'||x.status===S.filter);
+   if(!rows.length){host.innerHTML='<div class="ci-res-status">Nothing to show.</div>';return;}
+   host.innerHTML='<table class="ci-nt-table"><thead><tr><th>Date</th><th>Student</th><th>Submission</th><th>Site</th><th>Result</th><th>Status</th><th></th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(x.date)+'</td><td><b>'+esc(x.student)+'</b></td><td>'+esc(x.title)+(x.evaluationType?'<div style="color:#5e7288;font-size:12px">'+esc(x.evaluationType)+'</div>':'')+'</td><td>'+esc(x.site)+'</td><td>'+esc(x.result)+(x.grade?'<div style="color:#5e7288;font-size:12px">'+esc(x.grade)+'</div>':'')+'</td><td><span class="ci-nt-chip '+esc(x.status)+'">'+esc(x.status==='Submitted'?'Awaiting review':x.status==='Returned'?'Returned to you':x.status)+'</span>'+(x.notes&&x.status!=='Submitted'?'<div style="color:#5e7288;font-size:12px;margin-top:4px;white-space:pre-wrap">'+esc(x.notes.length>160?x.notes.slice(0,160)+'…':x.notes)+'</div>':'')+'</td><td>'+(/^https:\/\/(docs|drive)\.google\.com\//.test(x.document)?'<a href="'+esc(x.document)+'" target="_blank" rel="noopener noreferrer">Open</a>':'')+'</td></tr>').join('')+'</tbody></table>';
+  };draw();
+ }
+ window.ciWorkspaceOpen_=function(feature){
+  if(feature==='Notifications'){showNotifications();return true;}
+  if(feature==='My Submissions'){showSubmissions();return true;}
+  return false;
+ };
+ // Refresh after sign-in, when returning Home, and every 2 minutes while open.
+ let started=false,wrapped=false;
+ function kick(){
+  if(!wrapped&&typeof window.ciGoHome==='function'){wrapped=true;const g=window.ciGoHome;window.ciGoHome=function(){const r=g.apply(this,arguments);ciNtRefresh_();return r;};}
+  if(tok()&&home()){if(!started){started=true;ciNtRefresh_();}}else{started=false;S.list=null;S.subs=null;S.unread=0;paintBadges();}
+ }
+ setInterval(kick,1500);setInterval(()=>{if(tok()&&home()){S.subsLoading=false;ciNtRefresh_();}},120000);
 })();
 </script>
