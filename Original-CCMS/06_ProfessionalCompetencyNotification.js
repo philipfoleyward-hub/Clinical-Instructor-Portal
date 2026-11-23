@@ -4,6 +4,17 @@
  * Uses APP_CONFIG.NOTIFICATIONS.COORDINATOR_RECIPIENTS; no new recipient store.
  * No email is sent from read-only QA or template validation.
  */
+/** Rows added only for CI Portal submissions (rubric version, period, review). */
+function pcV2_emailExtraRows_(input) {
+  if (!input || input.channel !== 'CI Portal') return [];
+  const rows = [['Rubric version', input.score.family === 'Clinical 1-2' ?
+      'Clinical Practicum 1 & 2' : 'Clinical Practicum 3 - 5'],
+    ['Evaluation period', input.period],
+    ['Student review', input.reviewStatus === 'reviewed' ? 'Reviewed with student' : 'Review pending'],
+    ['Submitted via', 'Clinical Instructor Portal']];
+  if (input.discussion) rows.push(['Review discussion', input.discussion]);
+  return rows;
+}
 function pcV2_emailPayload_(input,grade,pdfUrl,sheetUrl) {
   const when=Utilities.formatDate(input.date,Session.getScriptTimeZone(),'MMM d, yyyy');
   const subject='Professional Competency — '+input.student.student+' — '+input.result;
@@ -17,14 +28,15 @@ function pcV2_emailPayload_(input,grade,pdfUrl,sheetUrl) {
     'Evaluation date: '+when,
     'Weighted score: '+input.score.rawScore.toFixed(2)+' / 3.00',
     'Grade: '+input.score.percentGrade.toFixed(2)+'%',
-    'Result: '+input.result,
+    'Result: '+input.result
+  ].concat(pcV2_emailExtraRows_(input).map(function(r){return r[0]+': '+r[1];})).concat([
     '',
     'Attached: completed Professional Competency evaluation (PDF)',
     'Completed evaluation (PDF): '+pdfUrl,
     'Editable evaluation sheet: '+sheetUrl,
     'Submission ID: '+input.sourceId,
     'Grade Record ID: '+grade.gradeRecordId
-  ];
+  ]);
   const plain=lines.join('\n');
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -36,7 +48,7 @@ function pcV2_emailPayload_(input,grade,pdfUrl,sheetUrl) {
      ['Clinical site',input.site.name],['Evaluation date',when],
      ['Weighted score',input.score.rawScore.toFixed(2)+' / 3.00'],
      ['Grade',input.score.percentGrade.toFixed(2)+'%'],['Result',input.result]
-    ].map(function(r){return '<tr><th style="padding:4px 16px 4px 0;text-align:left">'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>';}).join('')+
+    ].concat(pcV2_emailExtraRows_(input)).map(function(r){return '<tr><th style="padding:4px 16px 4px 0;text-align:left">'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>';}).join('')+
     '</table><p><strong>Attached:</strong> Completed Professional Competency evaluation (PDF)</p>'+
     '<p><a href="'+esc(pdfUrl)+'">View completed evaluation (PDF)</a> &nbsp;|&nbsp;'+
     '<a href="'+esc(sheetUrl)+'">Open grading sheet</a></p>'+

@@ -65,6 +65,22 @@ function pcV2_processSubmission_(response, responseId) {
     evaluator:evaluator.name,evaluatorId:evaluator.id, date:date, clinicalTerm:term,
     site:site, period:period, score:score, result:result,
     strengths:strengths, improvements:improvements, folder:folder, recipients:recipientList};
+  return pcV2_commit_(input, {source:PC_V2_SOURCE, originLine:'Form response ID: '+responseId});
+}
+
+/**
+ * Shared, retry-safe commit used by the Google Form and the CI Portal.
+ * Builds the approved tokenized Sheet + PDF, writes one Grade Record and sends
+ * the approved coordinator email exactly once (checkpointed by sourceId).
+ */
+function pcV2_commit_(input, meta) {
+  const properties = PropertiesService.getScriptProperties();
+  const responseId = input.responseId, sourceId = input.sourceId;
+  const student = input.student, score = input.score, result = input.result;
+  const term = input.clinicalTerm, period = input.period, site = input.site;
+  const strengths = input.strengths, improvements = input.improvements, date = input.date;
+  const evaluator = {id:input.evaluatorId, name:input.evaluator};
+  const family = score.family;
   const fingerprint = pcV2_fingerprint_(input);
   const stateKey = 'CCMS_PC_V2_'+responseId;
   const state = JSON.parse(properties.getProperty(stateKey) || '{}');
@@ -102,14 +118,14 @@ function pcV2_processSubmission_(response, responseId) {
       assignmentName:'Professional Competency — '+period,
       evaluationPeriod:period,date:date,instructor:evaluator.name,
       rawScore:score.rawScore,percentGrade:score.percentGrade,maximumScore:'',
-      deliveryMethod:'Digital',source:PC_V2_SOURCE,sourceId:sourceId,
+      deliveryMethod:'Digital',source:meta.source,sourceId:sourceId,
       sourceDocument:pdf.url,sourceFileId:pdf.pdfId,
       notes:['Result: '+result,'Clinical site: '+site.name,'Site ID: '+site.id,
         'Evaluator ID: '+evaluator.id,'Form rubric: '+family,
         'Applicable weight: '+score.applicableWeight,
         'Criterion points: '+score.totalCriterionScore,
         'Positive strengths: '+strengths,'Areas for improvement: '+improvements,
-        'Form response ID: '+responseId].join('\n')
+        meta.originLine].concat(meta.extraNotes||[]).join('\n')
     });
   }
   state.gradeRecordId = grade.gradeRecordId;
@@ -132,7 +148,7 @@ function pcV2_processSubmission_(response, responseId) {
     percentGrade:score.percentGrade,result:result,
     docId:document.docId,pdfId:pdf.pdfId,mailStatus:state.mailStatus}));
   return {success:true,sourceId:sourceId,studentId:student.studentId,
-    gradeRecordId:grade.gradeRecordId,grade:score.percentGrade,result:result,
+    gradeRecordId:grade.gradeRecordId,grade:score.percentGrade,rawScore:score.rawScore,result:result,
     documentUrl:document.url,pdfUrl:pdf.url,mailStatus:state.mailStatus};
 }
 function pcV2_checkpoint_(properties,key,state) {properties.setProperty(key,JSON.stringify(state));}

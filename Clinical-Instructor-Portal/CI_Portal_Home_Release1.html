@@ -90,6 +90,11 @@ const ciRun=(name,...args)=>new Promise((resolve,reject)=>{
   ciR1ResourceDocument:()=>runner.ciR1ResourceDocument(...args),
   ciR1ResourcePdf:()=>runner.ciR1ResourcePdf(...args),
   ciR1ScoringGuide:()=>runner.ciR1ScoringGuide(...args),
+  ciR1PcInitialize:()=>runner.ciR1PcInitialize(...args),
+  ciR1PcSaveDraft:()=>runner.ciR1PcSaveDraft(...args),
+  ciR1PcLoadDraft:()=>runner.ciR1PcLoadDraft(...args),
+  ciR1PcPreview:()=>runner.ciR1PcPreview(...args),
+  ciR1PcSubmit:()=>runner.ciR1PcSubmit(...args),
   ciR1Logout:()=>runner.ciR1Logout(...args),
   ciR1LoginHtml:()=>runner.ciR1LoginHtml(...args)
  };
@@ -364,6 +369,29 @@ async function ciEvalOpen(student,examination,resumeDraft){
   ciShowPage('evaluation-form');frame.srcdoc=init.html;setTimeout(()=>frame.scrollIntoView({block:'start'}),50);
  }catch(e){ciEvalContext=null;ciError(e);console.warn('CI evaluation start failed after',Math.round(performance.now()-begun),'ms',e);}
 }
+/** Professional Competency: same editor lifecycle; the rubric version
+ * (Clinical Practicum 1 & 2 or 3 - 5) is resolved by CCMS from the student's term. */
+function ciPcStart(studentId){
+ const student=ciRoster().find(x=>String(x.studentId)===String(studentId||ciSelected));
+ if(!student){ciDialog('Professional Competency','Select a student first.');return;}
+ return ciPcOpen(student,null);
+}
+async function ciPcOpen(student,resumeDraft){
+ ciDialog('Opening Professional Competency',`<p role="status" aria-live="polite">Preparing the Professional Competency Evaluation for <strong>${ciEsc(ciStudentName(student))}</strong>…</p><p style="color:#59738b;font-size:12px">Checking authorization and loading the correct form version (Clinical 1 &amp; 2 or Clinical 3 – 5) for this student.</p>`);
+ try{
+  const siteId=resumeDraft?String(resumeDraft.siteId):ciSite;
+  const evalDate=resumeDraft?String(resumeDraft.date):ciHome.date;
+  const req={siteId,date:evalDate,studentId:student.studentId,submissionId:resumeDraft?String(resumeDraft.submissionId):''};
+  const init=await ciRun('ciR1PcInitialize',ciToken,req);
+  if(!init||!init.submissionId||!init.schema||!init.html)throw new Error('The Professional Competency startup response is incomplete.');
+  const context={...req,instrument:'pc',submissionId:init.submissionId,student:ciStudentName(student),
+    site:ciSites.find(x=>x.siteId===siteId)?.site||siteId,evaluator:ciHome.evaluator?.evaluatorName||'',examination:'Professional Competency'};
+  ciEvalContext={context,schema:init.schema,initialDraft:init.initialDraft||{success:false,error:'Draft save was not confirmed'}};
+  const frame=document.getElementById('ci-evaluation-frame');
+  frame.onload=()=>{ciClose();frame.contentWindow.postMessage({source:'ci-eval-parent',type:'init',payload:ciEvalContext},'*');};
+  ciShowPage('evaluation-form');frame.srcdoc=init.html;setTimeout(()=>frame.scrollIntoView({block:'start'}),50);
+ }catch(e){ciEvalContext=null;ciError(e);}
+}
 /** Resume only an existing draft belonging to the signed-in evaluator.
  * No new submission ID and no alternative student ID is manufactured. */
 async function ciResumeEvaluation(draft){
@@ -378,6 +406,7 @@ async function ciResumeEvaluation(draft){
    if(!student)throw new Error('The saved student is no longer authorized for evaluation');
    ciTemporary.set(String(student.studentId),student);ciSaveTemp();ciRender();
   }
+  if(String(draft.examinationId)==='PROFESSIONAL-COMPETENCY')return ciPcOpen(student,draft);
   const opts=await ciRun('ciR1EvaluationExamOptions',ciToken,draft.siteId,draft.date,draft.studentId);
   const examination=(opts.examinations||[]).find(x=>String(x.examinationId)===String(draft.examinationId));
   if(!examination)throw new Error('Examination no longer available to your authenticated clinical instructor account');
@@ -394,12 +423,24 @@ window.addEventListener('message',async event=>{
  if(msg.type==='blocking_error'){ciDialog('Evaluation integration paused',ciEsc(msg.payload?.message||'Official Form schema mismatch'));return;}
  if(msg.type==='autofail_open'){ciShowPortalAutoFail_(msg.payload||{},send);return;}
  if(msg.type==='review_open'){ciShowPortalStudentReview_(msg.payload||{},send);return;}
- if(msg.type==='scoring_guide_open'){ciShowPortalScoringGuide_();return;}
+ if(msg.type==='scoring_guide_open'){if(msg.payload?.instrument==='professional_competency')ciShowPcScoringGuide_(msg.payload.family);else ciShowPortalScoringGuide_();return;}
  if(msg.type==='draft_print_open'){ciShowPortalDraftPrint_(msg.payload||{});return;}
  if(msg.type==='exit'){
    ciEvalContext=null;frame.srcdoc='';const target=String(msg.payload?.target||'evaluations');
    if(target==='home')ciGoHome();else if(target==='students')ciGoStudents();else if(target==='workspace')ciGoWorkspace();else if(target==='resources')ciGoResources();else ciGoEvaluations();
    return;
+ }
+ if(context.instrument==='pc'){
+  const p=msg.payload||{};
+  const rq={...context,answers:p.answers||{},uiState:p.uiState||null,currentSection:p.currentSection||0,reviewPending:p.reviewPending!==false,period:String(p.period||'')};
+  try{
+   if(msg.type==='draft_save'||msg.type==='draft_stop')send('save_result',{...(await ciRun('ciR1PcSaveDraft',ciToken,rq)),stopping:msg.type==='draft_stop'});
+   if(msg.type==='draft_load')send('draft_loaded',await ciRun('ciR1PcLoadDraft',ciToken,rq));
+   if(msg.type==='preview')send('preview_result',(await ciRun('ciR1PcPreview',ciToken,rq)).grade);
+   if(msg.type==='release_status')send('release_status',await ciRun('ciR1EvaluationReleaseStatus',ciToken,context.studentId));
+   if(msg.type==='submit'){try{send('submit_result',await ciRun('ciR1PcSubmit',ciToken,rq));}catch(err){send('submit_error',{message:String(err?.message||err)});}}
+  }catch(e){send('error',{action:msg.type,message:e?.message||String(e)});}
+  return;
  }
  const requested={...context,evaluationType:['Competency','ISO','SSO'].includes(msg.payload?.evaluationType)?msg.payload.evaluationType:(context.evaluationType||'Competency'),answers:msg.payload.answers||{},currentSection:msg.payload.currentSection||0,
   reviewPending:msg.payload.reviewPending||false,uiState:msg.payload.uiState||null};
@@ -440,6 +481,17 @@ function ciShowPortalScoringGuide_(){
  '<p>Pass requires performance ≥ 2.00 and image ≥ 2.00, with no automatic failure. The server determines the official result.</p>';
  ciDialog('Clinical Competency Scoring Guide',html);
 }
+function ciShowPcScoringGuide_(family){
+ const v=family==='Clinical 1-2'?'Clinical Practicum 1 & 2':family?'Clinical Practicum 3 - 5':'';
+ const rows=[['3','Highly Acceptable','CONSISTENTLY exhibits this skill/characteristic; performed with proficiency, speed and quality; requires no further improvement.'],
+  ['2','Improvement Needed','USUALLY exhibits this skill/characteristic; meets minimal standards but requires improvement in consistency.'],
+  ['1','Considerable Improvement Needed','INCONSISTENTLY exhibits this skill/characteristic; requires supervision and assistance.'],
+  ['0','Unacceptable','ALMOST NEVER exhibits this skill/characteristic; unsatisfactory performance; immediate change in behavior required.'],
+  ['N/A','Not Applicable','Excluded from the weighted calculation.']];
+ ciDialog('Professional Competency Scoring Guide','<p>'+(v?'Form version: <b>'+ciEsc(v)+'</b> (chosen from the student’s clinical term). ':'')+'Each criterion carries the weight printed on the official form.</p>'+
+  '<table style="width:100%;border-collapse:collapse;font-size:13px"><tbody>'+rows.map(r=>'<tr><td style="padding:6px;font-weight:700;vertical-align:top">'+r[0]+'</td><td style="padding:6px;vertical-align:top"><b>'+r[1]+'</b><br><span style="color:#5b7187">'+r[2]+'</span></td></tr>').join('')+'</tbody></table>'+
+  '<p><b>Weighted score</b> = Σ(rating × weight) ÷ Σ(weights of rated criteria), rounded to 2 decimals.<br><b>Grade %</b> = (weighted score + 1) × 25 — 3.00 = 100%, 2.00 = 75%, 0.00 = 25%.<br><b>Pass</b> requires 75.00% or higher. The CCMS server calculates the official grade.</p>');
+}
 /** Browser-printable local draft. It does not create an official CCMS record. */
 function ciShowPortalDraftPrint_(payload){
  const overlay=document.createElement('section');overlay.id='ci-portal-print-preview';
@@ -449,7 +501,7 @@ function ciShowPortalDraftPrint_(payload){
  const close=document.createElement('button');close.type='button';close.textContent='Close';close.onclick=()=>overlay.remove();
  const print=document.createElement('button');print.type='button';print.textContent='Print / Save as PDF';
  print.onclick=()=>window.print();actions.append(close,print);
- const title=document.createElement('h2');title.textContent='CLINICAL COMPETENCY — DRAFT REVIEW';
+ const title=document.createElement('h2');title.textContent=String(payload.title||'CLINICAL COMPETENCY — DRAFT REVIEW');
  const warning=document.createElement('p');warning.textContent='UNSUBMITTED DRAFT — NOT AN OFFICIAL EVALUATION DOCUMENT';warning.style.cssText='color:#a13221;font-weight:800';
  const detail=document.createElement('p');detail.textContent=[payload.student||'Student',payload.studentId||'',payload.examination||'',payload.date||'',payload.savedStatus||''].filter(Boolean).join(' · ');
  panel.append(actions,title,warning,detail);
@@ -465,7 +517,7 @@ function ciShowPortalDraftPrint_(payload){
  if(images.length){const head=document.createElement('h3');head.textContent='Image Views';panel.append(head);
   images.forEach(v=>{const p=document.createElement('p');p.textContent=[v.name,JSON.stringify(v.scores||{}),v.markerPresent,v.markerSide,v.markerQuality,v.comment].filter(Boolean).join(' · ');panel.append(p);});}
  const comments=document.createElement('h3');comments.textContent='Evaluator Comments';panel.append(comments);
- Object.entries(payload.comments||{}).filter(([k,v])=>String(v||'').trim()).forEach(([k,v])=>{const p=document.createElement('p');p.textContent='Section '+k+': '+String(v);panel.append(p);});
+ Object.entries(payload.comments||{}).filter(([k,v])=>String(v||'').trim()).forEach(([k,v])=>{const p=document.createElement('p');p.textContent=(payload.title?k:'Section '+k)+': '+String(v);panel.append(p);});
  overlay.append(panel);document.body.append(overlay);
  const style=document.createElement('style');style.id='ci-portal-print-style';
  style.textContent='@media print{body>*:not(#ci-portal-print-preview){display:none!important}#ci-portal-print-preview{position:static!important;display:block!important;padding:0!important;background:#fff!important}#ci-portal-print-preview>div{max-height:none!important;overflow:visible!important;width:100%!important;padding:0!important}#ci-print-actions{display:none!important}#ci-portal-print-preview tr{break-inside:avoid}}';
@@ -584,7 +636,7 @@ async function ciInit(){
   // Bind actions within the exact approved Students v3 inner markup.
   document.querySelectorAll('#ci-v3-root .scope-tab').forEach(b=>b.addEventListener('click',()=>ciSetScope(b.dataset.scope)));
   const studentsBack=document.getElementById('ci-v3-back');if(studentsBack)studentsBack.addEventListener('click',ciBackToStudents);
-  document.querySelectorAll('#ci-v3-root [data-clinical-action]').forEach(b=>b.addEventListener('click',()=>ciUnavailable(b.dataset.clinicalAction)));
+  document.querySelectorAll('#ci-v3-root [data-clinical-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.clinicalAction;if(a==='Professional Competency')ciPcStart(ciSelected);else if(a==='Start Evaluation')ciStartEvaluation(ciSelected);else ciUnavailable(a);}));
   ciRender();
   ciRefreshInProgress_();
  }catch(e){ciError(e);}

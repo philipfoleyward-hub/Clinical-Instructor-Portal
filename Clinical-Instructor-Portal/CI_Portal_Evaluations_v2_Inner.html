@@ -235,6 +235,11 @@
  function openInstrument(name) {
    const student=roster().find(s=>String(s.studentId)===selectedId);
    if(!student){showMessage('Select student','Choose a student from your authorized roster first.');return;}
+   if (name === 'Professional Competency Evaluation') {
+     if (typeof ciPcStart !== 'function') {showMessage('Professional Competency unavailable', 'The evaluation launcher is not loaded.');return;}
+     ciPcStart(student.studentId);
+     return;
+   }
    if (name === 'Competency Evaluation') {
   if (typeof ciStartEvaluation !== 'function') {
     showMessage('Examination picker unavailable', 'The approved examination picker is not loaded.');

@@ -43,7 +43,8 @@ function ciLink_verify_(message) {
   if (!message || typeof message !== 'object' || Array.isArray(message))
     throw Error('Malformed signed request');
   const action = String(message.action || '');
-  const actions = ['schema', 'preview', 'submit', 'draft_save', 'draft_load', 'draft_stop', 'draft_list'];
+  const actions = ['schema', 'preview', 'submit', 'draft_save', 'draft_load', 'draft_stop', 'draft_list',
+    'pc_schema', 'pc_preview', 'pc_submit'];
   if (!actions.includes(action)) throw Error('Unknown gateway action');
   const ms = Number(message.timestamp), nonce = String(message.nonce || '');
   if (!Number.isInteger(ms) || Math.abs(Date.now() - ms) > 120000 ||
@@ -370,6 +371,12 @@ function doPost(e) {
       result = ciLink_draftLoad_(data);
     } else if (a === 'draft_list') {
       result = ciLink_draftList_(data);
+    } else if (a === 'pc_schema') {
+      result = pcPortal_schema_(data);
+    } else if (a === 'pc_preview') {
+      result = pcPortal_preview_(data);
+    } else if (a === 'pc_submit') {
+      result = pcPortal_submit_(data);
     } else {
       result = ciLink_productionEnabled_() ? ciLink_commitProduction_(data) : ciLink_commitTest001_(data);
     }

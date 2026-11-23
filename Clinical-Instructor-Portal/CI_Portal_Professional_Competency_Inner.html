@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+
+<html><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Clinical Instructor Portal — Professional Competency Evaluation</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f8fb;color:#102b4d;font-family:Arial,Helvetica,sans-serif}button,textarea{font:inherit}
+.banner{height:112px;background:linear-gradient(90deg,#052b4a,#0b5278 58%,#062c4c);color:white;display:grid;grid-template-columns:280px 1fr 340px;align-items:center;padding:0 28px}
+.brand{border-right:1px solid #ffffff55;padding-right:25px}.brand .logo{font:700 28px Georgia,serif}.brand .logo i{font-style:normal;color:#ff7900}.brand small{display:block;font-size:16px;margin-top:4px}.portal{padding-left:24px}.portal h1{margin:0;font-size:25px}.portal p{margin:7px 0 0;color:#dceaf5}.profile{justify-self:end;background:#062a4a;border-radius:11px;padding:10px 14px;display:flex;gap:11px;align-items:center}.avatar{width:38px;height:38px;border-radius:50%;background:#dcecff;color:#285d94;display:grid;place-items:center;font-weight:bold}.profile small{display:block;color:#dce8f2;margin-top:2px}
+.crumbs{height:48px;background:#fff;border-bottom:1px solid #d9e4ed;padding:0 25px;display:flex;align-items:center;color:#0872d1;font-size:12px}.crumbs span{margin:0 8px;color:#8093a5}.exit{margin-left:auto;border:1px solid #0877dc;background:white;color:#0764be;border-radius:7px;padding:7px 12px;font-weight:bold}
+.context{margin:10px 14px;background:#fff;border:1px solid #d5e2eb;border-radius:9px;display:grid;grid-template-columns:1.6fr repeat(5,1fr);overflow:hidden}.student{padding:13px 16px;display:flex;gap:12px;align-items:center}.student .pic{width:58px;height:58px;border-radius:50%;background:#d9eafb;display:grid;place-items:center;font-weight:bold;color:#1d5d99}.student h2{margin:0 0 5px;font-size:20px}.student p{margin:0;color:#63778d;font-size:11px}.ctx{border-left:1px solid #dce6ee;padding:14px 12px;display:flex;flex-direction:column;justify-content:center}.ctx label{font-size:10px;color:#165499;font-weight:bold;margin-bottom:6px}.ctx b{font-size:12px}.ctx input{width:100%;border:0;outline:0;font-weight:bold;color:#124b84}
+.layout{display:grid;grid-template-columns:54px 278px minmax(650px,1fr) 286px;gap:11px;padding:0 14px 18px;align-items:start}
+.rail{position:sticky;top:10px;background:#07365d;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px #163f6120}.rail button{width:54px;height:54px;border:0;border-bottom:1px solid #ffffff22;background:transparent;color:white;font-size:20px;cursor:pointer}.rail button:hover,.rail button.active{background:#0877dc}.rail .menu{background:#ff7900;font-weight:bold}
+.card{background:#fff;border:1px solid #d5e2eb;border-radius:9px;box-shadow:0 3px 9px #173e5e0b;overflow:hidden}
+.left-head{padding:14px}.left-head h3{margin:0 0 5px;font-size:18px}.left-head p{margin:0;color:#62758a;font-size:11px}.section{display:flex;gap:10px;align-items:flex-start;padding:12px;border-top:1px solid #e2e9ef;cursor:pointer}.section:hover{background:#f7fbfe}.section.active{margin:0 6px 4px;border:0;border-radius:7px;background:#0b4f88;color:white}.num{width:34px;height:34px;border-radius:50%;background:#e5edf4;display:grid;place-items:center;flex:none;font-weight:bold}.active .num{background:#7ab7ea;color:white}.section b{display:block;font-size:12px}.section small{display:block;font-size:9.5px;line-height:1.3;color:#6a7e91;margin-top:3px}.active small{color:#dbeaf6}
+.section-head{display:grid;grid-template-columns:50px 1fr 190px;gap:13px;align-items:center;padding:15px 17px;border-bottom:1px solid #dce6ee}.big{width:46px;height:46px;border-radius:50%;background:#0877dc;color:white;display:grid;place-items:center;font-size:21px;font-weight:bold}.titleline{display:flex;align-items:center;gap:9px}.titleline h2{margin:0;font-size:20px}.badge{background:#fff0c7;color:#815d00;border-radius:14px;padding:4px 8px;font-size:9px;font-weight:bold}.desc{margin:5px 0 0;color:#526a82;font-size:11px}.bar{height:9px;background:#e1e9ef;border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:#28af69;width:0}.progress small{font-size:9px;color:#60748a}.progress b{font-size:10px}
+.naall{display:none;margin:10px 12px 0;background:#f1f5f8;border:1px solid #d3dee7;border-radius:8px;padding:10px 12px;align-items:center;justify-content:space-between}.naall.show{display:flex}.naall strong{font-size:11px}.naall small{display:block;color:#687b8e;font-size:9px;margin-top:2px}.naall button{border:1px solid #8197a9;background:#fff;color:#526a7d;border-radius:6px;padding:7px 10px;font-weight:bold}
+.criteria{padding:10px 12px 0}.criterion{border:1px solid #d8e4ed;border-radius:8px;background:#fbfdff;padding:12px;margin-bottom:9px;display:grid;grid-template-columns:minmax(280px,1fr) 430px;gap:14px;align-items:center}.ctitle{display:flex;gap:8px;align-items:center}.cnum{width:35px;height:35px;border-radius:50%;background:#e7f2fd;color:#17528d;display:grid;place-items:center;font-weight:bold;flex:none}.state{font-size:8px;background:#fff0c8;color:#865f00;border-radius:10px;padding:4px 6px;font-weight:bold}.criterion p{margin:5px 0 0 43px;font-size:12px;line-height:1.4;color:#294867}.scores{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.scores button{height:59px;border:1px solid #c9d9e6;background:white;border-radius:6px;color:#183a5a}.scores b{display:block;font-size:17px}.scores small{font-size:8px;line-height:1.1}.scores button.selected{border-width:2px}.scores button:nth-child(1).selected{background:#fde9e7;border-color:#d45b54;color:#9e3732}.scores button:nth-child(2).selected{background:#fff5d9;border-color:#d4a83a;color:#7e5a08}.scores button:nth-child(3).selected{background:#eaf6ef;border-color:#46a46a;color:#287349}.scores button:nth-child(4).selected{background:#e7f4ff;border-color:#1382dc;color:#075ca9}.scores button:nth-child(5).selected{background:#eef2f5;border-color:#8395a4;color:#586875}
+.comments{margin:0 12px 11px;background:#f8fbfe;border:1px solid #d8e4ed;border-radius:8px;padding:11px}.comments-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.comments strong{font-size:12px}.comments small{display:block;color:#6d8093;font-size:9px;margin-top:2px}.dictate{border:1px solid #0877dc;background:white;color:#0767c8;border-radius:6px;padding:7px 10px;font-weight:bold}.comments textarea{width:100%;height:72px;border:1px solid #c9d9e6;border-radius:6px;padding:9px;resize:vertical}
+.nav{position:sticky;bottom:0;z-index:20;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:9px 12px;background:#fffffffa;border-top:1px solid #d8e4ed;box-shadow:0 -4px 13px #173d5c12}.nav button{height:54px;border-radius:7px;font-weight:bold}.prev{border:1px solid #0877dc;background:#f5faff;color:#075eb8}.next{border:0;background:#0877dc;color:white}.nav small{display:block;font-size:9px;margin-top:3px;font-weight:normal}
+.right{display:flex;flex-direction:column;gap:9px}.fail{border:0;border-radius:8px;background:#f20d16;color:white;text-align:left;padding:12px;min-height:78px}.fail strong{display:block;font-size:16px}.fail small{display:block;margin:5px 0 0 35px;font-size:10px}.rbox{background:#fff;border:1px solid #d5e2eb;border-radius:8px;overflow:hidden}.rbox h3{margin:0;padding:11px 12px;background:#f5f9fc;border-bottom:1px solid #dfe8ef;font-size:14px}.overview-row{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #e8eef3;font-size:9.5px}.dot{width:26px;height:26px;border-radius:50%;background:#fff0c8;color:#8a6200;display:grid;place-items:center;font-weight:bold;flex:none}.overview-row.done .dot{background:#dff5e8;color:#167444}.quick button{display:grid;grid-template-columns:29px 1fr 12px;align-items:center;width:calc(100% - 14px);margin:7px;border:1px solid #c9dff1;background:#f8fcff;color:#164f82;border-radius:7px;padding:6px;text-align:left}.ico{width:27px;height:27px;border-radius:7px;background:#e3f2fd;display:grid;place-items:center}.quick b{font-size:10px}.quick small{display:block;font-size:8px;color:#73879a}.saved{text-align:center;color:#16804c;font-size:9px;font-weight:bold;padding:3px 0 9px}
+@media(max-width:1200px){.layout{grid-template-columns:54px 235px 1fr}.right{grid-column:2/-1;display:grid;grid-template-columns:repeat(3,1fr)}.criterion{grid-template-columns:1fr}.context{grid-template-columns:1.5fr repeat(3,1fr)}}
+</style>
+<style>
+/* APPROVED CHANGE ONLY: keep existing Previous / Next navigation visible while scrolling. */
+.nav{
+  position:sticky !important;
+  bottom:0 !important;
+  z-index:100 !important;
+}
+</style>
+<style>
+/* PATIENT CARE WORKFLOW MOCKUP — layered onto the locked global shell only. */
+.pc-group{border:1px solid #d8e4ed;border-radius:8px;margin:10px 12px;background:#fff;overflow:hidden}
+.pc-group-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px 13px;background:#f7fbfe;cursor:pointer}
+.pc-group-head:hover{background:#f1f8fd}
+.pc-group-head strong{font-size:12px;color:#173b5c}
+.pc-group-head small{display:block;margin-top:3px;font-size:9px;color:#718397}
+.pc-group-state{font-size:9px;font-weight:800;color:#8a6200;background:#fff0c8;border-radius:12px;padding:5px 8px}
+.pc-group.complete .pc-group-state{color:#167444;background:#dff5e8}
+.pc-group-body{display:none;padding:0 0 2px}
+.pc-group.open .pc-group-body{display:block}
+.pc-group.open .pc-group-head{border-bottom:1px solid #dfe8ef}
+.pc-group .criterion{margin:9px 10px}
+.pc-weight{display:inline-flex;align-items:center;justify-content:center;margin-left:7px;padding:3px 7px;border-radius:11px;background:#e8f1f8;color:#315d7e;font-size:9px;font-weight:800;border:1px solid #cbdce9}
+.pc-calc{display:none;margin-top:5px;margin-left:43px;font-size:9px;color:#60778b}
+.pc-calc.show{display:block}
+.pc-section-score{margin-top:7px;font-size:10px;color:#536b82}
+.pc-section-score b{color:#164f82}
+.pc-overview-group{border-bottom:1px solid #e6edf2}
+.pc-overview-head{display:grid;grid-template-columns:25px 1fr auto;gap:7px;align-items:center;padding:8px 10px;cursor:pointer;background:#fff}
+.pc-overview-head:hover{background:#f7fbfe}
+.pc-overview-head .dot{width:24px;height:24px}
+.pc-overview-head b{font-size:9.5px;color:#154b80}
+.pc-overview-head small{display:block;font-size:8px;color:#718397;margin-top:2px}
+.pc-overview-body{display:none}
+.pc-overview-group.open .pc-overview-body{display:block}
+.pc-overview-group.open .pc-overview-head{background:#f5f9fc}
+.pc-overview-row{display:grid;grid-template-columns:22px 28px 1fr;gap:5px;align-items:start;padding:6px 9px 6px 17px;border-top:1px solid #edf2f5;font-size:8.5px;color:#425c73}
+.pc-overview-row .mini{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#fff0c8;color:#8a6200;font-weight:bold}
+.pc-overview-row.done .mini{background:#dff5e8;color:#167444}
+.pc-group-score{font-size:8px;color:#668096;white-space:nowrap}
+.pc-scroll-note{font-size:8px;color:#7a8d9f;padding:0 13px 8px}
+</style>
+<style>
+/* PATIENT CARE SCORE-CONTROL FIT FIX ONLY
+   Preserve locked shell and five simultaneous choices: 0 / 1 / 2 / 3 / N/A. */
+.pc-group .criterion{
+  grid-template-columns:minmax(0,1fr) minmax(390px,44%) !important;
+  width:auto !important;
+  min-width:0 !important;
+}
+.pc-group .criterion > div{
+  min-width:0 !important;
+}
+.pc-group .scores{
+  width:100% !important;
+  min-width:0 !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:4px !important;
+}
+.pc-group .scores button{
+  min-width:0 !important;
+  width:100% !important;
+  padding:4px 2px !important;
+  overflow:hidden;
+}
+.pc-group .scores button small{
+  display:block;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  line-height:1.05;
+}
+@media(max-width:1350px){
+  .pc-group .criterion{
+    grid-template-columns:1fr !important;
+  }
+  .pc-group .scores{
+    margin-top:7px;
+  }
+}
+</style>
+<style>
+/* LOCKED STANDARD-SECTION FIT RULE:
+   Every visible criterion card must show 0 / 1 / 2 / 3 / N/A simultaneously.
+   Short sections remain fully expanded. Patient Care alone uses progressive disclosure here. */
+.criterion{
+  grid-template-columns:minmax(0,1fr) minmax(390px,44%) !important;
+  min-width:0 !important;
+}
+.criterion > div{min-width:0 !important}
+.scores{
+  width:100% !important;
+  min-width:0 !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:4px !important;
+}
+.scores button{
+  min-width:0 !important;
+  width:100% !important;
+  padding-left:2px !important;
+  padding-right:2px !important;
+}
+.scores button small{
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  line-height:1.05;
+}
+.criterion-label{
+  font-size:11px;
+  font-weight:800;
+  color:#173f67;
+}
+@media(max-width:1350px){
+  .criterion{grid-template-columns:1fr !important}
+  .scores{margin-top:7px}
+}
+</style>
+<style>
+/* IMAGE EVALUATION LOCK CANDIDATE — section-specific content only */
+.ie-wrap{padding:0 12px 10px}
+.ie-views{border:1px solid #d5e2eb;border-radius:8px;background:#fff;padding:9px;margin:10px 0}
+.ie-views-title{font-size:10px;font-weight:800;color:#173f67;margin-bottom:7px}
+.ie-view-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ie-tab{border:1px solid #cddce8;border-radius:7px;background:#fff;padding:8px 10px;text-align:left;cursor:pointer;color:#173f67}
+.ie-tab.active{border-color:#1478d1;background:#eaf4ff}.ie-tab.done{background:#edf9f2}
+.ie-tab b{display:block;font-size:10px}.ie-tab small{font-size:8px;color:#6d8092}
+.ie-workhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0 7px}
+.ie-workhead h3{margin:0;font-size:13px;color:#102f4b}
+.ref-btn{border:1px solid #1478d1;background:#fff;color:#0867b8;border-radius:6px;padding:7px 10px;font-size:9px;font-weight:800;cursor:pointer}
+.ie-main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(245px,.85fr);gap:10px}
+.ie-scorebox,.ie-marker{border:1px solid #d8e4ed;border-radius:8px;background:#fff;padding:10px}
+.ie-legend{background:#fff4d6;border-radius:6px;padding:7px 9px;font-size:8px;color:#8a5b00;margin-bottom:7px}
+.ie-matrix{width:100%;border-collapse:collapse;font-size:9px}
+.ie-matrix th,.ie-matrix td{border-bottom:1px solid #dce6ed;padding:7px 5px;text-align:center}
+.ie-matrix th:first-child,.ie-matrix td:first-child{text-align:left}
+.ie-radio{width:18px;height:18px;border:1px solid #8ea5b8;border-radius:50%;background:#fff;display:inline-grid;place-items:center;cursor:pointer}
+.ie-radio.sel:after{content:"";width:8px;height:8px;border-radius:50%;background:#d99a00}
+.ie-ei{display:grid;grid-template-columns:auto 1fr auto;gap:7px;align-items:center;margin-top:9px}
+.ie-ei label{font-size:9px;font-weight:800}.ie-ei input{border:1px solid #c9d9e5;border-radius:6px;padding:7px;width:100%}
+.range-btn{border:1px solid #1478d1;background:#f7fbff;color:#0867b8;border-radius:6px;padding:7px 8px;font-size:8px;font-weight:bold;cursor:pointer}
+.ie-marker h4{margin:0 0 9px;font-size:11px}
+.marker-line{margin-bottom:9px}.marker-line label{display:block;font-size:8px;margin-bottom:5px;color:#49657d}
+.marker-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.marker-pair button{border:1px solid #bcd0df;background:#fff;border-radius:6px;padding:8px 4px;font-size:8px;cursor:pointer}
+.marker-pair button.sel{border-color:#1478d1;background:#eaf4ff;color:#0867b8;font-weight:bold}
+.ie-comments{margin-top:10px;border:1px solid #d8e4ed;border-radius:8px;background:#fff;padding:10px}
+.ie-comments-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ie-comments-head b{font-size:10px}.dictate{border:1px solid #a8cce8;background:#f7fbff;color:#0867b8;border-radius:18px;padding:6px 11px;font-size:9px;font-weight:bold}
+.ie-comments textarea{width:100%;min-height:72px;resize:vertical;border:1px solid #cbdbe7;border-radius:6px;padding:8px;font-family:inherit;font-size:9px}
+.ie-calc{margin-top:10px;background:#edf9f2;border-radius:8px;padding:9px 11px}
+.calc-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #d2e8db;font-size:8.5px}
+.calc-final{display:flex;justify-content:space-between;align-items:center;background:#d8f2e2;margin-top:7px;padding:8px;font-weight:900;color:#08723a}
+.ie-note{font-size:8px;color:#708396;margin-top:6px}
+.ie-modal{position:fixed;inset:0;background:#09243b66;z-index:1000;display:none;place-items:center;padding:15px}
+.ie-modal.show{display:grid}.ie-dialog{width:min(720px,94vw);max-height:88vh;overflow:auto;background:#fff;border-radius:10px;box-shadow:0 18px 45px #102d4566}
+.ie-dialog-head{background:#07365d;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.ie-dialog-head h3{margin:0;font-size:14px}.xbtn{border:0;background:#ffffff22;color:white;border-radius:5px;padding:5px 8px;cursor:pointer}
+.ie-dialog-body{padding:13px}
+.reference-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+.ref-image{min-height:280px;border-radius:8px;background:linear-gradient(135deg,#071827,#153a55);display:grid;place-items:center;color:#cde7f8;text-align:center;padding:18px}
+.ref-image b{font-size:16px}.ref-image small{display:block;margin-top:7px;color:#9dc2da}
+.ref-details h4{margin:0 0 5px;font-size:10px;color:#0d4f84}.ref-details p{font-size:9px;line-height:1.4;color:#4c657a;margin:0 0 10px}
+.ref-exposure{background:#eef7ff;border:1px solid #c9e1f5;border-radius:7px;padding:9px}
+.ref-exposure b{display:block;color:#0b568e;font-size:10px}.ref-exposure small{font-size:8px;color:#60788d}
+.range-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:8px}.range-table th,.range-table td{border:1px solid #d4e2ec;padding:6px;text-align:center}
+.future{margin-top:9px;font-size:8px;color:#718497;font-style:italic}
+@media(max-width:900px){
+ .ie-main{grid-template-columns:1fr}.ie-view-tabs{grid-template-columns:1fr}.reference-grid{grid-template-columns:1fr}
+ .ie-workhead{align-items:flex-start;flex-direction:column}.ie-ei{grid-template-columns:1fr}
+}
+</style>
+<style>
+/* IMAGE EVALUATION UX PASS — scoring personality + marker personality only */
+.ie-matrix td:not(:first-child){padding:5px 3px}
+.ie-radio{
+  width:100% !important;
+  min-width:34px;
+  height:31px !important;
+  border-radius:7px !important;
+  border:1px solid #c9d7e2 !important;
+  background:#f8fbfd !important;
+  color:#34546d;
+  font-size:10px;
+  font-weight:900;
+  display:grid !important;
+  place-items:center;
+  transition:.14s ease;
+}
+.ie-radio:after{display:none !important}
+.ie-radio:hover{transform:translateY(-1px);box-shadow:0 2px 6px #173b5c1f}
+.ie-radio[data-score="0"].sel{background:#fde8e8 !important;border-color:#d95252 !important;color:#a51f1f !important;box-shadow:inset 0 0 0 1px #d95252}
+.ie-radio[data-score="1"].sel{background:#fff0cf !important;border-color:#d89c28 !important;color:#875800 !important;box-shadow:inset 0 0 0 1px #d89c28}
+.ie-radio[data-score="2"].sel{background:#f2f3c9 !important;border-color:#a6a83a !important;color:#626600 !important;box-shadow:inset 0 0 0 1px #a6a83a}
+.ie-radio[data-score="3"].sel{background:#dff4e7 !important;border-color:#3a9c68 !important;color:#17663d !important;box-shadow:inset 0 0 0 1px #3a9c68}
+.ie-radio[data-score="N/A"].sel{background:#e7f0f7 !important;border-color:#6f91ab !important;color:#315b79 !important;box-shadow:inset 0 0 0 1px #6f91ab}
+
+.ie-marker{
+  background:linear-gradient(180deg,#fbfdff 0%,#f5f9fc 100%) !important;
+  border:1px solid #cbdde9 !important;
+  padding:0 !important;
+  overflow:hidden;
+}
+.marker-titlebar{
+  display:flex;gap:9px;align-items:center;
+  padding:10px 11px;
+  background:#edf6fc;
+  border-bottom:1px solid #d6e5ef;
+}
+.marker-icon{
+  width:31px;height:31px;border-radius:8px;
+  background:#0c5d94;color:#fff;display:grid;place-items:center;
+  font-weight:900;font-size:13px;
+}
+.marker-titlebar h4{margin:0 !important;font-size:11px;color:#173f67}
+.marker-titlebar small{display:block;font-size:8px;color:#6d8192;margin-top:2px}
+.marker-content{padding:10px}
+.marker-line{margin-bottom:10px !important}
+.marker-line:last-child{margin-bottom:0 !important}
+.marker-line label{
+  font-size:8.5px !important;
+  font-weight:800;
+  color:#35556f !important;
+  margin-bottom:5px !important;
+}
+.marker-pair{grid-template-columns:1fr 1.18fr !important}
+.marker-pair button{
+  position:relative;
+  min-height:36px;
+  border:1px solid #c8d8e4 !important;
+  background:#fff !important;
+  color:#36536a;
+  font-weight:700;
+  transition:.14s ease;
+}
+.marker-pair button:hover{transform:translateY(-1px);box-shadow:0 2px 6px #173b5c18}
+.marker-pair button.positive.sel{
+  background:#e3f5ea !important;
+  border-color:#55a978 !important;
+  color:#17633c !important;
+  box-shadow:inset 0 0 0 1px #55a978;
+}
+.marker-pair button.penalty.sel{
+  background:#fde9e9 !important;
+  border-color:#d85b5b !important;
+  color:#a12626 !important;
+  box-shadow:inset 0 0 0 1px #d85b5b;
+}
+.penalty-badge{
+  display:inline-block;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:10px;
+  background:#fbe1e1;
+  color:#a12626;
+  font-size:7px;
+  font-weight:900;
+}
+.marker-pair button.penalty.sel .penalty-badge{
+  background:#c83f3f;color:#fff;
+}
+</style>
+<style>header.banner{display:none!important}.layout>.rail{display:none!important}.layout{grid-template-columns:278px minmax(650px,1fr) 286px!important}@media(max-width:1200px){.layout{grid-template-columns:235px minmax(530px,1fr)!important}.right{grid-column:1/-1!important}}</style><style>.ctx:last-child{position:relative}#ccmsExamSearch{border-bottom:1px solid #b6cce0;padding:3px 0}#ccmsExamMatches:not([hidden]){position:absolute;top:calc(100% - 8px);left:7px;right:7px;z-index:120;background:#fff;border:1px solid #b9cce0;box-shadow:0 6px 20px #1233;max-height:200px;overflow:auto;border-radius:7px}#ccmsExamMatches button{display:block;width:100%;padding:9px 11px;text-align:left;background:white;border:0;color:#124b84;font:600 12px Arial}#ccmsExamMatches button:hover,#ccmsExamMatches button:focus{background:#e8f3ff}#ccmsExamSearch:focus{outline:2px solid #0878e5;outline-offset:2px}</style><style>
+/* Additive workflow controls only. Keep original component sizing unchanged. */
+.ccms-start-backdrop{position:fixed;inset:0;background:#0b203b88;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px}
+.ccms-start-card{width:min(520px,96vw);max-height:90vh;overflow:auto;background:white;border-radius:14px;box-shadow:0 20px 60px #061b3470;padding:25px;color:#102440;font-family:Arial,sans-serif}
+.ccms-start-card h2{margin:0 0 7px;font-size:23px}.ccms-start-card p{color:#60738b;font-size:13px;line-height:1.5}.ccms-start-card label{display:block;font-weight:700;font-size:12px;margin:14px 0 5px}
+.ccms-start-card input{width:100%;height:40px;border:1px solid #b8cee0;border-radius:7px;padding:8px 11px;font-size:14px}.ccms-start-card .ccms-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.ccms-start-card button,.ccms-mini-action{border:1px solid #b8cee0;border-radius:7px;padding:10px 14px;background:#fff;color:#075da9;font-weight:700;cursor:pointer}.ccms-start-card button.primary{background:#0878e5;color:#fff;border-color:#0878e5}.ccms-start-card button:disabled{opacity:.5;cursor:not-allowed}
+.ccms-start-card .ccms-matches{max-height:160px;overflow:auto;border:1px solid #d3e0ee;border-radius:7px;margin-top:3px}.ccms-start-card .ccms-matches button{display:block;width:100%;border:0;border-radius:0;text-align:left;padding:9px 12px}
+.ccms-mini-bar{position:sticky;top:0;z-index:180;display:flex;align-items:center;gap:9px;justify-content:space-between;flex-wrap:wrap;background:#edf6ff;border-bottom:1px solid #bad4eb;padding:8px 15px;font:12px Arial;color:#123c65}
+.ccms-mini-bar strong{font-size:13px}.ccms-mini-bar button{padding:7px 10px}
+.ccms-mini-bar .ccms-status{color:#37745a}.ccms-mini-bar button[hidden]{display:none!important}#ccmsStop{background:#fff3ef;border-color:#d8a99d;color:#9e3f2a}#ccmsStart{background:#0872c6;color:white;border-color:#0872c6}
+.ccms-section-done{color:#148349!important}.ccms-section-done .num{background:#e1f7e8!important;color:#148349!important;border-color:#90d7a6!important}
+.ccms-section-done .ccms-check{color:#148349;font-weight:900}
+@media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr)!important}.layout>.left,.layout>.right{grid-column:1!important}.ccms-mini-bar{position:sticky}}
+</style><style>
+.ci-review-overlay{position:fixed;z-index:2000;inset:0;background:#10213c9a;display:flex;align-items:flex-start;justify-content:center;padding:10px;font-family:Inter,"Segoe UI",Arial,sans-serif;color:#11355b}
+.ci-review-dialog{width:min(950px,100%);max-height:min(66vh,630px);overflow:auto;border:1px solid #cfdeed;border-radius:12px;background:#fff;box-shadow:0 15px 50px #062b4a55;font-size:13px}
+.ci-review-heading{background:#f0f6fc;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #d9e5ef}.ci-review-heading b{font-size:15px}.ci-review-heading span{font-size:10px;color:#7d93a8;margin-left:auto}.ci-review-x{border:0;background:none;font-size:23px;color:#456981;cursor:pointer}
+.ci-review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px}.ci-review-box{border:1px solid #cfdfed;border-radius:9px;padding:13px;background:#fbfdff}.ci-review-label{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-bottom:9px}.ci-review-label button{background:none;border:0;color:#0b508c;font-weight:700;cursor:pointer}.ci-review-chips{font-size:10px;color:#8297a9;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px}.ci-review-chips span{border:1px solid #c9dce9;border-radius:20px;padding:3px 7px;background:#fff;color:#426989}
+.ci-review-box textarea{width:100%;min-height:100px;border:1px solid #bcd0e2;border-radius:7px;background:#fff;color:#132f4c;font:inherit;line-height:1.45;padding:9px;resize:vertical}.ci-review-full{margin:0 12px 10px}.ci-review-full textarea{min-height:115px}.ci-review-refs{font-size:10px;color:#7890a5;margin-top:9px}
+.ci-review-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px}.ci-review-status{padding:13px 12px;border:1px solid #cbddeb;border-radius:8px;background:white;text-align:left;color:#173856;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:13px}.ci-review-status small{font-size:10px}.ci-review-status.chosen[data-status="reviewed"]{border-color:#39a571;background:#eaf8ef;color:#116d40}.ci-review-status.chosen[data-status="pending"]{border-color:#70a3cc;background:#eff7fd}
+.ci-review-footer{margin:0 12px;background:#eef5fb;border-radius:8px;color:#617b92;font-size:11px;line-height:1.45;padding:12px}.ci-review-actions{display:flex;gap:9px;justify-content:flex-end;padding:14px}.ci-review-actions button{border-radius:7px;border:1px solid #9fc4e4;background:white;color:#075c9b;padding:9px 14px;font-weight:700;cursor:pointer}.ci-review-actions #ci-review-save{background:#0878e5;color:#fff;border-color:#0878e5}
+@media(max-width:630px){.ci-review-grid,.ci-review-choice{grid-template-columns:1fr}.ci-review-heading span{display:none}.ci-review-dialog{max-height:min(52vh,510px)}}
+</style>
+
+<style id="ccms-approved-overall-v2-style">
+/* Restore selected CI_Portal_Overall_Competency_Simplified_v2.html visual composition. */
+.simple-final{padding:0 12px 16px}
+.final-hero{margin:10px 0 12px;border:1px solid #c9dbe7;border-radius:10px;background:#fff;overflow:hidden}
+.final-hero-top{text-align:center;padding:15px 14px 11px;background:linear-gradient(180deg,#f8fbfe,#fff)}
+.final-hero-top small{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;color:#688094}
+.final-percent{font-size:38px;line-height:1;font-weight:900;color:#123f67;margin-top:5px}
+.final-score{font-size:12px;font-weight:800;color:#557086;margin-top:5px}
+.pass-banner{margin:0 12px 12px;border-radius:8px;padding:11px;text-align:center;background:#dff5e8;border:1px solid #68b989;color:#11623a;font-size:22px;font-weight:1000;letter-spacing:.08em}
+.pass-banner.fail{background:#fee8e8;border-color:#d78484;color:#922b2b}
+.pass-banner.pending{background:#eef5fb;border-color:#c9dbe7;color:#356380;font-size:16px;letter-spacing:0}
+.score-split{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px}
+.score-split div{border:1px solid #d9e4ec;border-radius:7px;background:#f8fbfd;padding:8px 10px;text-align:center}
+.score-split small{display:block;font-size:10px;color:#6d8193;font-weight:800}
+.score-split b{display:block;margin-top:3px;font-size:13px;color:#174f7c}
+.simple-panel{border:1px solid #d5e2eb;border-radius:8px;background:#fff;margin-bottom:10px;overflow:hidden}
+.simple-head{padding:9px 11px;background:#f3f8fc;border-bottom:1px solid #dce7ee;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.simple-head h4{margin:0;font-size:13px;color:#173f67}.simple-head small{font-size:10px;color:#718497}
+.simple-body{padding:10px}
+.section-result{display:grid;grid-template-columns:minmax(155px,1fr) 120px 75px;gap:8px;align-items:center;padding:8px 5px;border-bottom:1px solid #e5edf2;font-size:11px}
+.section-result:last-child{border-bottom:0}.section-result b{color:#274f6d}
+.section-result .score{text-align:right;color:#526d82}.section-result .pct{text-align:right;font-weight:900;color:#174f7c}
+.section-result.na .score,.section-result.na .pct{color:#7b8b98}
+.final-comment-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.final-comment-head b{font-size:12px;color:#315873}
+.final-comment{width:100%;min-height:92px;border:1px solid #cbdbe7;border-radius:7px;padding:9px;font-family:inherit;font-size:12px;resize:vertical}
+.final-dictate{border:1px solid #a8cce8;background:#f7fbff;color:#0867b8;border-radius:18px;padding:6px 10px;font-size:10px;font-weight:800;cursor:pointer}
+.simple-actions{display:grid;grid-template-columns:.85fr 1.15fr;gap:8px;margin-top:11px}
+.review-button,.submit-button{border:0;border-radius:8px;padding:12px 10px;font-size:12px;font-weight:900;cursor:pointer}
+.review-button{background:#e8f2f9;color:#195d8e;border:1px solid #b8d4e7}
+.submit-button{background:#0878dc;color:#fff;box-shadow:0 3px 8px #0a5ea329}
+.submit-button:disabled{background:#e8edf1;color:#8999a6;box-shadow:none;cursor:not-allowed}
+.simple-note{text-align:center;margin-top:8px;font-size:10px;color:#7a8b98}
+#ci-final-details{font-size:11px;color:#5b7388;padding:0 14px 12px;text-align:center}
+#ci-final-grade-error{font-size:11px;color:#8d3c3c;text-align:center;margin:0 0 9px}#ci-final-grade-retry[hidden]{display:none!important}
+@media(max-width:620px){.score-split,.simple-actions{grid-template-columns:1fr}.section-result{grid-template-columns:minmax(90px,1fr) 90px 52px;gap:4px;font-size:10px}}
+</style>
+<style id="ci-finish-view-status">
+#overview .ovrow{display:flex;gap:7px;align-items:center;flex-wrap:nowrap;font-size:11px;line-height:1.5;padding:5px 8px;cursor:pointer}
+#overview .ovrow .dot{width:22px;height:22px;min-width:22px;display:inline-grid;place-items:center;border-radius:50%;background:#fff0c8;color:#906b10}
+#overview .ovrow.done .dot{background:#def5e6;color:#167444}
+#overview .ovrow.done span:last-child{color:#166b3c;font-weight:700}
+#overview .ovrow.unused .dot{background:#eef2f5;color:#7a8995}
+#overview .ovrow.unused span:last-child{color:#738294}
+#overview .ovrow.in-progress .dot{background:#e7f2ff;color:#126eb2}
+.ie-tab.unused{opacity:.76}
+#ci-quick-return{border-color:#9cc8e5}
+</style><style id="ci-nav-colors-2026-11">
+/* Score scale colours: 0 red, 1 yellow, 2–3 green (hint when unselected, solid when selected). */
+.scores button:nth-child(1){border-top:4px solid #d64545!important}
+.scores button:nth-child(2){border-top:4px solid #e9b200!important}
+.scores button:nth-child(3),.scores button:nth-child(4){border-top:4px solid #2e9d5b!important}
+.scores button:nth-child(1).selected{background:#d64545!important;border-color:#b52f2f!important;color:#fff!important}
+.scores button:nth-child(2).selected{background:#f4c20d!important;border-color:#c99a00!important;color:#3b2c00!important}
+.scores button:nth-child(3).selected,.scores button:nth-child(4).selected{background:#2e9d5b!important;border-color:#237a46!important;color:#fff!important}
+.scores button.selected small{color:inherit!important}
+.ie-radio{width:30px!important;height:30px!important;font-weight:800;font-size:12px}
+.ie-radio[data-score="0"]{border:2px solid #d64545!important;color:#b52f2f}
+.ie-radio[data-score="1"]{border:2px solid #e9b200!important;color:#8a6a00}
+.ie-radio[data-score="2"],.ie-radio[data-score="3"]{border:2px solid #2e9d5b!important;color:#237a46}
+.ie-radio[data-score="0"].sel{background:#d64545!important;color:#fff!important}
+.ie-radio[data-score="1"].sel{background:#f4c20d!important;color:#3b2c00!important}
+.ie-radio[data-score="2"].sel,.ie-radio[data-score="3"].sel{background:#2e9d5b!important;color:#fff!important}
+/* One navigation system: stepper on top, one sticky bar at the bottom. */
+#sectionList{display:none!important}
+main.card{overflow:visible!important}/* overflow:hidden prevented the sticky stepper and bottom bar */
+.layout{grid-template-columns:minmax(0,1fr) 286px!important}
+@media(max-width:1200px){.layout{grid-template-columns:minmax(0,1fr)!important}.right{grid-column:1/-1!important}}
+#ccms-page-bar{display:none!important}
+#ci-stepper{position:sticky;top:0;z-index:120;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:#fff;border-bottom:1px solid #d5e2eb;scrollbar-width:thin}
+#ci-stepper button{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1px solid #c9d9e6;background:#f7fbfe;border-radius:999px;padding:6px 11px;font:inherit;font-size:12px;color:#183a5a;cursor:pointer;white-space:nowrap}
+#ci-stepper button .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#dce8f1;font-weight:800;font-size:11px}
+#ci-stepper button small{color:#5b7388;font-size:11px}
+#ci-stepper button.active{background:#17679e;border-color:#17679e;color:#fff}
+#ci-stepper button.active small{color:#d8ebf8}#ci-stepper button.active .n{background:#fff;color:#17679e}
+#ci-stepper button.done .n{background:#2e9d5b;color:#fff}
+.nav{position:sticky!important;bottom:0!important;z-index:120!important;display:flex!important;align-items:center;gap:10px;background:#fff;border-top:1px solid #d5e2eb;box-shadow:0 -4px 12px #173b5c14;padding:9px 12px!important;margin:0!important}
+.nav .prev,.nav .next{flex:0 1 auto}
+#ci-nav-status{flex:1 1 auto;text-align:center;font-size:12px;font-weight:700;color:#194a70}
+.ci-flash{outline:3px solid #f4c20d!important;outline-offset:2px;transition:outline-color .3s}
+.ci-missing{border:1px solid #e9b200;background:#fff8e1;border-radius:8px;padding:10px 12px;margin:10px 14px;text-align:left}
+.ci-missing strong{display:block;color:#6b5200;margin-bottom:6px}
+.ci-missing-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:5px 0;font-size:12px}
+.ci-missing-row span{font-weight:700;color:#183a5a;margin-right:4px}
+.ci-missing-link{border:1px solid #c99a00;background:#fff;border-radius:6px;padding:4px 8px;font:inherit;font-size:12px;color:#6b5200;cursor:pointer}
+.ci-missing-link:hover{background:#f4c20d;color:#3b2c00}
+</style>
+<style id="ci-pc-2026-11">
+/* Professional Competency layer — same shell, score scale and navigation as the competency evaluation. */
+.layout{grid-template-columns:minmax(0,1fr) 286px!important}
+@media(max-width:1200px){.layout{grid-template-columns:minmax(0,1fr)!important}.right{grid-column:1/-1!important}}
+.context{grid-template-columns:1.6fr repeat(5,1fr)!important}
+@media(max-width:1200px){.context{grid-template-columns:1.5fr repeat(2,1fr)!important}}
+.ctx select,.ctx input{width:100%;border:1px solid #c9d9e6;border-radius:6px;padding:6px 7px;font:inherit;font-size:12px;font-weight:bold;color:#124b84;background:#fff}
+#pc-version{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 12px 0;padding:11px 14px;border-radius:9px;border:2px solid;font-weight:800}
+#pc-version .tag{font-size:10px;letter-spacing:.08em;padding:4px 8px;border-radius:12px;color:#fff}
+#pc-version b{font-size:15px}#pc-version small{font-weight:600;font-size:11px}
+#pc-version.v12{background:#e9f3ff;border-color:#1471c7;color:#0d4d8a}#pc-version.v12 .tag{background:#1471c7}
+#pc-version.v35{background:#f3ecfb;border-color:#6b3fa8;color:#4b2580}#pc-version.v35 .tag{background:#6b3fa8}
+.ctx .ver{display:inline-block;border-radius:12px;padding:3px 8px;color:#fff;font-size:11px}
+.ver.v12{background:#1471c7}.ver.v35{background:#6b3fa8}
+.criterion .pc-weight{margin-left:auto}
+.state.done{background:#dff5e8;color:#167444}
+.pc-estimate{font-size:10px;color:#5b7388;padding:0 11px 11px}
+</style></head><body>
+<section class="context">
+ <div class="student"><div class="pic" id="pc-initials">—</div><div><h2 id="pc-student">Selected Student</h2><p id="pc-student-id">Student ID will load from your authorized session</p></div></div>
+ <div class="ctx"><label>Today's Site</label><b id="pc-site">Selected Clinical Site</b></div>
+ <div class="ctx"><label>Date</label><b id="pc-date">Evaluation Date</b></div>
+ <div class="ctx"><label>Evaluator</label><b id="pc-evaluator">Authenticated Evaluator</b></div>
+ <div class="ctx"><label>Form Version</label><b><span class="ver" id="pc-ver-chip">Loading…</span></b></div>
+ <div class="ctx"><label for="pc-period">Evaluation Period</label><input id="pc-period" list="pc-period-options" maxlength="120" placeholder="e.g. Midterm"/><datalist id="pc-period-options"><option value="Midterm"></option><option value="Final"></option></datalist></div>
+</section>
+<div class="layout">
+<main class="card">
+ <div id="pc-version" class="v12"><span class="tag">FORM VERSION</span><b id="pc-version-title">Professional Competency Evaluation</b><small id="pc-version-note"></small></div>
+ <div class="section-head"><div class="big" id="bigNum">1</div><div><div class="titleline"><h2 id="title">Loading…</h2><span class="badge" id="pc-badge">◇ In Progress</span><span id="countLabel" style="font-size:10px"></span></div><p class="desc" id="desc"></p></div><div class="progress"><b>Section Progress</b><div class="bar"><i id="sectionBar"></i></div><small id="sectionProgress"></small></div></div>
+ <div class="criteria" id="criteria"></div>
+ <div class="nav"><button class="prev" id="prev" type="button">← Back<small id="prevLabel"></small></button><div id="ci-nav-status"></div><button class="next" id="next" type="button">Next →<small id="nextLabel"></small></button></div>
+</main>
+<aside class="right">
+ <div class="rbox"><h3>Quick Section Overview</h3><div id="overview"></div></div>
+ <div class="rbox"><h3>Evaluation Progress</h3><div style="padding:11px"><div class="bar"><i id="overallBar"></i></div><p id="overallText" style="font-size:10px;margin-bottom:0"></p></div><div class="pc-estimate" id="pc-estimate"></div></div>
+ <div class="rbox quick"><h3>Quick Actions</h3>
+  <button type="button" id="ci-quick-save"><span class="ico">▣</span><span><b>Save Progress</b><small>Confirm draft storage</small></span><span>›</span></button>
+  <button type="button" id="ci-quick-review"><span class="ico">✎</span><span><b>Student Review &amp; Feedback</b><small>Strengths · improvements · discussion</small></span><span>›</span></button>
+  <button type="button" id="ci-quick-scoring"><span class="ico">?</span><span><b>View Scoring Guide</b><small>Professional Competency scale</small></span><span>›</span></button>
+  <button type="button" id="ci-quick-print"><span class="ico">▤</span><span><b>Print / Save PDF</b><small>Printable unsubmitted draft</small></span><span>›</span></button>
+  <button type="button" id="ci-quick-return"><span class="ico">↩</span><span><b>Save &amp; Return</b><small>Return after save is confirmed</small></span><span>›</span></button>
+  <div class="saved" role="status" aria-live="polite">● Not yet saved</div></div>
+</aside>
+</div>
+<div id="pc-toast" role="status" aria-live="polite" style="position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#10213c;color:#fff;padding:9px 14px;border-radius:8px;font-size:12px;z-index:300;display:none;max-width:90vw"></div>
+<script>
+(function(){
+const SCALE=[['0','Unacceptable'],['1','Considerable Improvement'],['2','Improvement Needed'],['3','Highly Acceptable'],['N/A','Not Applicable']];
+let context=null,schema=null,criteria=[],sections=[],current=0;
+const scores={};let studentReview={strengths:'',improvements:'',discussion:'',status:'pending',reviewedAt:null};
+let timer=null,saving=false,dirty=false,leaveRequested=false,leaveTarget='evaluations';
+let submitAllowed=false,submitBusy=false,submitDone=false,awaitingSubmit=false,prepared=null;
+let grade=null,gradeSig='',gradeError='',previewBusy=false,previewTimer=null,reqSig='';
+const $=id=>document.getElementById(id);
+const post=(type,payload)=>parent.postMessage({source:'ci-eval-inner',type,payload:payload||{}},'*');
+function notify(t){const n=$('pc-toast');n.textContent=t;n.style.display='block';clearTimeout(n._t);n._t=setTimeout(()=>n.style.display='none',4200);}
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FINAL=()=>sections.length;
+function buildSections(){
+ const n=criteria.length,cuts=schema.family==='Clinical 1-2'?[[0,9],[9,n]]:[[0,9],[9,20],[20,n]];
+ sections=cuts.map(([a,b])=>({name:'Criteria '+(a+1)+'–'+b,from:a,to:b}));
+}
+const items=s=>criteria.slice(s.from,s.to).map((c,k)=>({c,i:s.from+k}));
+function secCount(s){const t=s.to-s.from,d=items(s).filter(x=>scores[x.c.id]!==undefined).length;return {d,t,done:d===t};}
+function estimate(){let p=0,w=0;for(const c of criteria){const v=scores[c.id];if(v===undefined||v==='N/A')continue;p+=Number(v)*c.weight;w+=c.weight;}
+ if(!w)return null;const raw=Math.round((p/w+Number.EPSILON)*100)/100;return {raw,pct:Math.round(((raw+1)*25+Number.EPSILON)*100)/100,points:p,weight:w};}
+function complete(){return criteria.every(c=>scores[c.id]!==undefined)&&criteria.some(c=>scores[c.id]!=='N/A');}
+function sig(){return JSON.stringify(criteria.map(c=>scores[c.id]??''));}
+function stepper(){
+ let st=$('ci-stepper');if(!st){st=document.createElement('nav');st.id='ci-stepper';st.setAttribute('aria-label','Evaluation sections');const m=document.querySelector('main.card');m.insertBefore(st,m.firstChild);}
+ st.replaceChildren();
+ sections.concat([{name:'Review & Submit'}]).forEach((s,i)=>{const c=i<FINAL()?secCount(s):null;const b=document.createElement('button');b.type='button';
+  b.className=(i===current?'active ':'')+(c&&c.done?'done':'');
+  b.innerHTML='<span class="n"></span><span></span>'+(c?'<small></small>':'');b.children[0].textContent=c&&c.done?'✓':String(i+1);b.children[1].textContent=s.name;if(c)b.children[2].textContent=c.d+'/'+c.t;
+  b.onclick=()=>go(i);st.append(b);});
+ st.querySelector('.active')?.scrollIntoView({block:'nearest',inline:'center'});
+}
+function navbar(){
+ const names=sections.map(s=>s.name).concat(['Review & Submit']);
+ $('prev').disabled=current===0;$('prevLabel').textContent=current>0?names[current-1]:'';
+ $('next').disabled=current>=FINAL();$('nextLabel').textContent=current<FINAL()?names[current+1]:'';
+ $('next').firstChild.textContent=current===FINAL()-1?'Review & Submit →':'Next →';
+ const c=current<FINAL()?secCount(sections[current]):null;$('ci-nav-status').textContent=c?c.d+' of '+c.t+' scored':'';
+ document.querySelector('.nav').style.display=current===FINAL()?'none':'';
+}
+function overview(){
+ const host=$('overview');
+ if(current===FINAL()){host.innerHTML=sections.map((s,i)=>{const c=secCount(s);return `<div class="overview-row ${c.done?'done':''}" style="cursor:pointer" data-go="${i}"><span class="dot">${c.done?'✓':'•'}</span><b>${i+1}</b><span>${esc(s.name)} · ${c.d}/${c.t}</span></div>`;}).join('');}
+ else host.innerHTML=items(sections[current]).map(({c,i})=>`<div class="overview-row ${scores[c.id]!==undefined?'done':''}" style="cursor:pointer" data-jump="${i}"><span class="dot">${scores[c.id]!==undefined?'✓':'•'}</span><b>${i+1}</b><span>${esc(c.title.slice(0,70))}${c.title.length>70?'…':''}</span></div>`).join('');
+ host.querySelectorAll('[data-go]').forEach(r=>r.onclick=()=>go(Number(r.dataset.go)));
+ host.querySelectorAll('[data-jump]').forEach(r=>r.onclick=()=>jump(Number(r.dataset.jump)));
+ const total=criteria.length,done=criteria.filter(c=>scores[c.id]!==undefined).length;
+ $('overallBar').style.width=(total?Math.round(done/total*100):0)+'%';
+ $('overallText').textContent=done+'/'+total+' criteria scored · '+(schema?schema.versionLabel:'');
+ const e=estimate();$('pc-estimate').textContent=e?'Running weighted score: '+e.raw.toFixed(2)+' / 3.00 · '+e.pct.toFixed(2)+'% (official grade confirmed by CCMS at submission)':'';
+}
+function head(){
+ if(current===FINAL()){$('bigNum').textContent=String(FINAL()+1);$('title').textContent='Review & Submit';$('countLabel').textContent='Final Review';
+  $('desc').textContent='Review the Professional Competency result, complete Student Review & Feedback, and submit.';$('sectionBar').style.width='100%';$('sectionProgress').textContent='';return;}
+ const s=sections[current],c=secCount(s);
+ $('bigNum').textContent=String(current+1);$('title').textContent=s.name;$('countLabel').textContent=c.t+' criteria in this section';
+ $('desc').textContent='Rate each criterion 0–3 or N/A using the approved Professional Competency scale. Weights come from the official '+schema.versionLabel+' form.';
+ $('sectionBar').style.width=Math.round(c.d/c.t*100)+'%';$('sectionProgress').textContent=c.d+' of '+c.t+' completed ('+Math.round(c.d/c.t*100)+'%)';
+ const badge=$('pc-badge');badge.textContent=c.done?'✓ Complete':'◇ In Progress';
+}
+function renderSection(){
+ const s=sections[current];
+ $('criteria').innerHTML=items(s).map(({c,i})=>{const v=scores[c.id];return `<div class="criterion" data-i="${i}"><div><div class="ctitle"><span class="cnum">${i+1}</span><strong>Criterion ${i+1}</strong><span class="state ${v!==undefined?'done':''}">${v!==undefined?'Completed':'Not Completed'}</span><span class="pc-weight">Weight ${c.weight}</span></div><p>${esc(c.title)}</p></div><div class="scores">${SCALE.map(([k,l])=>`<button type="button" class="${v===k?'selected':''}" data-id="${esc(c.id)}" data-v="${k}"><b>${k}</b><small>${l}</small></button>`).join('')}</div></div>`;}).join('');
+ $('criteria').querySelectorAll('.scores button').forEach(b=>b.onclick=()=>setScore(b.dataset.id,b.dataset.v,b));
+}
+function setScore(id,v,btn){
+ if(submitDone)return;scores[id]=v;
+ const row=btn.closest('.criterion');row.querySelectorAll('.scores button').forEach(x=>x.classList.toggle('selected',x.dataset.v===v));
+ const st=row.querySelector('.state');st.textContent='Completed';st.classList.add('done');
+ head();overview();stepper();navbar();changed();
+}
+function renderFinal(){
+ const rows=sections.map((s,i)=>{let p=0,w=0;items(s).forEach(({c})=>{const v=scores[c.id];if(v!==undefined&&v!=='N/A'){p+=Number(v)*c.weight;w+=c.weight;}});
+  const sc=w?p/w:null;return `<div class="section-result ${sc===null?'na':''}"><b>${i+1}. ${esc(s.name)}</b><span class="score">${sc===null?'—':sc.toFixed(2)+' / 3.00'}</span><span class="pct">${sc===null?'—':((sc+1)*25).toFixed(1)+'%'}</span></div>`;}).join('');
+ $('criteria').innerHTML=`<div class="simple-final">
+  <section class="final-hero"><div class="final-hero-top"><small>PROFESSIONAL COMPETENCY GRADE · ${esc(schema.versionLabel.toUpperCase())}</small>
+   <div class="final-percent" id="ci-final-percent">—</div><div class="final-score" id="ci-final-score">Awaiting official grade</div></div>
+   <div class="pass-banner pending" id="ci-final-result">Grade not yet calculated</div>
+   <div class="score-split"><div><small>WEIGHTED SCORE</small><b id="ci-final-raw">—</b></div><div><small>APPLICABLE WEIGHT</small><b id="ci-final-weight">—</b></div></div>
+   <div id="ci-final-details"></div></section>
+  <section class="simple-panel"><div class="simple-head"><h4>Section Results</h4><small id="ci-final-complete-label"></small></div><div class="simple-body">${rows}</div></section>
+  <section class="simple-panel"><div class="simple-head"><h4>Student Review &amp; Feedback</h4><small>Strengths and improvements print on the official form</small></div><div class="simple-body" id="ci-final-review-summary"></div></section>
+  <div id="ci-final-missing"></div><div id="ci-final-grade-error" role="status" aria-live="polite"></div>
+  <div class="simple-actions"><button type="button" class="review-button" id="ci-final-review">Student Review &amp; Feedback</button>
+   <button type="button" class="submit-button" id="ci-final-submit" disabled>Finalize &amp; Submit Professional Competency</button></div>
+  <div class="simple-note" id="ci-final-review-status"></div></div>`;
+ $('ci-final-review').onclick=openReview;$('ci-final-submit').onclick=finalize;
+ paintFinal();queuePreview();
+}
+function paintFinal(){
+ if(current!==FINAL()||!$('ci-final-percent'))return;
+ const ok=complete(),g=grade&&gradeSig===sig()?grade:null;
+ $('ci-final-percent').textContent=g?Number(g.percentGrade).toFixed(2)+'%':'—';
+ $('ci-final-score').textContent=g?'Official CCMS grade · '+Number(g.rawScore).toFixed(2)+' / 3.00':ok?(previewBusy?'Calculating official grade…':'Official grade pending'):'Complete every criterion to calculate the grade';
+ const b=$('ci-final-result');b.className='pass-banner '+(g?(String(g.result).toLowerCase()==='pass'?'':'fail'):'pending');b.textContent=g?String(g.result).toUpperCase()+' · pass requires 75%':'Grade not yet calculated';
+ $('ci-final-raw').textContent=g?Number(g.rawScore).toFixed(2)+' / 3.00':'—';$('ci-final-weight').textContent=g?String(g.applicableWeight):'—';
+ $('ci-final-complete-label').textContent=ok?'All criteria scored':'Incomplete';
+ $('ci-final-grade-error').textContent=gradeError;
+ const r=studentReview;$('ci-final-review-summary').innerHTML=['strengths','improvements','discussion'].map(k=>`<p style="margin:0 0 7px;font-size:12px"><b>${{strengths:'Positive strengths',improvements:'Areas in need of improvement',discussion:'Review discussion'}[k]}:</b> ${r[k].trim()?esc(r[k]):'<i style="color:#8a9aa8">Not entered</i>'}</p>`).join('');
+ $('ci-final-review-status').textContent=(r.status==='reviewed'?'✓ Reviewed with Student':'◯ Review Pending')+' · Open Student Review & Feedback to record strengths, improvements and discussion.';
+ const s=$('ci-final-submit');if(!submitDone&&!submitBusy){s.disabled=!submitAllowed;s.textContent='Finalize & Submit Professional Competency';}
+ renderMissing();
+}
+function missing(){const out=[];sections.forEach((s,si)=>{const it=items(s).filter(({c})=>scores[c.id]===undefined).map(({i})=>({label:String(i+1),go:()=>jump(i)}));if(it.length)out.push({section:(si+1)+'. '+s.name,items:it});});
+ if(criteria.length&&criteria.every(c=>scores[c.id]==='N/A'))out.push({section:'Ratings',items:[{label:'At least one criterion must be rated 0–3',go:()=>jump(0)}]});return out;}
+function renderMissing(){const host=$('ci-final-missing');if(!host)return;host.replaceChildren();if(submitDone)return;const g=missing();if(!g.length)return;
+ const box=document.createElement('div');box.className='ci-missing';const h=document.createElement('strong');h.textContent='Still to complete before submitting ('+g.reduce((n,x)=>n+x.items.length,0)+')';box.append(h);
+ g.forEach(x=>{const row=document.createElement('div');row.className='ci-missing-row';const n=document.createElement('span');n.textContent=x.section;row.append(n);x.items.forEach(it=>{const a=document.createElement('button');a.type='button';a.className='ci-missing-link';a.textContent=it.label;a.onclick=it.go;row.append(a);});box.append(row);});host.append(box);}
+function flash(el){if(!el)return;el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('ci-flash');setTimeout(()=>el.classList.remove('ci-flash'),2200);}
+function jump(i){const si=sections.findIndex(s=>i>=s.from&&i<s.to);go(si,true);setTimeout(()=>flash(document.querySelector('#criteria .criterion[data-i="'+i+'"]')),120);}
+function go(i,keep){
+ if(!schema)return;current=Math.max(0,Math.min(FINAL(),i));
+ if(current===FINAL())renderFinal();else renderSection();
+ head();overview();stepper();navbar();if(!keep)window.scrollTo(0,0);if(dirty&&!saving)save(false);
+}
+$('prev').onclick=()=>go(current-1);$('next').onclick=()=>go(current+1);
+function UI(){return {version:1,instrument:'professional_competency',family:schema&&schema.family,scores:{...scores},studentReview:{...studentReview},period:$('pc-period').value.trim(),current};}
+function answers(){const a={};criteria.forEach(c=>{if(scores[c.id]!==undefined)a[c.id]=scores[c.id];});return a;}
+function payload(){return {answers:answers(),uiState:UI(),currentSection:current,reviewPending:studentReview.status!=='reviewed',period:$('pc-period').value.trim()};}
+function changed(){grade=grade&&gradeSig===sig()?grade:null;dirty=true;const el=document.querySelector('.rbox.quick .saved');el.textContent='● Unsaved changes';clearTimeout(timer);timer=setTimeout(()=>save(false),12000);if(current===FINAL())paintFinal();queuePreview();}
+function save(stopping){
+ if(!context||submitBusy||submitDone)return;clearTimeout(timer);if(stopping)leaveRequested=true;
+ if(saving){dirty=true;return;}saving=true;dirty=false;
+ document.querySelector('.rbox.quick .saved').textContent='↻ Saving…';post(leaveRequested?'draft_stop':'draft_save',payload());
+}
+function restore(ui){
+ if(!ui||ui.instrument!=='professional_competency')return;
+ if(ui.family&&schema&&ui.family!==schema.family){notify('Saved draft used a different form version; its ratings were not restored.');return;}
+ const ids=new Set(criteria.map(c=>c.id));Object.entries(ui.scores||{}).forEach(([k,v])=>{if(ids.has(k)&&SCALE.some(s=>s[0]===v))scores[k]=v;});
+ if(ui.studentReview)Object.assign(studentReview,ui.studentReview);
+ $('pc-period').value=String(ui.period||'');go(Number(ui.current)||0);
+}
+function queuePreview(){clearTimeout(previewTimer);if(!complete()||submitDone)return;previewTimer=setTimeout(()=>{if(previewBusy||(grade&&gradeSig===sig()))return;previewBusy=true;gradeError='';reqSig=sig();post('preview',payload());paintFinal();},700);}
+function openReview(){if(!context)return;post('review_open',{review:{...studentReview}});}
+function finalize(){
+ if(!submitAllowed||submitBusy||submitDone||awaitingSubmit){notify('Official submission is unavailable or already in progress');return;}
+ if(!complete()){renderMissing();flash($('ci-final-missing'));notify('Some criteria are not finished yet. Use the links under "Still to complete".');return;}
+ if(!studentReview.strengths.trim()&&!studentReview.improvements.trim()&&!confirm('No strengths or areas for improvement were entered. These print on the official form. Submit anyway?'))return;
+ awaitingSubmit=true;prepared=payload();
+ if(grade&&gradeSig===sig()){confirmSubmit();return;}
+ if(previewBusy){notify('Official grade is being calculated…');return;}previewBusy=true;reqSig=sig();post('preview',prepared);notify('Checking official grading before final confirmation…');
+}
+function confirmSubmit(){
+ awaitingSubmit=false;
+ const msg='Finalize Professional Competency ('+schema.versionLabel+') for '+(context.student||'the selected student')+'?\n\nOfficial grade: '+Number(grade.percentGrade).toFixed(2)+'% · '+grade.result+'\nStudent review: '+(studentReview.status==='reviewed'?'Reviewed with Student':'Review Pending')+'\n\nThis files the official evaluation in the student folder, records the grade and emails the coordinators. Continue?';
+ if(!confirm(msg)){prepared=null;notify('Finalization canceled; draft preserved');return;}
+ submitBusy=true;const s=$('ci-final-submit');s.disabled=true;s.textContent='Submitting…';notify('Submitting official evaluation · do not close this page…');
+ post('submit',prepared||payload());prepared=null;
+}
+function wire(){
+ $('ci-quick-save').onclick=()=>{if(!context){notify('Evaluation is not ready');return;}save(false);};
+ $('ci-quick-return').onclick=()=>{leaveTarget='evaluations';save(true);};
+ $('ci-quick-review').onclick=openReview;
+ $('ci-quick-scoring').onclick=()=>post('scoring_guide_open',{instrument:'professional_competency',family:schema&&schema.family});
+ $('ci-quick-print').onclick=()=>{if(!context)return;post('draft_print_open',{title:'PROFESSIONAL COMPETENCY ('+(schema.versionLabel||'')+') — DRAFT REVIEW',student:context.student,studentId:context.studentId,examination:schema.versionLabel,date:context.date,
+  savedStatus:document.querySelector('.rbox.quick .saved').textContent,grade:grade?{result:grade.result,finalScore:Number(grade.rawScore).toFixed(2)}:null,
+  rows:criteria.map((c,i)=>({section:'Criterion '+(i+1)+' · weight '+c.weight,criterion:c.title,rating:scores[c.id]??'Not scored'})),images:[],
+  comments:{'Positive strengths':studentReview.strengths,'Areas for improvement':studentReview.improvements,'Review discussion':studentReview.discussion}});};
+ $('pc-period').addEventListener('input',()=>changed());
+}
+window.addEventListener('message',e=>{
+ const msg=e.data||{};if(msg.source!=='ci-eval-parent')return;const p=msg.payload||{};
+ if(msg.type==='init'){
+  context=p.context;schema=p.schema;criteria=(schema.criteria||[]).map(c=>({id:String(c.id),title:String(c.title),weight:Number(c.weight)}));buildSections();
+  const v12=schema.family==='Clinical 1-2';
+  $('pc-version').className=v12?'v12':'v35';$('pc-version-title').textContent='PROFESSIONAL COMPETENCY EVALUATION: '+schema.versionLabel;
+  $('pc-version-note').textContent=(schema.clinicalTerm||'')+' · '+criteria.length+' weighted criteria · version chosen automatically from the student’s clinical term';
+  const chip=$('pc-ver-chip');chip.className='ver '+(v12?'v12':'v35');chip.textContent=v12?'Clinical 1 & 2':'Clinical 3 – 5';
+  $('pc-student').textContent=context.student||schema.student||'';$('pc-student-id').textContent='Student ID: '+(context.studentId||'');
+  $('pc-initials').textContent=String(context.student||'').split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase();
+  $('pc-site').textContent=schema.site||context.site||'';$('pc-date').textContent=context.date||'';$('pc-evaluator').textContent=schema.evaluator||context.evaluator||'';
+  go(0);
+  if(p.initialDraft&&p.initialDraft.success===false)notify('Draft storage unavailable: '+p.initialDraft.error);
+  post('draft_load',{});post('release_status',{});return;
+ }
+ if(msg.type==='draft_loaded'){if(p.found&&p.draft&&p.draft.uiState)restore(p.draft.uiState);notify(p.found&&p.draft&&p.draft.uiState?'Draft restored':'New evaluation · not submitted');return;}
+ if(msg.type==='release_status'){submitAllowed=Boolean(p.submitEnabled);if(!submitAllowed)notify('Draft mode · official submission is not enabled');paintFinal();return;}
+ if(msg.type==='save_and_leave'){leaveTarget=String(p.target||'evaluations');if(submitDone){post('exit',{target:leaveTarget});return;}save(true);return;}
+ if(msg.type==='review_result'){const r=p.review||{};['strengths','improvements','discussion'].forEach(k=>studentReview[k]=String(r[k]||'').slice(0,8000));
+  studentReview.status=r.status==='reviewed'?'reviewed':'pending';studentReview.reviewedAt=studentReview.status==='reviewed'?r.reviewedAt:null;changed();notify('Student review updated; saving draft…');return;}
+ if(msg.type==='save_result'){saving=false;const t=p.savedAt&&!isNaN(Date.parse(p.savedAt))?new Date(p.savedAt).toLocaleTimeString():'';
+  document.querySelector('.rbox.quick .saved').textContent=dirty?'● Unsaved changes':'✓ Saved '+t;
+  if(dirty){save(leaveRequested);return;}if(p.stopping||leaveRequested){leaveRequested=false;post('exit',{target:leaveTarget});}return;}
+ if(msg.type==='preview_result'){previewBusy=false;
+  if(reqSig!==sig()){grade=null;awaitingSubmit=false;prepared=null;paintFinal();queuePreview();return;}
+  grade=p;gradeSig=reqSig;gradeError='';paintFinal();if(awaitingSubmit)confirmSubmit();return;}
+ if(msg.type==='submit_error'){submitBusy=false;awaitingSubmit=false;paintFinal();notify('Submission NOT confirmed: '+String(p.message||'Unknown error'));gradeError='Submission NOT confirmed: '+String(p.message||'Unknown error');paintFinal();return;}
+ if(msg.type==='submit_result'){submitBusy=false;submitDone=true;const s=$('ci-final-submit');if(s){s.disabled=true;s.textContent='Submitted';}
+  renderMissing();const host=$('ci-final-details');if(host){host.replaceChildren();const box=document.createElement('div');box.id='ci-eval-confirmation';box.setAttribute('role','status');box.style.cssText='padding:12px;border:1px solid #a3cfaa;background:#ebf8ed;border-radius:8px;text-align:left';
+   const t=document.createElement('strong');t.textContent='Official Professional Competency recorded';const n=document.createElement('p');n.textContent='Submission ID: '+String(p.sourceId||p.submissionId||'')+(p.gradeRecordId?' · Grade Record '+p.gradeRecordId:'')+' · coordinator email '+String(p.mailStatus||'').toLowerCase();box.append(t,n);
+   const d=p.document||{};[['Open evaluation sheet',d.docUrl],['Open evaluation PDF',d.pdfUrl]].forEach(([l,u])=>{if(typeof u==='string'&&/^https:\/\/(docs|drive)\.google\.com\//.test(u)){const a=document.createElement('a');a.textContent=l;a.href=u;a.target='_blank';a.rel='noopener noreferrer';a.style.cssText='margin-right:12px;color:#0969b5';box.append(a);}});
+   const back=document.createElement('button');back.type='button';back.textContent='Return to Evaluations';back.style.cssText='display:block;margin-top:10px;padding:8px 12px;border:1px solid #0877dc;border-radius:7px;background:#fff;color:#0764be;font-weight:bold';back.onclick=()=>post('exit',{});box.append(back);host.append(box);}
+  notify('Official Professional Competency committed');return;}
+ if(msg.type==='error'){const a=String(p.action||''),d=String(p.message||'Unknown error');
+  if(a==='draft_save'||a==='draft_stop'||a==='draft_load'){saving=false;dirty=true;leaveRequested=false;document.querySelector('.rbox.quick .saved').textContent='⚠ Not saved';notify('Draft storage unavailable: '+d);}
+  else if(a==='release_status'){submitAllowed=false;paintFinal();}
+  else{previewBusy=false;awaitingSubmit=false;prepared=null;gradeError='Unable to calculate grade: '+d;paintFinal();notify(gradeError);}
+ }
+});
+document.addEventListener('click',e=>{const d=e.target.closest('.dictate');if(d)e.preventDefault();});
+wire();
+})();
+</script>
+</body></html>

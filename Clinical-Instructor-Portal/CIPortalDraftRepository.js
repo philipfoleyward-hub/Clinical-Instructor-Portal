@@ -100,6 +100,7 @@ function ciDraftList_(evaluatorId){
     if(String(data.evaluatorId)!==String(evaluatorId))continue;
     result.push({submissionId:data.submissionId,studentId:data.studentId,
       siteId:data.siteId,examinationId:data.examinationId,date:data.date,
+      evaluationType:data.evaluationType||'Competency',
       currentSection:data.currentSection||0,savedAt:data.savedAt||'',
       reviewPending:Boolean(data.reviewPending)});
   }
@@ -111,8 +112,8 @@ function ciDraftList_(evaluatorId){
     const exams=ciDataRows_(book,'Examinations',['Examination ID','Examination']);
     const studentMap=new Map(students.map(r=>[String(r['Student ID']),String(r.Student||'')]));
     const examMap=new Map(exams.map(r=>[String(r['Examination ID']),String(r.Examination||'')]));
-    result.forEach(d=>{d.student=studentMap.get(d.studentId)||'';d.examination=examMap.get(d.examinationId)||'';});
-  }catch(err){console.warn('Draft list display-name lookup unavailable: '+String(err.message||err));}
+    result.forEach(d=>{d.student=studentMap.get(d.studentId)||'';d.examination=d.examinationId==='PROFESSIONAL-COMPETENCY'?'Professional Competency':(examMap.get(d.examinationId)||'');});
+  }catch(err){result.forEach(d=>{if(d.examinationId==='PROFESSIONAL-COMPETENCY')d.examination='Professional Competency';});console.warn('Draft list display-name lookup unavailable: '+String(err.message||err));}
   result.sort((a,b)=>String(b.savedAt).localeCompare(String(a.savedAt)));
   return {success:true,drafts:result.slice(0,100),count:result.length};
 }

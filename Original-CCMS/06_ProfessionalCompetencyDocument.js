@@ -56,17 +56,17 @@ function pcV2_verifyParent_(file,folderId) {
   if(!valid)throw new Error('Generated file is not within the authorized student evaluation folder.');
 }
 function pcV2_buildDocument_(input,priorId) {
-const fileName = [
-  input.student.student,
-  'Professional Competency Evaluation',
-  Utilities.formatDate(
-    input.evaluationDate,
-    Session.getScriptTimeZone(),
-    'MM-dd-yyyy'
-  )
-].join(' - ');
-
-  
+  // Approved file name: "<Student> - Professional Competency Evaluation - MM-dd-yyyy".
+  const fileName=pcV2_safeName_([
+    input.student.student,
+    'Professional Competency Evaluation',
+    Utilities.formatDate(input.date,Session.getScriptTimeZone(),'MM-dd-yyyy')
+  ].join(' - '));
+  // Retry-safe: reuse ONLY the copy this submission already checkpointed.
+  // Never reuse by name: two evaluations on one day share the same name.
+  const file=priorId
+    ? DriveApp.getFileById(priorId)
+    : DriveApp.getFileById(PC_V2_TEMPLATES[input.score.family]).makeCopy(fileName,input.folder.folder);
   pcV2_verifyParent_(file,input.folder.folderId);
   const book=SpreadsheetApp.openById(file.getId());
   const sheet=book.getSheetByName('Sheet1');
@@ -114,7 +114,7 @@ const fileName = [
 }
 function pcV2_buildPdf_(input,document,priorId) {
   const name=document.name+'.pdf';
-  let existing=priorId?DriveApp.getFileById(priorId):pcV2_findExactFile_(input.folder.folder,name,MimeType.PDF);
+  const existing=priorId?DriveApp.getFileById(priorId):null;
   if(existing){pcV2_verifyParent_(existing,input.folder.folderId);
     return {pdfId:existing.getId(),url:existing.getUrl()};}
   const exportUrl='https://docs.google.com/spreadsheets/d/'+encodeURIComponent(document.docId)+
