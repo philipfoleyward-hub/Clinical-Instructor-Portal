@@ -8,6 +8,14 @@
 .ci-secondary-chevron{color:#0a6fc6;font-size:19px}.ci-secondary-tag{display:inline-block;color:#0878e5;background:#eaf3fc;border-radius:99px;min-width:22px;height:22px;text-align:center;font-size:13px;line-height:22px}
 .ci-secondary-label{font-size:12px;font-weight:800;letter-spacing:.045em;color:#7a91a6;padding:13px 14px 7px}
 .ci-secondary-detail{max-width:540px;border:1px solid #d7e5f0;border-radius:11px;background:white;padding:22px;color:#214360}.ci-secondary-detail p{line-height:1.6;font-size:14px;color:#5e7288}
+.ci-res-wrap{max-width:900px}.ci-res-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 12px}.ci-res-bar h2{margin:0;font-size:20px;color:#112944;flex:1 1 auto}
+.ci-res-meta{color:#5e7288;font-size:12px}.ci-res-btn{border:1px solid #0878e5;background:#fff;color:#0878e5;border-radius:8px;padding:8px 12px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}.ci-res-btn:disabled{opacity:.6}
+.ci-res-doc{width:100%;border:1px solid #d7e5f0;border-radius:10px;background:#fff;min-height:70vh;display:block}
+.ci-res-status{padding:18px;border:1px dashed #c9d9e6;border-radius:10px;color:#5e7288;background:#fafcfe}
+.ci-sg h3{font-size:16px;color:#112944;margin:22px 0 8px}.ci-sg p,.ci-sg li{font-size:14px;line-height:1.55;color:#33506b}.ci-sg table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}
+.ci-sg th,.ci-sg td{border:1px solid #dce6ee;padding:7px 9px;text-align:left;vertical-align:top}.ci-sg th{background:#f1f6fa;color:#183a5a}
+.ci-sg .s0{background:#fde8e8}.ci-sg .s1{background:#fff6d6}.ci-sg .s2,.ci-sg .s3{background:#e6f5ec}.ci-sg details{border:1px solid #dce6ee;border-radius:8px;margin:6px 0;background:#fff}
+.ci-sg summary{cursor:pointer;padding:9px 12px;font-weight:700;color:#183a5a}.ci-sg details table{margin:0 0 6px}.ci-sg .formula{background:#f1f6fa;border-radius:8px;padding:10px 12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:#183a5a;white-space:pre-wrap}
 @media(max-width:600px){.ci-secondary-panel{padding:15px 12px}.ci-secondary-row{font-size:15px}}
 </style>
 <section id="ci-workspace-view" hidden class="ci-secondary-panel" aria-label="My CI Workspace">
@@ -27,22 +35,91 @@
  <div class="ci-secondary-list" id="ci-resources-items">
   <button type="button" class="ci-secondary-row primary" data-ci-group="resources" data-ci-feature="Program Handbook"><span>Program Handbook</span><span class="ci-secondary-chevron">›</span></button>
   <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Clinical Syllabus"><span>Clinical Syllabus</span><span class="ci-secondary-chevron">›</span></button>
-  <div class="ci-secondary-label">CLINICAL REFERENCES</div>
-  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Exposure Grading Scales"><span>Exposure Grading Scales</span><span class="ci-secondary-chevron">›</span></button>
+  <div class="ci-secondary-label">EVALUATION</div>
   <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Evaluation &amp; Scoring Guide"><span>Evaluation &amp; Scoring Guide</span><span class="ci-secondary-chevron">›</span></button>
-  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Competency Reference"><span>Competency Reference</span><span class="ci-secondary-chevron">›</span></button>
-  <button type="button" class="ci-secondary-row" data-ci-group="resources" data-ci-feature="Program Contacts"><span>Program Contacts</span><span class="ci-secondary-chevron">›</span></button>
+  <!-- Exposure Grading Scales, Competency Reference and Program Contacts: hidden until instructor input is gathered. -->
  </div>
  <div id="ci-resources-detail" hidden></div>
 </section>
 <script>
 (function(){
- const allowed={workspace:['Notifications','My Submissions','Mileage Submission','Program Requests','Survey Responses','Email Coordinator / Program'],resources:['Program Handbook','Clinical Syllabus','Exposure Grading Scales','Evaluation & Scoring Guide','Competency Reference','Program Contacts']};
+ const allowed={workspace:['Notifications','My Submissions','Mileage Submission','Program Requests','Survey Responses','Email Coordinator / Program'],resources:['Program Handbook','Clinical Syllabus','Evaluation & Scoring Guide']};
  window.ciSecondaryBack=function(group){const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(items&&detail){items.hidden=false;detail.hidden=true;detail.replaceChildren();}};
- window.ciSecondaryOpen=function(group,feature){if(!allowed[group]?.includes(feature))return;const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(!items||!detail)return;
+ window.ciSecondaryOpen=function(group,feature){if(!allowed[group]?.includes(feature))return;if(group==='resources'&&window.ciResourceOpen_){window.ciResourceOpen_(feature);return;}const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(!items||!detail)return;
   items.hidden=true;detail.hidden=false;detail.replaceChildren();const back=document.createElement('button');back.className='ci-secondary-back';back.type='button';back.textContent='‹';back.setAttribute('aria-label','Back to '+group);back.onclick=()=>ciSecondaryBack(group);
   const box=document.createElement('div');box.className='ci-secondary-detail';const h=document.createElement('h2');h.textContent=feature;const p=document.createElement('p');p.textContent='This section is part of the approved portal navigation. Its data, permissions and actions will be connected in a dedicated implementation pass; no records or notifications are generated from this screen.';box.append(h,p);detail.append(back,box);
  };
  document.addEventListener('click',function(e){const b=e.target.closest('[data-ci-group][data-ci-feature]');if(!b)return;ciSecondaryOpen(b.dataset.ciGroup,b.dataset.ciFeature);});
+})();
+</script>
+
+<script>
+(function(){
+ const DOCS={'Program Handbook':'handbook','Clinical Syllabus':'syllabus'};
+ function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+ function shell(title){
+  const items=document.getElementById('ci-resources-items'),detail=document.getElementById('ci-resources-detail');
+  items.hidden=true;detail.hidden=false;detail.replaceChildren();
+  const wrap=el('div','ci-res-wrap'),bar=el('div','ci-res-bar');
+  const back=el('button','ci-secondary-back','‹');back.type='button';back.setAttribute('aria-label','Back to Resources');back.onclick=()=>ciSecondaryBack('resources');
+  const h=el('h2','',title);bar.append(back,h);wrap.append(bar);detail.append(wrap);return {wrap,bar};
+ }
+ function fail(target,err){target.replaceChildren(el('div','ci-res-status','Could not load this resource: '+String(err?.message||err)));}
+ function openDoc(title,key){
+  const {wrap,bar}=shell(title);const status=el('div','ci-res-status','Loading '+title+'…');wrap.append(status);
+  const meta=el('span','ci-res-meta','');const pdf=el('button','ci-res-btn','Download PDF');pdf.type='button';bar.append(meta,pdf);
+  pdf.onclick=()=>{pdf.disabled=true;pdf.textContent='Preparing PDF…';
+   ciRun('ciR1ResourcePdf',ciToken,key).then(r=>{
+    const bytes=Uint8Array.from(atob(r.base64),c=>c.charCodeAt(0));const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+    const a=document.createElement('a');a.href=url;a.download=r.fileName||title+'.pdf';document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);pdf.textContent='Download PDF';pdf.disabled=false;
+   }).catch(e=>{pdf.textContent='Download PDF';pdf.disabled=false;alert('PDF unavailable: '+String(e?.message||e));});};
+  ciRun('ciR1ResourceDocument',ciToken,key).then(r=>{
+   meta.textContent='Updated '+r.updated;
+   const frame=document.createElement('iframe');frame.className='ci-res-doc';frame.title=title;
+   frame.setAttribute('sandbox','allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+   const style='<style>body{margin:0;padding:18px clamp(12px,4vw,40px);max-width:860px;font-family:Inter,"Segoe UI",Arial,sans-serif;color:#1d3550;line-height:1.5;overflow-wrap:anywhere}img{max-width:100%!important;height:auto!important}table{max-width:100%!important;width:auto!important;display:block;overflow-x:auto}body>*{max-width:100%!important}</style>';
+   frame.srcdoc=String(r.html).replace(/<head([^>]*)>/i,'<head$1><base target="_blank">'+style);
+   frame.onload=()=>{try{const d=frame.contentDocument;const fit=()=>{frame.style.height=Math.max(500,d.documentElement.scrollHeight+24)+'px';};fit();setTimeout(fit,600);setTimeout(fit,2000);}catch(e){}};
+   status.replaceWith(frame);
+  }).catch(e=>fail(status.parentNode?status:wrap,e));
+ }
+ function fmt(n){return (n>0?'+':'')+String(n);}
+ function openGuide(){
+  const {wrap}=shell('Evaluation & Scoring Guide');const status=el('div','ci-res-status','Loading the current scoring rules…');wrap.append(status);
+  ciRun('ciR1ScoringGuide',ciToken).then(g=>{
+   const box=el('div','ci-sg');const p=g.penalties,pass=Number(g.rules.passEach).toFixed(1);
+   const add=(tag,text,cls)=>{const e=el(tag,cls,text);box.append(e);return e;};
+   add('p','These rules are read live from the CCMS Scoring Weights and Image Scoring Rules sheets and the official evaluation form, so they always match how grades are calculated.');
+   add('h3','1. Performance rating scale');
+   const t1=el('table');t1.innerHTML='<tr><th>Score</th><th>Meaning</th></tr>';
+   [['0','Gross Error'],['1','Minor Error'],['2','Satisfactory'],['3','Optimal'],['N/A','Not applicable — not scored and not counted']].forEach(([s,m],i)=>{const tr=document.createElement('tr');tr.className=i<4?'s'+i:'';tr.append(el('td','',s),el('td','',m));t1.append(tr);});box.append(t1);
+   add('h3','2. How each performance section is calculated');
+   add('p','Every criterion has a weight. A criterion’s points are its score × its weight. N/A criteria are left out of both the points and the weights.');
+   add('div','Section score = (sum of score × weight) ÷ (sum of weights scored)\nPerformance score = the same calculation across all sections together','formula');
+   add('p','Example: criteria weighted 2 and 1, scored 3 and 2 → (3×2 + 2×1) ÷ (2+1) = 8 ÷ 3 = 2.67.');
+   (g.sections||[]).forEach(s=>{const d=document.createElement('details');d.append(el('summary','',s.title+' — '+s.criteria.length+' criteria'));
+    const t=el('table');t.innerHTML='<tr><th>#</th><th>Criterion</th><th>Weight</th></tr>';
+    s.criteria.forEach((c,i)=>{const tr=document.createElement('tr');tr.append(el('td','',String(i+1)),el('td','',c.criterion),el('td','',c.weight==null?'—':String(c.weight)));t.append(tr);});d.append(t);box.append(d);});
+   add('h3','3. Image evaluation');
+   add('p','Each view is scored 0–3 on each of its image criteria. The official descriptions are:');
+   (g.image||[]).filter(q=>!/marker/i.test(q.title)).forEach(q=>{const d=document.createElement('details');d.append(el('summary','',q.title));
+    const t=el('table');q.choices.forEach(c=>{const m=String(c).match(/^\s*([0-3])/);const tr=document.createElement('tr');if(m)tr.className='s'+m[1];tr.append(el('td','',c));t.append(tr);});d.append(t);box.append(d);});
+   add('h3','4. Image penalties');
+   const t2=el('table');t2.innerHTML='<tr><th>Situation</th><th>Points</th></tr>';
+   [['Any criterion scored 0 in a view (applied once per view)',p.zero],['Missing marker (per view)',p.missingMarker],['Wrong marker (per view)',p.wrongMarker],['Illegible or poorly placed marker (per view)',p.illegibleMarker]]
+    .forEach(([a,b])=>{const tr=document.createElement('tr');tr.append(el('td','',a),el('td','',fmt(b)));t2.append(tr);});box.append(t2);
+   add('div','Image score = (all image criterion scores + all penalties) ÷ (number of image criteria scored)\nThe image score never goes below 0.','formula');
+   add('p','Example: one view scored 3, 2, 0, 3 with a correct marker → (8 '+fmt(p.zero)+') ÷ 4 = '+((8+Number(p.zero))/4).toFixed(2)+'.');
+   add('h3','5. Final grade and pass rule');
+   add('div','Final competency grade = (Performance score + Image score) ÷ 2','formula');
+   const ul=el('ul');[
+    'To pass, the Performance score AND the Image score must each be '+pass+' or higher.',
+    'An Automatic Failure makes the final competency grade 0.0, whatever the other scores are.',
+    'Scores are on a 0–'+g.rules.scaleMax+' scale.'].forEach(x=>ul.append(el('li','',x)));box.append(ul);
+   status.replaceWith(box);
+  }).catch(e=>fail(status,e));
+ }
+ window.ciResourceOpen_=function(feature){if(DOCS[feature])openDoc(feature,DOCS[feature]);else if(feature==='Evaluation & Scoring Guide')openGuide();};
 })();
 </script>
