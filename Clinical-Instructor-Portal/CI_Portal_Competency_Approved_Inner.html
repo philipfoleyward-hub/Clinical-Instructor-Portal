@@ -1160,24 +1160,28 @@ function save(stopping){
  // while uiState also preserves incomplete sections exactly for resume.
  try{Object.assign(data,exportAnswers());}catch(e){data.answers={};}
  post((stopping||ciLeaveRequested)?'draft_stop':'draft_save',data);saving=true;dirty=false;const el=document.querySelector('.rbox.quick .saved');if(el)el.textContent='↻ Saving…';notify((stopping||ciLeaveRequested)?'Saving before leaving…':'Saving draft…');}
-let ciSpeech_=null;
-function dictation(textarea,button){
+// Google's Apps Script wrapper frame does not delegate microphone access, so
+// in-page speech recognition is always refused. Dictate instead focuses the
+// comment box and shows how to start the device's own voice typing.
+function ciVoiceTypingTip_(){
+ const ua=navigator.userAgent||'',plat=String(navigator.userAgentData?.platform||navigator.platform||'');
+ if(/iPhone|iPad|iPod/i.test(ua)||(/Mac/i.test(plat)&&navigator.maxTouchPoints>1))return 'Tap the 🎤 on your keyboard and start speaking.';
+ if(/Android/i.test(ua))return 'Tap the 🎤 on your keyboard and start speaking.';
+ if(/Win/i.test(plat))return 'Press Windows key + H and start speaking.';
+ if(/Mac/i.test(plat))return 'Press Fn twice (or the 🎤 key) and start speaking.';
+ if(/CrOS/i.test(ua))return 'Press Search + D (or Launcher + D) and start speaking.';
+ return 'Use your device’s voice typing (the 🎤 on your keyboard) and start speaking.';
+}
+function dictation(textarea){
  if(!textarea)return;
- if(ciSpeech_){try{ciSpeech_.stop();}catch(e){}ciSpeech_=null;return;}
- const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SpeechRecognition){notify('Speech recognition is unavailable in this browser or embedded editor. Type comments, or use your device’s voice typing.');return;}
- const rec=new SpeechRecognition();rec.lang='en-US';rec.interimResults=false;rec.continuous=false;
- ciSpeech_=rec;
- if(button)button.textContent='■ Stop Dictation';
- rec.onresult=e=>{
-   const phrase=Array.from(e.results||[]).map(r=>r[0]?.transcript||'').join(' ').trim();
-   if(!phrase)return;
-   const space=textarea.value&&!/\s$/.test(textarea.value)?' ':'';
-   textarea.value+=space+phrase;textarea.dispatchEvent(new Event('input',{bubbles:true}));
- };
- rec.onerror=e=>{const reason=String(e.error||'browser error');notify(reason==='not-allowed'?'Microphone denied by browser or embedded page. Check site permission; if policy blocks embedded speech recognition, use approved device voice typing.':'Dictation unavailable ('+reason+'). Use the comment box or approved device voice typing.');};
- rec.onend=()=>{if(ciSpeech_===rec)ciSpeech_=null;if(button)button.textContent='🎙 Dictate';};
- try{rec.start();notify('Listening for your comments…');}catch(e){ciSpeech_=null;if(button)button.textContent='🎙 Dictate';notify('Dictation could not start: '+String(e.message||e));}
+ textarea.focus();try{const n=textarea.value.length;textarea.setSelectionRange(n,n);}catch(e){}
+ const tip=ciVoiceTypingTip_();
+ let hint=textarea.parentElement&&textarea.parentElement.querySelector('.ci-voice-tip');
+ if(!hint){hint=document.createElement('div');hint.className='ci-voice-tip';hint.setAttribute('role','status');
+  hint.style.cssText='margin:6px 0 0;padding:7px 10px;border-radius:6px;background:#e8f3fb;border:1px solid #9cc8e8;color:#17496f;font-size:12px;font-weight:600';
+  textarea.insertAdjacentElement('afterend',hint);}
+ hint.textContent='🎙 Voice typing: '+tip;
+ clearTimeout(hint._t);hint._t=setTimeout(()=>hint.remove(),9000);
 }
 window.ciEvalDictate_=dictation;
 function setupDictation(){/* Delegated native dictation handler below survives approved re-renders. */}
