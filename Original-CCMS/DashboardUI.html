@@ -6615,7 +6615,7 @@ function v2ApplyAssets() {
   document.querySelectorAll('[data-asset-bg]').forEach(function(el) {
     const k = el.getAttribute('data-asset-bg');
     if (a[k]) el.style.backgroundImage = (k === 'HOME_HERO'
-      ? 'linear-gradient(90deg,rgba(255,240,226,.97) 0%,rgba(255,238,222,.93) 52%,rgba(255,236,220,.55) 68%,rgba(255,236,220,0) 78%),'
+      ? 'linear-gradient(90deg,#fdebd9 0%,#fdead7 54%,rgba(253,234,215,0) 60%),'
       : '') + 'url("' + a[k] + '")';
   });
   document.querySelectorAll('[data-asset-img]').forEach(function(el) {
@@ -6769,11 +6769,11 @@ function v2Activity() {
     if (V2.chip === 'pending') return st !== 'reviewed' && !x.flagged;
     if (V2.chip === 'flagged') return x.flagged;
     return true;
-  }).slice(0, 25);
+  }).slice(0, 12);
   if (!items.length) return '<div class="v2-rows"><div class="muted small" style="padding:14px">Nothing here right now.</div></div>';
   let day = '', out = '';
   items.forEach(function(x) {
-    const d = String(x.date || '').slice(0, 10);
+    const d = v2DayKey(x);
     if (d !== day) {day = d; out += (out ? '</div>' : '') + '<div class="v2-day">' + v2Esc(v2DayLabel(d)) + '</div><div class="v2-rows">';}
     const reviewed = String(x.coordinatorReviewStatus || '').toLowerCase() === 'reviewed';
     const color = x.flagged ? 'r' : reviewed ? 'g' : x.kind === 'professional' ? 'p' : 'y';
@@ -6791,6 +6791,12 @@ function v2Activity() {
       (reviewed ? 'Open' : 'Review') + '</button></div>';
   });
   return out + '</div>';
+}
+function v2DayKey(x) {
+  const t = Number(x.dateValue || 0);
+  if (!t) return String(x.date || '').slice(0, 10);
+  const p = new Date(t);
+  return p.getFullYear() + '-' + String(p.getMonth() + 1).padStart(2, '0') + '-' + String(p.getDate()).padStart(2, '0');
 }
 function v2DayLabel(d) {
   if (!d) return 'Undated';

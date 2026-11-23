@@ -117,7 +117,14 @@ function dashboardV2GetHome() {
     })[0];
     if (ev) name = cpLink_t_(ev['Evaluator']);
   } catch (e) {}
-  if (!name && email.indexOf('@') > 0) name = email.split('@')[0];
+  if (!name) {
+    // Coordinator display names (not in Evaluators). Script property
+    // CCMS_USER_NAMES = {"email":"Name"} overrides these defaults.
+    let names = {'philipfoleyward@sunyorange.edu': 'Philip', 'micheleterracino@sunyorange.edu': 'Michele',
+      'nicolemurray@sunyorange.edu': 'Nicole'};
+    try {Object.assign(names, JSON.parse(PropertiesService.getScriptProperties().getProperty('CCMS_USER_NAMES') || '{}'));} catch (e) {}
+    name = names[appNormalize_(email)] || '';
+  }
   let term = '';
   try {term = cpLink_t_(clinicalTerm_getForDate(new Date()));} catch (e) {}
   const log = cpLink_rows_(ss);
