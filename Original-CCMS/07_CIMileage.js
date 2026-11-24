@@ -122,11 +122,12 @@ function cpMile_markInboxRead_(itemId) {
 /* ---------------- Google Maps ---------------- */
 function cpMile_route_(origin, destination) {
   const res = Maps.newDirectionFinder().setOrigin(origin).setDestination(destination)
-    .setMode(Maps.DirectionFinder.Mode.DRIVING).getDirections();
+    .setMode(Maps.DirectionFinder.Mode.DRIVING).setAlternatives(true).getDirections();
   if (!res || res.status !== 'OK' || !res.routes || !res.routes.length) {
     throw new Error('Google Maps could not find a driving route to ' + destination + (res && res.status ? ' (' + res.status + ')' : ''));
   }
-  const route = res.routes[0], leg = route.legs[0];
+  // Shortest of the routes Google Maps suggests (matches how mileage has been claimed).
+  const route = res.routes.slice().sort(function(a, b) {return a.legs[0].distance.value - b.legs[0].distance.value;})[0], leg = route.legs[0];
   return {miles: cpMile_r_(leg.distance.value / 1609.344, 1), distanceText: leg.distance.text, durationText: leg.duration.text,
     summary: route.summary || '', start: leg.start_address, end: leg.end_address, polyline: route.overview_polyline && route.overview_polyline.points,
     steps: (leg.steps || []).map(function(s) {
