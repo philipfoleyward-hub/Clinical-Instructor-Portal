@@ -6285,7 +6285,7 @@ function renderSchedules() {
     <div class="landing-grid" style="margin-bottom:22px">
       <div class="landing-card"><span class="status-pill ready">Planning workspace</span><h3>Semester Clinical Planning</h3><p>Overview → Site Placement → Room Rotations → CI Coverage → Review.</p><button class="primary-button" onclick="openSemesterPlanning()">Open Semester Planning</button></div>
       <div class="landing-card"><span class="status-pill ready">Read service connected</span><h3>Attendance &amp; ETO</h3><p>Cohort attendance, ETO credited/used/available, make-up obligations, evening replacement, and review flags.</p><button class="primary-button" onclick="showPage('attendance')">Open Attendance</button></div>
-      <div class="landing-card"><span class="status-pill future">Connection pending</span><h3>CI Availability &amp; Coverage</h3><p>Availability, preferred sites, assignments, and coverage gaps will feed the planner after the Calendar/CI adapter is authoritative.</p></div>
+      <div class="landing-card"><span class="status-pill ready">Connected</span><h3>CI Availability &amp; Hours</h3><p>Approve or decline instructor availability, assign instructors to a site for a day, track hours against targets and maximums, and send availability reminders.</p><button class="primary-button" onclick="showPage('ciAvailability')">Open CI Availability &amp; Hours</button></div>
       <div class="landing-card"><span class="status-pill future">Publish phase</span><h3>Current Clinical Schedule</h3><p>The published schedule will feed Home, Student, CI, and Site “who is where” snapshots.</p></div>
     </div>
     <div class="section section-flat"><div class="section-title">Print, Export &amp; Distribution</div><div class="export-capability-grid">
@@ -6568,7 +6568,7 @@ showPage = function(page) {
 };
 function v2SetActive(page) {
   const key = {administration: 'paperwork', reports: 'paperwork', newEntry: 'paperwork', clinicalReview: 'paperwork',
-    attendance: 'schedules', review: 'home'}[page] || page;
+    attendance: 'schedules', ciAvailability: 'schedules', review: 'home'}[page] || page;
   document.querySelectorAll('.v2-nav button[data-v2]').forEach(function(b) {b.classList.toggle('active', b.dataset.v2 === key);});
   const help = document.querySelector('.v2-help');
   if (help) help.classList.toggle('active', page === 'help');
@@ -6580,6 +6580,7 @@ const v2OriginalRender = render;
 render = function() {
   if (APP.page === 'system') return v2RenderSystem();
   if (APP.page === 'help') return v2RenderHelp();
+  if (APP.page === 'ciAvailability') return v2RenderCiHours();
   return v2OriginalRender();
 };
 
@@ -6962,6 +6963,7 @@ function v2PaintAvailability() {
     '<label class="v2-dlabel" for="v2-review-notes">Note to the instructor (required to decline)</label>' +
     '<textarea id="v2-review-notes" rows="3" maxlength="2000" placeholder="e.g. Approved for St Luke\'s · or why the dates can\'t be used"></textarea>' +
     (V2.reviewMsg ? '<div class="entry-message ' + (/^✓/.test(V2.reviewMsg) ? 'success' : 'error') + '">' + v2Esc(V2.reviewMsg) + '</div>' : '') +
+    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px"><input type="checkbox" id="v2-av-email" checked> Also e-mail the instructor</label>' +
     '<div class="v2-dactions"><button class="v2-btn-red" ' + (V2.reviewBusy ? 'disabled' : '') + ' onclick="v2AvailabilityDecide(\'Declined\')">Decline selected</button>' +
     '<button class="primary-button" ' + (V2.reviewBusy ? 'disabled' : '') + ' onclick="v2AvailabilityDecide(\'Approved\')">Approve selected</button></div>' +
     '<div class="muted small">The calendar entry turns green (approved) or red (declined) and the instructor gets a notification with your note.</div></div></div>';
@@ -6973,11 +6975,163 @@ function v2AvailabilityDecide(decision) {
   if (!ids.length) {V2.reviewMsg = 'Select at least one date.'; v2PaintAvailability(); return;}
   if (decision === 'Declined' && !notes.trim()) {V2.reviewMsg = 'Add a note so the instructor knows why.'; v2PaintAvailability(); return;}
   V2.reviewBusy = true; V2.reviewMsg = ''; v2PaintAvailability();
-  v2Run('dashboardV2AvailabilityDecide', [{notificationId: d.notificationId, eventIds: ids, decision: decision, notes: notes}], function(r) {
+  const emailBox = document.getElementById('v2-av-email');
+  v2Run('dashboardV2AvailabilityDecideEvents', [{eventIds: ids, decision: decision, notes: notes, email: !emailBox || emailBox.checked}], function(r) {
     V2.reviewBusy = false; const msg = '✓ ' + (r.events || []).length + ' date' + ((r.events || []).length === 1 ? '' : 's') + ' ' + decision.toLowerCase() + ' · instructor notified';
     v2LoadHome(true);
     v2Run('dashboardV2AvailabilityDetail', [d.notificationId], function(x) {x.availability = true; x.notificationId = d.notificationId; V2.review = x; V2.reviewMsg = msg; v2PaintAvailability();});
   }, function(e) {V2.reviewBusy = false; V2.reviewMsg = errorMessage(e); v2PaintAvailability();});
+}
+
+/* ---------- CI Availability & Hours (Scheduling) ---------- */
+V2.hours = {from: '', to: '', data: null, loading: false, error: '', filter: 'Pending', ci: '', msg: ''};
+function v2IsoDay(d) {return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');}
+function v2HoursPreset(kind) {
+  const t = new Date(), y = t.getFullYear();
+  const p = {month: [new Date(y, t.getMonth(), 1), new Date(y, t.getMonth() + 1, 0)],
+    spring: [new Date(y, 0, 1), new Date(y, 4, 31)], summer: [new Date(y, 5, 1), new Date(y, 7, 14)], fall: [new Date(y, 7, 15), new Date(y, 11, 31)]}[kind];
+  V2.hours.from = v2IsoDay(p[0]); V2.hours.to = v2IsoDay(p[1]); v2LoadCiHours();
+}
+function v2LoadCiHours() {
+  const H = V2.hours;
+  if (!H.from) {const t = new Date(); const m = t.getMonth(); return v2HoursPreset(m >= 7 ? 'fall' : m >= 5 ? 'summer' : 'spring');}
+  H.loading = true; H.error = ''; v2RenderCiHours();
+  v2Run('dashboardV2CiHours', [{from: H.from, to: H.to}], function(d) {H.loading = false; H.data = d; v2RenderCiHours();},
+    function(e) {H.loading = false; H.error = errorMessage(e); v2RenderCiHours();});
+}
+function v2Hrs(n) {return n == null || n === '' ? '—' : (Math.round(Number(n) * 10) / 10) + ' h';}
+function v2RenderCiHours() {
+  const c = document.getElementById('content'); if (!c || APP.page !== 'ciAvailability') return;
+  const H = V2.hours, d = H.data;
+  if (!H.from && !H.loading) {setTimeout(v2LoadCiHours, 0);}
+  const toolbar = '<div class="schedule-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:10px 0 16px">' +
+    '<div><label class="small muted" for="v2h-from">From</label><br><input type="date" id="v2h-from" value="' + v2Esc(H.from) + '"></div>' +
+    '<div><label class="small muted" for="v2h-to">To</label><br><input type="date" id="v2h-to" value="' + v2Esc(H.to) + '"></div>' +
+    '<button class="primary-button" onclick="V2.hours.from=document.getElementById(\'v2h-from\').value;V2.hours.to=document.getElementById(\'v2h-to\').value;v2LoadCiHours()">Load</button>' +
+    ['month:This month', 'spring:Spring', 'summer:Summer', 'fall:Fall'].map(function(x) {const k = x.split(':'); return '<button class="secondary-button" onclick="v2HoursPreset(\'' + k[0] + '\')">' + k[1] + ' ' + (k[0] === 'month' ? '' : new Date().getFullYear()) + '</button>';}).join('') +
+    '<span style="flex:1"></span><button class="secondary-button" onclick="v2OpenReminder()" ' + (d ? '' : 'disabled') + '>✉ Email availability reminder</button></div>';
+  let body = '';
+  if (H.loading) body = '<div class="section loading">Loading availability, assignments and hours…</div>';
+  else if (H.error) body = '<div class="entry-message error">' + v2Esc(H.error) + ' <button class="secondary-button" onclick="v2LoadCiHours()">Retry</button></div>';
+  else if (d) {
+    const tot = d.totals || [];
+    body += '<div class="section"><div class="section-title">Hours by instructor · ' + v2Esc(d.from) + ' to ' + v2Esc(d.to) + '</div>' +
+      '<div class="muted small" style="margin-bottom:8px">Assigned hours come from site assignments with a start and end time. Target and maximum are per instructor for this kind of period; leave blank if not used.</div>' +
+      '<table><thead><tr><th>Instructor</th><th>Pending</th><th>Approved available</th><th>Assigned</th><th>Target</th><th>Maximum</th><th>Status</th><th></th></tr></thead><tbody>' +
+      tot.map(function(t) {
+        let st = '<span class="status-pill">—</span>';
+        if (t.max != null && t.assignedHours > t.max) st = '<span class="status-pill" style="background:#ffe8ea;color:#c4262d">Over maximum by ' + v2Hrs(t.assignedHours - t.max) + '</span>';
+        else if (t.max != null && t.assignedHours >= t.max * 0.9) st = '<span class="status-pill" style="background:#fff3cf;color:#8a5a00">Near maximum</span>';
+        else if (t.target != null && t.assignedHours < t.target) st = '<span class="status-pill" style="background:#eaf3fc;color:#0a63b4">' + v2Hrs(t.target - t.assignedHours) + ' below target</span>';
+        else if (t.target != null || t.max != null) st = '<span class="status-pill" style="background:#e6f5ec;color:#17733a">On track</span>';
+        return '<tr><td><strong>' + v2Esc(t.evaluator) + '</strong><div class="muted small">' + v2Esc(t.evaluatorId) + (t.email ? '' : ' · no e-mail on file') + '</div></td>' +
+          '<td>' + v2Hrs(t.pendingHours) + '</td><td>' + v2Hrs(t.approvedHours) + '</td><td>' + v2Hrs(t.assignedHours) + '<div class="muted small">' + t.assignedDays + ' day' + (t.assignedDays === 1 ? '' : 's') + (t.untimedAssignments ? ' · ' + t.untimedAssignments + ' without times' : '') + '</div></td>' +
+          '<td><input type="number" min="0" step="0.5" style="width:80px" id="v2t-' + v2Esc(t.evaluatorId) + '" value="' + (t.target == null ? '' : t.target) + '"></td>' +
+          '<td><input type="number" min="0" step="0.5" style="width:80px" id="v2m-' + v2Esc(t.evaluatorId) + '" value="' + (t.max == null ? '' : t.max) + '"></td>' +
+          '<td>' + st + '</td><td><button class="action-button" onclick="v2SaveCiHours(\'' + escapeJs(t.evaluatorId) + '\')">Save</button></td></tr>';
+      }).join('') + '</tbody></table></div>';
+    const list = (d.availability || []).filter(function(a) {return (H.filter === 'All' || a.status === H.filter) && (!H.ci || a.evaluatorId === H.ci);});
+    body += '<div class="section"><div class="section-title">Availability</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">' +
+      ['Pending', 'Approved', 'Declined', 'All'].map(function(f) {const n = f === 'All' ? (d.availability || []).length : (d.availability || []).filter(function(a) {return a.status === f;}).length;
+        return '<button class="' + (H.filter === f ? 'primary-button' : 'secondary-button') + '" onclick="V2.hours.filter=\'' + f + '\';v2RenderCiHours()">' + f + ' (' + n + ')</button>';}).join('') +
+      '<select onchange="V2.hours.ci=this.value;v2RenderCiHours()"><option value="">All instructors</option>' + tot.map(function(t) {return '<option value="' + v2Esc(t.evaluatorId) + '" ' + (H.ci === t.evaluatorId ? 'selected' : '') + '>' + v2Esc(t.evaluator) + '</option>';}).join('') + '</select></div>' +
+      (list.length ? '<table><thead><tr><th><input type="checkbox" onclick="document.querySelectorAll(\'.v2h-pick\').forEach(function(x){x.checked=event.target.checked})"></th><th>Date</th><th>Instructor</th><th>Hours</th><th>Note</th><th>Status</th><th>Assigned</th><th></th></tr></thead><tbody>' +
+        list.map(function(a) {
+          return '<tr><td><input type="checkbox" class="v2h-pick" value="' + v2Esc(a.eventId) + '"></td><td>' + v2Esc(v2DayLabel(a.date)) + '</td><td>' + v2Esc(a.evaluator) + '</td><td>' + v2Hrs(a.hours) +
+            (a.start ? '<div class="muted small">' + v2Esc(a.start + '–' + a.end) + '</div>' : '') + '</td><td class="small">' + v2Esc(a.note) + '</td><td>' + v2Esc(a.status) + '</td><td>' + v2Esc((a.assigned || []).join(', ') || '—') + '</td>' +
+            '<td>' + (a.status !== 'Declined' ? '<button class="action-button primary" onclick="v2OpenAssign(\'' + escapeJs(a.evaluatorId) + '\',\'' + escapeJs(a.date) + '\',\'' + escapeJs(a.start) + '\',\'' + escapeJs(a.end) + '\')">Assign to site</button>' : '') + '</td></tr>';
+        }).join('') + '</tbody></table>' +
+        '<label class="v2-dlabel" for="v2h-notes">Note to the instructor(s) (required to decline)</label><textarea id="v2h-notes" rows="2" maxlength="2000" style="width:100%"></textarea>' +
+        '<div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:8px;flex-wrap:wrap"><label class="small"><input type="checkbox" id="v2h-email" checked> Also e-mail the instructor(s)</label>' +
+        '<button class="v2-btn-red" onclick="v2HoursDecide(\'Declined\')">Decline selected</button><button class="primary-button" onclick="v2HoursDecide(\'Approved\')">Approve selected</button></div>'
+        : '<div class="empty">No ' + (H.filter === 'All' ? '' : H.filter.toLowerCase() + ' ') + 'availability in this range.</div>') + '</div>';
+    body += '<div class="section"><div class="section-title">Site assignments</div>' + ((d.assignments || []).length ?
+      '<table><thead><tr><th>Date</th><th>Instructor</th><th>Site</th><th>Time</th><th>Hours</th><th>Notes</th><th></th></tr></thead><tbody>' +
+      d.assignments.map(function(a) {
+        return '<tr><td>' + v2Esc(v2DayLabel(a.date)) + '</td><td>' + v2Esc(a.evaluator) + '</td><td>' + v2Esc(a.site) + '</td><td>' + v2Esc(a.start ? a.start + '–' + a.end : '—') + '</td><td>' + v2Hrs(a.hours) +
+          '</td><td class="small">' + v2Esc(a.notes) + '</td><td><button class="action-button" onclick="v2RemoveAssignment(\'' + escapeJs(a.assignmentId) + '\')">Cancel</button></td></tr>';
+      }).join('') + '</tbody></table>' : '<div class="empty">No site assignments in this range.</div>') +
+      '<div style="margin-top:8px"><button class="secondary-button" onclick="v2OpenAssign(\'\',\'\',\'\',\'\')">+ Assign an instructor to a site</button></div></div>';
+  }
+  c.innerHTML = '<h1 class="page-title">CI Availability &amp; Hours</h1><div class="page-subtitle">Instructors submit the dates and hours they are available in the Clinical Instructor Portal. Approve or decline, assign to a site, and keep hours within target.</div>' +
+    toolbar + (H.msg ? '<div class="entry-message ' + (/^✓/.test(H.msg) ? 'success' : 'error') + '">' + v2Esc(H.msg) + '</div>' : '') + body;
+}
+function v2HoursDecide(decision) {
+  const ids = [].map.call(document.querySelectorAll('.v2h-pick:checked'), function(x) {return x.value;});
+  const notes = (document.getElementById('v2h-notes') || {}).value || '';
+  if (!ids.length) {V2.hours.msg = 'Select at least one availability entry.'; return v2RenderCiHours();}
+  if (decision === 'Declined' && !notes.trim()) {V2.hours.msg = 'Add a note so the instructor knows why.'; return v2RenderCiHours();}
+  const email = (document.getElementById('v2h-email') || {}).checked !== false;
+  V2.hours.msg = 'Saving…'; v2RenderCiHours();
+  v2Run('dashboardV2AvailabilityDecideEvents', [{eventIds: ids, decision: decision, notes: notes, email: email}], function(r) {
+    V2.hours.msg = '✓ ' + r.entries + ' entr' + (r.entries === 1 ? 'y' : 'ies') + ' ' + decision.toLowerCase() + ' · ' + r.instructors + ' instructor' + (r.instructors === 1 ? '' : 's') + ' notified' + (email ? ' · ' + r.emailed + ' e-mailed' : '');
+    v2LoadCiHours(); v2LoadHome(true);
+  }, function(e) {V2.hours.msg = errorMessage(e); v2RenderCiHours();});
+}
+function v2SaveCiHours(id) {
+  const t = document.getElementById('v2t-' + id).value, m = document.getElementById('v2m-' + id).value;
+  v2Run('dashboardV2SetCiHours', [{evaluatorId: id, target: t, max: m}], function() {V2.hours.msg = '✓ Hours saved'; v2LoadCiHours();},
+    function(e) {V2.hours.msg = errorMessage(e); v2RenderCiHours();});
+}
+function v2RemoveAssignment(id) {
+  if (!confirm('Cancel this site assignment? It is kept in CI Assignments with status Cancelled.')) return;
+  v2Run('dashboardV2RemoveAssignment', [id], function() {V2.hours.msg = '✓ Assignment cancelled'; v2LoadCiHours();},
+    function(e) {V2.hours.msg = errorMessage(e); v2RenderCiHours();});
+}
+function v2To24(t) {
+  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(t || '').trim()); if (!m) return '';
+  let h = Number(m[1]) % 12; if (/pm/i.test(m[3])) h += 12; return String(h).padStart(2, '0') + ':' + m[2];
+}
+function v2OpenAssign(evaluatorId, date, start, end) {
+  const d = V2.hours.data || {};
+  let m = document.getElementById('v2-review-modal');
+  if (!m) {m = document.createElement('div'); m.id = 'v2-review-modal'; m.className = 'v2-modal'; document.body.appendChild(m);
+    m.addEventListener('click', function(e) {if (e.target === m) v2CloseReview();});}
+  V2.review = {assign: true};
+  m.innerHTML = '<div class="v2-dialog" role="dialog" aria-modal="true"><div class="v2-dhead"><b>Assign instructor to a site</b><button onclick="v2CloseReview()" aria-label="Close">×</button></div><div class="v2-dbody">' +
+    '<label class="v2-dlabel">Instructor</label><select id="v2a-ci" style="width:100%">' + (d.totals || []).map(function(t) {return '<option value="' + v2Esc(t.evaluatorId) + '" ' + (t.evaluatorId === evaluatorId ? 'selected' : '') + '>' + v2Esc(t.evaluator) + '</option>';}).join('') + '</select>' +
+    '<label class="v2-dlabel">Date</label><input type="date" id="v2a-date" value="' + v2Esc(date) + '">' +
+    '<label class="v2-dlabel">Clinical site</label><select id="v2a-site" style="width:100%"><option value="">Choose a site…</option>' + (d.sites || []).map(function(s) {return '<option value="' + v2Esc(s.siteId) + '">' + v2Esc(s.site) + '</option>';}).join('') + '</select>' +
+    '<div style="display:flex;gap:10px"><div><label class="v2-dlabel">Start (for hours)</label><input type="time" id="v2a-start" value="' + v2Esc(v2To24(start)) + '"></div><div><label class="v2-dlabel">End</label><input type="time" id="v2a-end" value="' + v2Esc(v2To24(end)) + '"></div></div>' +
+    '<label class="v2-dlabel">Note (optional)</label><textarea id="v2a-notes" rows="2" maxlength="500" style="width:100%"></textarea>' +
+    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px"><input type="checkbox" id="v2a-email" checked> E-mail the instructor</label>' +
+    '<div id="v2a-msg" class="small" style="margin-top:6px"></div><div class="v2-dactions"><button class="secondary-button" onclick="v2CloseReview()">Cancel</button><button class="primary-button" id="v2a-go" onclick="v2DoAssign()">Assign</button></div>' +
+    '<div class="muted small">Creates a CI Assignments record (status Current). The instructor sees it as their clinical site in the Portal and gets a notification.</div></div></div>';
+}
+function v2DoAssign() {
+  const g = function(id) {return document.getElementById(id);};
+  const req = {evaluatorId: g('v2a-ci').value, date: g('v2a-date').value, siteId: g('v2a-site').value, start: g('v2a-start').value, end: g('v2a-end').value, notes: g('v2a-notes').value, email: g('v2a-email').checked};
+  if (!req.evaluatorId || !req.date || !req.siteId) {g('v2a-msg').textContent = 'Choose the instructor, date and site.'; return;}
+  if (!!req.start !== !!req.end) {g('v2a-msg').textContent = 'Enter both a start and an end time, or neither.'; return;}
+  g('v2a-go').disabled = true; g('v2a-msg').textContent = 'Saving…';
+  v2Run('dashboardV2AssignCi', [req], function(r) {
+    v2CloseReview(); V2.hours.msg = '✓ Assigned (' + r.assignmentId + ')' + (r.emailed ? ' · instructor e-mailed' : '') + ' · instructor notified'; v2LoadCiHours();
+  }, function(e) {g('v2a-go').disabled = false; g('v2a-msg').textContent = errorMessage(e);});
+}
+function v2OpenReminder() {
+  const d = V2.hours.data || {}, tot = d.totals || [];
+  let m = document.getElementById('v2-review-modal');
+  if (!m) {m = document.createElement('div'); m.id = 'v2-review-modal'; m.className = 'v2-modal'; document.body.appendChild(m);
+    m.addEventListener('click', function(e) {if (e.target === m) v2CloseReview();});}
+  V2.review = {reminder: true};
+  const fmt = function(s) {const p = new Date(s + 'T12:00:00'); return p.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});};
+  m.innerHTML = '<div class="v2-dialog" role="dialog" aria-modal="true"><div class="v2-dhead"><b>Remind instructors to submit availability</b><button onclick="v2CloseReview()" aria-label="Close">×</button></div><div class="v2-dbody">' +
+    '<div class="muted small">Pre-selected: instructors with no availability submitted for ' + v2Esc(d.from) + ' to ' + v2Esc(d.to) + '. Each gets an e-mail and a Portal notification.</div>' +
+    tot.map(function(t) {const none = !t.pendingHours && !t.approvedHours;
+      return '<label style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #eef2f6"><input type="checkbox" class="v2r-pick" value="' + v2Esc(t.evaluatorId) + '" ' + (none && t.email ? 'checked' : '') + (t.email ? '' : ' disabled') + '><span style="flex:1">' + v2Esc(t.evaluator) + (t.email ? '' : ' <span class="muted small">(no e-mail on file)</span>') + '</span><span class="muted small">' + (none ? 'Nothing submitted' : v2Hrs(t.pendingHours + t.approvedHours) + ' submitted') + '</span></label>';}).join('') +
+    '<label class="v2-dlabel">Period (shown in the e-mail)</label><input id="v2r-period" style="width:100%" value="' + v2Esc(fmt(d.from) + ' – ' + fmt(d.to)) + '">' +
+    '<label class="v2-dlabel">Message (optional)</label><textarea id="v2r-msg" rows="3" maxlength="2000" style="width:100%" placeholder="e.g. Please submit by Friday so the schedule can be finalized."></textarea>' +
+    '<div id="v2r-status" class="small" style="margin-top:6px"></div><div class="v2-dactions"><button class="secondary-button" onclick="v2CloseReview()">Cancel</button><button class="primary-button" id="v2r-go" onclick="v2SendReminder()">Send reminder</button></div></div></div>';
+}
+function v2SendReminder() {
+  const ids = [].map.call(document.querySelectorAll('.v2r-pick:checked'), function(x) {return x.value;});
+  const st = document.getElementById('v2r-status');
+  if (!ids.length) {st.textContent = 'Select at least one instructor.'; return;}
+  if (!confirm('Send the availability reminder to ' + ids.length + ' instructor' + (ids.length === 1 ? '' : 's') + '?')) return;
+  document.getElementById('v2r-go').disabled = true; st.textContent = 'Sending…';
+  v2Run('dashboardV2SendAvailabilityReminder', [{evaluatorIds: ids, period: document.getElementById('v2r-period').value, message: document.getElementById('v2r-msg').value}], function(r) {
+    v2CloseReview(); V2.hours.msg = '✓ Reminder sent · ' + r.emailed + ' e-mailed · ' + r.notified + ' notified in the Portal' + (r.failures.length ? ' · not e-mailed: ' + r.failures.join(', ') : ''); v2RenderCiHours();
+  }, function(e) {document.getElementById('v2r-go').disabled = false; st.textContent = errorMessage(e);});
 }
 
 /* ---------- System & Setup, Help ---------- */

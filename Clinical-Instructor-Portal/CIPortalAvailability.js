@@ -35,6 +35,7 @@ function ciAvailOut_(e) {
     date: Utilities.formatDate(s, tz, 'yyyy-MM-dd'),
     start: allDay ? '' : Utilities.formatDate(s, tz, 'HH:mm'),
     end: allDay ? '' : Utilities.formatDate(en, tz, 'HH:mm'),
+    hours: Number((/^Hours:\s*([\d.]+)/m.exec(String(e.getDescription() || '')) || [])[1]) || (allDay ? null : Math.round((en - s) / 360000) / 10),
     status: ciAvailStatus_(e), note: note,
     coordinatorNote: ((/^Coordinator note:\s*(.*)$/m.exec(String(e.getDescription() || '')) || [])[1] || '').trim()};
 }
@@ -48,6 +49,14 @@ function ciR1AvailabilityList(token) {
   const from = new Date(); from.setHours(0, 0, 0, 0); from.setDate(from.getDate() - 7);
   const to = new Date(from.getTime()); to.setDate(to.getDate() + 190);
   const events = ciAvailMine_(ev, from, to).map(ciAvailOut_).sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
+  // Site assignments for the same days (authoritative CI Assignments).
+  try {
+    const book = ciDataBook_(), sites = {};
+    ciDataRows_(book, 'Clinical Sites', ['Clinical Site ID', 'Clinical Site']).forEach(r => {sites[String(r['Clinical Site ID']).trim()] = String(r['Clinical Site']).trim();});
+    const asg = ciDataRows_(book, 'CI Assignments', ['Evaluator ID', 'Date', 'Site ID', 'Status'])
+      .filter(r => String(r['Evaluator ID']).trim() === ev.evaluatorId && /^current$/i.test(String(r.Status || '').trim()));
+    events.forEach(e => {e.assigned = asg.filter(r => ciDataDate_(r.Date) === e.date).map(r => sites[String(r['Site ID']).trim()] || String(r['Site ID']));});
+  } catch (err) {console.warn('Assignments unavailable: ' + (err.message || err));}
   return {success: true, events: events, calendarId: id,
     embedUrl: 'https://calendar.google.com/calendar/embed?src=' + encodeURIComponent(id) + '&ctz=' + encodeURIComponent(Session.getScriptTimeZone()) + '&mode=MONTH&showPrint=0&showTabs=1&showCalendars=0',
     openUrl: 'https://calendar.google.com/calendar/u/0/r?cid=' + encodeURIComponent(id)};
@@ -60,6 +69,8 @@ function ciR1AvailabilityAdd(token, request) {
   if (!dates.length) throw new Error('Choose at least one date.');
   if (dates.length > 31) throw new Error('Add up to 31 dates at a time.');
   const allDay = req.allDay !== false;
+  const hours = Math.round(Number(req.hours) * 2) / 2;
+  if (!Number.isFinite(hours) || hours < 0.5 || hours > 16) throw new Error('Enter how many hours you are available (0.5 to 16).');
   const hm = v => {const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(String(v || '')); if (!m) throw new Error('Enter start and end times.'); return [Number(m[1]), Number(m[2])];};
   let st = null, en = null;
   if (!allDay) {st = hm(req.start); en = hm(req.end); if (st[0] * 60 + st[1] >= en[0] * 60 + en[1]) throw new Error('End time must be after start time.');}
@@ -73,9 +84,9 @@ function ciR1AvailabilityAdd(token, request) {
     return dt;
   });
   const cal = ciAvailCalendar_();
-  const title = 'Available — ' + ev.evaluatorName + (allDay ? '' : ' (' + req.start + '–' + req.end + ')');
+  const title = 'Available — ' + ev.evaluatorName + ' (' + hours + ' h' + (allDay ? '' : ', ' + req.start + '–' + req.end) + ')';
   const desc = ['Clinical instructor availability', 'Evaluator: ' + ev.evaluatorName + ' (' + ev.evaluatorId + ')',
-    'Status: Pending coordinator approval', 'Note: ' + note,
+    'Hours: ' + hours, 'Status: Pending coordinator approval', 'Note: ' + note,
     'Submitted via Clinical Instructor Portal ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm'),
     ciAvailTag_(ev)].join('\n');
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
@@ -83,8 +94,7 @@ function ciR1AvailabilityAdd(token, request) {
   try {
     parsed.forEach(dt => {
       const dayEnd = new Date(dt.getTime()); dayEnd.setDate(dayEnd.getDate() + 1);
-      const dup = ciAvailMine_(ev, dt, dayEnd).some(e => e.isAllDayEvent() === allDay &&
-        (allDay || (e.getStartTime().getHours() === st[0] && e.getStartTime().getMinutes() === st[1])));
+      const dup = ciAvailMine_(ev, dt, dayEnd).some(e => ciAvailStatus_(e) !== 'Declined');
       if (dup) return;
       let e;
       if (allDay) e = cal.createAllDayEvent(title, dt, {description: desc});
@@ -101,7 +111,7 @@ function ciR1AvailabilityAdd(token, request) {
     // Tell the coordinator (Coordinator Dashboard bell / inbox).
     try {
       const tz = Session.getScriptTimeZone();
-      const when = created.map(c => Utilities.formatDate(new Date(c.date + 'T12:00:00'), tz, 'EEE MMM d') + (c.allDay ? '' : ' ' + c.start + '–' + c.end)).join('; ');
+      const when = created.map(c => Utilities.formatDate(new Date(c.date + 'T12:00:00'), tz, 'EEE MMM d') + ' · ' + hours + ' h' + (c.allDay ? '' : ' ' + c.start + '–' + c.end)).join('; ');
       const row = {'Notification ID': 'NT-' + Utilities.getUuid().replace(/-/g, '').slice(0, 14).toUpperCase(), 'Created At': new Date(),
         'Recipient Type': 'Coordinator', 'Recipient': 'Clinical Coordinator', 'Type': 'Availability Submitted',
         'Item Kind': 'availability', 'Item ID': created.map(c => c.id).join(' '),

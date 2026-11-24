@@ -170,9 +170,9 @@
  }
  function itemButton(n){
   const b=document.createElement('button');b.type='button';
-  const bad=n.type==='Returned'||n.type==='Availability Declined';
-  b.className='ci-nt-item'+(n.status==='Unread'?' unread':'')+(bad?' returned':' accepted');
-  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
+  const bad=n.type==='Returned'||n.type==='Availability Declined';const info=n.type==='Availability Reminder'||n.type==='Site Assignment';
+  b.className='ci-nt-item'+(n.status==='Unread'?' unread':'')+(bad?' returned':info?'':' accepted');
+  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
   b.onclick=()=>openNotification(n.id);return b;
  }
  window.ciNtRefresh_=async function(){
@@ -211,7 +211,7 @@
   const {wrap}=shell('Notification');const box=document.createElement('div');box.className='ci-nt-detail';
   const back=wrap.querySelector('.ci-secondary-back');back.onclick=()=>showNotifications();
   box.innerHTML='<h3>'+esc(n.title)+'</h3><div style="color:#5e7288;font-size:13px">'+esc(n.student)+(n.studentId?' ('+esc(n.studentId)+')':'')+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</div>'+
-   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':n.type==='Availability Declined'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator declined this availability:</p>':n.type==='Availability Approved'?'<p style="margin:12px 0 0;font-weight:700;color:#17733a">The coordinator approved this availability.</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
+   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':n.type==='Availability Declined'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator declined this availability:</p>':n.type==='Availability Approved'?'<p style="margin:12px 0 0;font-weight:700;color:#17733a">The coordinator approved this availability.</p>':n.type==='Availability Reminder'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">Reminder from the coordinator: please submit your availability (My CI Workspace → Submit Availability).</p>':n.type==='Site Assignment'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">You have a clinical site assignment.</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
    (n.message?'<div class="ci-nt-note'+(n.type==='Returned'||n.type==='Availability Declined'?'':' ok')+'">'+esc(n.message)+'</div>':'')+
    (n.response?'<p style="font-weight:700;margin-bottom:4px">Your reply · '+esc(when(n.respondedAt))+'</p><div class="ci-nt-note ok">'+esc(n.response)+'</div>':'');
   if(!n.response){
@@ -278,11 +278,12 @@
   detail.innerHTML='<div class="ci-nt-wrap" style="max-width:1200px"><div class="ci-nt-bar"><button type="button" class="ci-secondary-back" aria-label="Back to My CI Workspace">‹</button><h2>Submit Availability</h2><a class="ci-res-btn" id="ci-av-open" target="_blank" rel="noopener" style="text-decoration:none" hidden>Open in Google Calendar</a></div>'+
   '<div class="ci-av-grid"><div><div class="ci-av-card"><h3>Add availability</h3>'+
    '<label for="ci-av-date">Date</label><div class="ci-av-row"><div><input type="date" id="ci-av-date" min="'+iso(today)+'"></div><button type="button" class="ci-nt-btn ghost" id="ci-av-adddate">Add date</button></div><div class="ci-av-dates" id="ci-av-dates"></div>'+
-   '<label style="display:flex;gap:8px;align-items:center;font-size:13px;color:#214360"><input type="checkbox" id="ci-av-allday" checked style="width:auto"> All day</label>'+
+   '<label for="ci-av-hours">Hours available each day</label><input type="number" id="ci-av-hours" min="0.5" max="16" step="0.5" placeholder="e.g. 6">'+
+   '<label style="display:flex;gap:8px;align-items:center;font-size:13px;color:#214360"><input type="checkbox" id="ci-av-window" style="width:auto"> Add a time window (optional)</label>'+
    '<div class="ci-av-row" id="ci-av-times" hidden><div><label for="ci-av-start">From</label><input type="time" id="ci-av-start" value="08:00"></div><div><label for="ci-av-end">To</label><input type="time" id="ci-av-end" value="16:00"></div></div>'+
    '<label for="ci-av-note">Note for the coordinator (optional)</label><textarea id="ci-av-note" rows="2" maxlength="500" placeholder="e.g. preferred site, mornings only"></textarea>'+
    '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button type="button" class="ci-nt-btn" id="ci-av-submit">Submit availability</button></div><div id="ci-av-msg" role="status" style="font-size:13px;margin-top:8px"></div>'+
-   '<p style="font-size:12px;color:#5e7288;margin:10px 0 0">New entries show on the shared calendar as <b>Pending</b> (yellow). The coordinator approves them there.</p></div>'+
+   '<p style="font-size:12px;color:#5e7288;margin:10px 0 0">New entries show on the shared calendar as <b>Pending</b> (yellow). You will be notified when the coordinator approves or declines them, and when you are assigned to a site.</p></div>'+
    '<div class="ci-av-card" style="margin-top:14px"><h3>My availability</h3><div class="ci-av-list" id="ci-av-list">Loading…</div></div></div>'+
    '<div><iframe class="ci-av-frame" id="ci-av-frame" title="Shared clinical instructor availability calendar" hidden></iframe><div class="ci-res-status" id="ci-av-frame-note">Loading the shared calendar…</div></div></div></div>';
   detail.querySelector('.ci-secondary-back').onclick=()=>ciSecondaryBack('workspace');
@@ -291,21 +292,22 @@
    $('ci-av-dates').querySelectorAll('button').forEach(b=>b.onclick=()=>{dates.delete(b.dataset.d);drawDates();});};
   $('ci-av-adddate').onclick=()=>{const v=$('ci-av-date').value;if(v){dates.add(v);drawDates();$('ci-av-date').value='';}};
   $('ci-av-date').addEventListener('change',()=>{const v=$('ci-av-date').value;if(v){dates.add(v);drawDates();$('ci-av-date').value='';}});
-  $('ci-av-allday').onchange=()=>{$('ci-av-times').hidden=$('ci-av-allday').checked;};
+  $('ci-av-window').onchange=()=>{$('ci-av-times').hidden=!$('ci-av-window').checked;};
   let frameUrl='';
   const load=async()=>{
    try{const r=await ciRun('ciR1AvailabilityList',tok());
     if(!frameUrl){frameUrl=r.embedUrl;$('ci-av-frame').src=r.embedUrl;$('ci-av-frame').hidden=false;$('ci-av-frame-note').textContent='Not seeing the calendar? Make sure you are signed in to Google with your college account, or use Open in Google Calendar.';$('ci-av-frame-note').style.marginTop='8px';const o=$('ci-av-open');o.href=r.openUrl;o.hidden=false;}
     else $('ci-av-frame').src=frameUrl;
     const now=iso(new Date());const up=(r.events||[]).filter(e=>e.date>=now);
-    $('ci-av-list').innerHTML=up.length?up.map(e=>'<div class="it"><b>'+esc(nice(e.date))+'</b><span style="flex:1">'+(e.allDay?'All day':esc(hm(e.start)+' – '+hm(e.end)))+(e.note?'<br><span style="color:#5e7288">'+esc(e.note)+'</span>':'')+(e.coordinatorNote?'<br><span style="color:'+(e.status==='Declined'?'#c4262d':'#17733a')+'">Coordinator: '+esc(e.coordinatorNote)+'</span>':'')+'</span><span class="ci-av-st '+esc(e.status)+'">'+esc(e.status)+'</span>'+(e.status==='Approved'?'':'<button type="button" class="ci-nt-btn ghost" style="padding:4px 9px;font-size:12px" data-id="'+esc(e.id)+'">Remove</button>')+'</div>').join(''):'<div style="color:#5e7288;font-size:13px">No upcoming availability submitted.</div>';
+    $('ci-av-list').innerHTML=up.length?up.map(e=>'<div class="it"><b>'+esc(nice(e.date))+'</b><span style="flex:1">'+(e.hours?esc(e.hours)+' h':'')+(e.allDay?'':(e.hours?' · ':'')+esc(hm(e.start)+' – '+hm(e.end)))+((e.assigned||[]).length?'<br><b style="color:#0a63b4">Assigned: '+esc(e.assigned.join(', '))+'</b>':'')+(e.note?'<br><span style="color:#5e7288">'+esc(e.note)+'</span>':'')+(e.coordinatorNote?'<br><span style="color:'+(e.status==='Declined'?'#c4262d':'#17733a')+'">Coordinator: '+esc(e.coordinatorNote)+'</span>':'')+'</span><span class="ci-av-st '+esc(e.status)+'">'+esc(e.status)+'</span>'+(e.status==='Approved'?'':'<button type="button" class="ci-nt-btn ghost" style="padding:4px 9px;font-size:12px" data-id="'+esc(e.id)+'">Remove</button>')+'</div>').join(''):'<div style="color:#5e7288;font-size:13px">No upcoming availability submitted.</div>';
     $('ci-av-list').querySelectorAll('button[data-id]').forEach(b=>b.onclick=async()=>{if(!confirm('Remove this availability from the shared calendar?'))return;b.disabled=true;try{await ciRun('ciR1AvailabilityRemove',tok(),b.dataset.id);load();}catch(e){b.disabled=false;alert(String(e?.message||e));}});
    }catch(e){$('ci-av-list').textContent='Could not load availability: '+String(e?.message||e);$('ci-av-frame-note').textContent='The shared calendar could not be loaded.';}
   };
   $('ci-av-submit').onclick=async()=>{
    const pending=$('ci-av-date').value;if(pending)dates.add(pending);
    const msg=$('ci-av-msg');if(!dates.size){msg.textContent='Choose at least one date.';return;}
-   const req={dates:[...dates].sort(),allDay:$('ci-av-allday').checked,start:$('ci-av-start').value,end:$('ci-av-end').value,note:$('ci-av-note').value};
+   const hrs=Number($('ci-av-hours').value);if(!(hrs>=0.5&&hrs<=16)){msg.textContent='Enter how many hours you are available (0.5 to 16).';return;}
+   const req={dates:[...dates].sort(),hours:hrs,allDay:!$('ci-av-window').checked,start:$('ci-av-start').value,end:$('ci-av-end').value,note:$('ci-av-note').value};
    const b=$('ci-av-submit');b.disabled=true;b.textContent='Submitting…';msg.textContent='';
    try{const r=await ciRun('ciR1AvailabilityAdd',tok(),req);dates.clear();drawDates();$('ci-av-note').value='';
     msg.textContent='✓ '+(r.created||[]).length+' availability entr'+((r.created||[]).length===1?'y':'ies')+' added'+(r.skipped?' · '+r.skipped+' already on the calendar':'')+'.';load();}
