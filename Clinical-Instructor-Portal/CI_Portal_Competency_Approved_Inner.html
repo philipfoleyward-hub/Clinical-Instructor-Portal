@@ -1482,4 +1482,13 @@ main.card{overflow:visible!important}/* overflow:hidden prevented the sticky ste
  setTimeout(refresh,300);
 })();
 </script>
+<style id="ccms-wide-screen">
+/* Large displays (TVs, external monitors): keep the form at a readable width, centred,
+   with the right-hand panel (Auto Fail, Quick Overview, Quick Actions) pinned in view.
+   Laptop-size screens (<=1300px) are unchanged. */
+@media (min-width:1301px){
+ section.context,.layout{max-width:1640px;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}
+ .layout>.right{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 20px);overflow-y:auto;overscroll-behavior:contain}
+}
+</style>
 </body></html>
