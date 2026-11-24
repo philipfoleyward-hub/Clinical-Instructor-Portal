@@ -6670,6 +6670,8 @@ function v2OpenInbox(id) {
   const n = ((V2.home || {}).inbox || []).filter(function(x) {return x.id === id;})[0];
   if (!n) return;
   if (n.itemKind === 'availability') return v2OpenAvailability(n.id);
+  if (n.itemKind === 'reflection') {if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
+    const m = /\(([^()]+)\)\s*$/.exec(n.from || ''); V2.ci.openAfter = m ? m[1] : ''; V2.ci.data = null; return showPage('instructors');}
   if (/^mileage/.test(n.itemKind || '')) {if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {}); return showPage('ciMileage');}
   if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
   if (n.itemId) v2OpenReview(n.itemKind || 'evaluation', n.itemId);
@@ -7298,7 +7300,7 @@ function v2SendMileageReminder() {
 V2.ci = {term: '', data: null, loading: false, error: '', q: '', inactive: false, msg: ''};
 function v2LoadInstructors() {
   const S = V2.ci; S.loading = true; S.error = ''; v2RenderInstructors();
-  v2Run('dashboardV2Instructors', [{term: S.term}], function(d) {S.loading = false; S.data = d; S.term = d.term; v2RenderInstructors();},
+  v2Run('dashboardV2Instructors', [{term: S.term}], function(d) {S.loading = false; S.data = d; S.term = d.term; v2RenderInstructors(); if (S.openAfter) {const id = S.openAfter; S.openAfter = ''; S.focus = 'reflection'; v2OpenCi(id);}},
     function(e) {S.loading = false; S.error = errorMessage(e); v2RenderInstructors();});
 }
 function v2CiDate(k) {if (!k) return '—'; const d = new Date(k + 'T12:00:00'); return isNaN(d) ? k : d.toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'});}
@@ -7367,6 +7369,7 @@ function v2PaintCiCards() {
       row('Evaluations', c.evalCount + ' this semester' + (c.pcCount ? ' · ' + c.pcCount + ' PC' : '') + (c.evalAwaiting ? ' ' + v2CiPill(c.evalAwaiting + ' to review', 'amber') : '') + (c.evalFlagged ? ' ' + v2CiPill(c.evalFlagged + ' returned', 'red') : '')) +
       row('Dosimeter', dos ? v2Esc(dos.dosimeterId) + ' · until ' + v2Esc(v2CiDate(dos.end)) + ' ' + v2CiPill(dos.state, v2CiDosTone(dos.state)) : '<span class="muted">None recorded</span>') +
       row('Mileage', c.mileage ? v2CiPill(c.mileage.status, c.mileage.status === 'Approved' ? 'green' : c.mileage.status === 'Returned' ? 'red' : 'amber') + ' ' + v2Esc(c.mileage.totalMiles + ' mi · $' + Number(c.mileage.totalAmount).toFixed(2)) : (/college ci/i.test(c.type) ? '<span class="muted">Not submitted</span>' : '<span class="muted">—</span>')) +
+      row('Reflection', c.reflection ? v2CiPill(c.reflection.status === 'Requested' ? 'Waiting for instructor' : c.reflection.status, {Accepted: 'green', Submitted: 'amber', Returned: 'red'}[c.reflection.status] || 'blue') : '<span class="muted">Summary not shared</span>') +
       '</button>';
   }).join('') : '<div class="empty">No instructors match.</div>';
 }
@@ -7390,9 +7393,62 @@ function v2OpenCi(id) {
     sec('Mileage', (c.mileage ? '<div class="small">' + v2Esc(d.term) + ': ' + v2CiPill(c.mileage.status, c.mileage.status === 'Approved' ? 'green' : 'amber') + ' ' + v2Esc(c.mileage.totalMiles + ' mi · $' + Number(c.mileage.totalAmount).toFixed(2)) + '</div>' : '<div class="small muted">' + v2Esc(d.term) + ': not submitted.</div>') +
       tbl(['Site', 'Paid per trip', 'Status'], c.distances.map(function(x) {return '<tr><td>' + v2Esc(x.site) + '</td><td>' + v2Esc(x.miles + ' mi (' + (x.basis === 'Home' ? 'home' : 'campus') + ' route)') + '</td><td>' + v2Esc(x.status) + '</td></tr>';}), 'No site distances entered yet.') +
       '<div style="margin-top:6px"><button class="secondary-button" onclick="v2CloseReview();showPage(\'ciMileage\')">Open CI Mileage</button></div>') +
-    sec('Surveys', '<div class="muted small">Not connected yet: tell the system where instructor survey responses are kept and they will appear here.</div>');
+    sec('Student feedback &amp; reflection (' + v2Esc(d.term) + ')', v2CiReflectionHtml(c, d));
   v2Modal(c.evaluator, body);
   const dlg = document.querySelector('#v2-review-modal .v2-dialog'); if (dlg) {dlg.style.maxWidth = '860px'; dlg.style.width = '92vw';}
+  if (V2.ci.focus === 'reflection') {const el = document.getElementById('v2rf-anchor'); if (el) el.scrollIntoView({block: 'start'}); V2.ci.focus = '';}
+}
+function v2CiReflectionHtml(c, d) {
+  const r = c.reflection, para = function(t) {return '<div class="small" style="white-space:pre-wrap;background:#f7fafc;border:1px solid #e3ecf3;border-radius:8px;padding:8px 10px">' + v2Esc(t || '—') + '</div>';};
+  let h = '<div id="v2rf-anchor"></div>';
+  if (r) {
+    h += '<div class="small" style="margin-bottom:6px">Status: ' + v2CiPill(r.status === 'Requested' ? 'Waiting for instructor' : r.status, {Accepted: 'green', Submitted: 'amber', Returned: 'red'}[r.status] || 'blue') +
+      (r.sharedAt ? ' · summary shared ' + v2Esc(v2CiDate(r.sharedAt.slice(0, 10))) : '') + (r.summaryUrl ? ' · <a target="_blank" rel="noopener" href="' + v2Esc(r.summaryUrl) + '">Summary PDF</a>' : '') + '</div>';
+    if (r.status === 'Submitted' || r.status === 'Accepted' || (r.status === 'Returned' && r.observations)) {
+      h += '<div style="font-weight:700;margin-top:6px">1. Observations and Insights</div>' + para(r.observations) +
+        '<div style="font-weight:700;margin-top:6px">2. Learning Experiences</div>' + para(r.learning) +
+        '<div style="font-weight:700;margin-top:6px">3. Goals for the future, Improvements</div>' + para(r.goals) +
+        '<div class="small" style="margin-top:6px">' + (r.docUrl ? '<a target="_blank" rel="noopener" href="' + v2Esc(r.docUrl) + '">Open reflection (Doc)</a>' : '') + (r.pdfUrl ? ' · <a target="_blank" rel="noopener" href="' + v2Esc(r.pdfUrl) + '">PDF</a>' : '') +
+        (r.submittedAt ? ' · submitted ' + v2Esc(v2CiDate(r.submittedAt.slice(0, 10))) : '') + (r.coordinatorNote ? ' · your note: ' + v2Esc(r.coordinatorNote) : '') + '</div>';
+    }
+    if (r.status === 'Submitted') {
+      h += '<label class="v2-dlabel" for="v2rf-notes">Note to the instructor (required to return)</label><textarea id="v2rf-notes" rows="2" maxlength="2000" style="width:100%"></textarea>' +
+        '<div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:6px"><label class="small"><input type="checkbox" id="v2rf-demail" checked> E-mail the instructor</label>' +
+        '<button class="v2-btn-red" onclick="v2CiReflDecide(\'' + escapeJs(r.reflectionId) + '\',\'Returned\')">Return</button><button class="primary-button" onclick="v2CiReflDecide(\'' + escapeJs(r.reflectionId) + '\',\'Accepted\')">Accept</button></div><div id="v2rf-dmsg" class="small"></div>';
+    }
+  } else h += '<div class="small muted" style="margin-bottom:6px">No feedback summary shared for ' + v2Esc(d.term) + ' yet.</div>';
+  if (!r || r.status === 'Requested' || r.status === 'Returned') {
+    h += '<details' + (r ? '' : ' open') + ' style="margin-top:8px"><summary class="small" style="cursor:pointer;font-weight:700">' + (r ? 'Update the feedback summary' : 'Share the student feedback summary and request the reflection') + '</summary>' +
+      '<label class="v2-dlabel" for="v2rf-text">Summary of student feedback (shown to the instructor)</label><textarea id="v2rf-text" rows="5" maxlength="20000" style="width:100%" placeholder="Paste the summary of what students said about this instructor.">' + v2Esc(r ? r.summaryText : '') + '</textarea>' +
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-top:6px"><div><label class="small muted">Or attach the summary (PDF)</label><br><input type="file" id="v2rf-pdf" accept="application/pdf"></div>' +
+      '<div><label class="small muted">Complete by (optional)</label><br><input id="v2rf-due" placeholder="e.g. Dec 15" style="width:120px"></div>' +
+      '<label class="small"><input type="checkbox" id="v2rf-email" checked> E-mail the instructor</label>' +
+      '<button class="primary-button" id="v2rf-go" onclick="v2CiReflShare(\'' + escapeJs(c.evaluatorId) + '\')">' + (r ? 'Update summary' : 'Share &amp; request reflection') + '</button></div><div id="v2rf-msg" class="small" style="margin-top:4px"></div></details>';
+  }
+  const past = (c.reflections || []).filter(function(x) {return x.term !== d.term;});
+  if (past.length) h += '<div class="small" style="margin-top:10px"><b>Earlier semesters:</b> ' + past.map(function(x) {return v2Esc(x.term) + ' ' + v2Esc(x.status) + (x.docUrl ? ' (<a target="_blank" rel="noopener" href="' + v2Esc(x.docUrl) + '">Doc</a>)' : '');}).join(' · ') + '</div>';
+  return h;
+}
+function v2CiReflShare(id) {
+  const g = function(x) {return document.getElementById(x);}, f = g('v2rf-pdf').files[0], m = g('v2rf-msg');
+  if (!g('v2rf-text').value.trim() && !f) {m.textContent = 'Paste the summary or attach it as a PDF.'; return;}
+  if (f && f.size > 10 * 1024 * 1024) {m.textContent = 'The PDF must be 10 MB or smaller.'; return;}
+  g('v2rf-go').disabled = true; m.textContent = 'Saving…';
+  const send = function(b64) {
+    v2Run('dashboardV2ReflectionShare', [{evaluatorId: id, term: V2.ci.data.term, summaryText: g('v2rf-text').value, pdfBase64: b64 || '', due: g('v2rf-due').value, email: g('v2rf-email').checked}],
+      function(r) {v2CloseReview(); V2.ci.msg = '✓ Summary shared · instructor notified' + (r.emailed ? ' and e-mailed' : ''); v2LoadInstructors();},
+      function(e) {g('v2rf-go').disabled = false; m.textContent = errorMessage(e);});
+  };
+  if (!f) return send('');
+  const rd = new FileReader(); rd.onload = function() {send(String(rd.result).split(',')[1] || '');}; rd.onerror = function() {g('v2rf-go').disabled = false; m.textContent = 'Could not read the file.';}; rd.readAsDataURL(f);
+}
+function v2CiReflDecide(id, decision) {
+  const n = document.getElementById('v2rf-notes').value, m = document.getElementById('v2rf-dmsg');
+  if (decision === 'Returned' && !n.trim()) {m.textContent = 'Add a note so the instructor knows what to change.'; return;}
+  m.textContent = 'Saving…';
+  v2Run('dashboardV2ReflectionDecide', [{reflectionId: id, decision: decision, notes: n, email: document.getElementById('v2rf-demail').checked}],
+    function(r) {v2CloseReview(); V2.ci.msg = '✓ Reflection ' + (decision === 'Accepted' ? 'accepted' : 'returned') + (r.emailed ? ' · instructor e-mailed' : ''); v2LoadInstructors(); v2LoadHome(true);},
+    function(e) {m.textContent = errorMessage(e);});
 }
 function v2CiRecordDos(id) {
   const g = function(x) {return document.getElementById(x);};

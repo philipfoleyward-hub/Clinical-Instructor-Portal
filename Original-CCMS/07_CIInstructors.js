@@ -119,6 +119,9 @@ function dashboardV2Instructors(request) {
     });
   } catch (e) {console.warn('Mileage skipped: ' + (e.message || e));}
 
+  // Summary reflections (CI survey responses).
+  let refl = {};
+  try {refl = cpRefl_byEvaluator_();} catch (e) {console.warn('Reflections skipped: ' + (e.message || e));}
   const soon = cpCi_key_(new Date(Date.now() + 14 * 864e5));
   const out = evs.map(function(e) {
     const c = card[e.evaluatorId];
@@ -137,6 +140,8 @@ function dashboardV2Instructors(request) {
       c.dosimeter = {dosimeterId: cur.dosimeterId, start: cur.start, end: cur.end, state: state, status: stated};
     }
     c.dosimeters = c.dosimeters.slice(0, 6);
+    c.reflections = (refl[e.evaluatorId] || []).slice(0, 6);
+    c.reflection = c.reflections.filter(function(x) {return x.term === term.term;})[0] || null;
     return c;
   }).sort(function(a, b) {return (b.active ? 1 : 0) - (a.active ? 1 : 0) || a.evaluator.localeCompare(b.evaluator);});
   return {success: true, term: term.term, start: term.start, end: term.end, today: today, terms: cpMile_terms_(),

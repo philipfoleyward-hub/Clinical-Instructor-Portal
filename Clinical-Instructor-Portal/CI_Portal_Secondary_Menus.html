@@ -170,9 +170,9 @@
  }
  function itemButton(n){
   const b=document.createElement('button');b.type='button';
-  const bad=n.type==='Returned'||n.type==='Availability Declined'||n.type==='Mileage Returned'||n.type==='Distance Declined';const info=n.type==='Availability Reminder'||n.type==='Site Assignment'||n.type==='Mileage Reminder';
+  const bad=n.type==='Returned'||n.type==='Availability Declined'||n.type==='Mileage Returned'||n.type==='Distance Declined'||n.type==='Reflection Returned';const info=n.type==='Availability Reminder'||n.type==='Site Assignment'||n.type==='Mileage Reminder'||n.type==='Reflection Requested';
   b.className='ci-nt-item'+(n.status==='Unread'?' unread':'')+(bad?' returned':info?'':' accepted');
-  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type==='Mileage Approved'||n.type==='Distance Approved'?'Approved':n.type==='Mileage Returned'?'Returned to you':n.type==='Distance Declined'?'Declined':n.type==='Mileage Reminder'?'Reminder':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
+  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type==='Mileage Approved'||n.type==='Distance Approved'?'Approved':n.type==='Mileage Returned'?'Returned to you':n.type==='Distance Declined'?'Declined':n.type==='Mileage Reminder'?'Reminder':n.type==='Reflection Requested'?'To complete':n.type==='Reflection Accepted'?'Accepted':n.type==='Reflection Returned'?'Returned to you':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
   b.onclick=()=>openNotification(n.id);return b;
  }
  window.ciNtRefresh_=async function(){
@@ -211,7 +211,7 @@
   const {wrap}=shell('Notification');const box=document.createElement('div');box.className='ci-nt-detail';
   const back=wrap.querySelector('.ci-secondary-back');back.onclick=()=>showNotifications();
   box.innerHTML='<h3>'+esc(n.title)+'</h3><div style="color:#5e7288;font-size:13px">'+esc(n.student)+(n.studentId?' ('+esc(n.studentId)+')':'')+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</div>'+
-   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':n.type==='Availability Declined'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator declined this availability:</p>':n.type==='Availability Approved'?'<p style="margin:12px 0 0;font-weight:700;color:#17733a">The coordinator approved this availability.</p>':n.type==='Availability Reminder'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">Reminder from the coordinator: please submit your availability (My CI Workspace → Submit Availability).</p>':n.type==='Site Assignment'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">You have a clinical site assignment.</p>':/^(Mileage|Distance)/.test(n.type)?'<p style="margin:12px 0 0;font-weight:700;color:'+(/Returned|Declined/.test(n.type)?'#c4262d':n.type==='Mileage Reminder'?'#0a63b4':'#17733a')+'">'+(n.type==='Mileage Reminder'?'Reminder from the coordinator: please submit your mileage (My CI Workspace → Mileage Submission).':n.type==='Mileage Returned'?'The coordinator returned your mileage. Update it in My CI Workspace → Mileage Submission and submit again.':n.type==='Distance Declined'?'The coordinator declined this mileage distance. Update it in My CI Workspace → Mileage Submission.':n.type==='Mileage Approved'?'Your mileage was approved.':'Your mileage distance was approved.')+'</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
+   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':n.type==='Availability Declined'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator declined this availability:</p>':n.type==='Availability Approved'?'<p style="margin:12px 0 0;font-weight:700;color:#17733a">The coordinator approved this availability.</p>':n.type==='Availability Reminder'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">Reminder from the coordinator: please submit your availability (My CI Workspace → Submit Availability).</p>':n.type==='Site Assignment'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">You have a clinical site assignment.</p>':/^Reflection/.test(n.type)?'<p style="margin:12px 0 0;font-weight:700;color:'+(n.type==='Reflection Returned'?'#c4262d':n.type==='Reflection Accepted'?'#17733a':'#0a63b4')+'">'+(n.type==='Reflection Requested'?'Your student feedback summary is ready. Complete your reflection in My CI Workspace → Survey Responses.':n.type==='Reflection Returned'?'The coordinator returned your reflection. Update it in My CI Workspace → Survey Responses and resubmit.':'Your reflection was accepted.')+'</p>':/^(Mileage|Distance)/.test(n.type)?'<p style="margin:12px 0 0;font-weight:700;color:'+(/Returned|Declined/.test(n.type)?'#c4262d':n.type==='Mileage Reminder'?'#0a63b4':'#17733a')+'">'+(n.type==='Mileage Reminder'?'Reminder from the coordinator: please submit your mileage (My CI Workspace → Mileage Submission).':n.type==='Mileage Returned'?'The coordinator returned your mileage. Update it in My CI Workspace → Mileage Submission and submit again.':n.type==='Distance Declined'?'The coordinator declined this mileage distance. Update it in My CI Workspace → Mileage Submission.':n.type==='Mileage Approved'?'Your mileage was approved.':'Your mileage distance was approved.')+'</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
    (n.message?'<div class="ci-nt-note'+(n.type==='Returned'||n.type==='Availability Declined'?'':' ok')+'">'+esc(n.message)+'</div>':'')+
    (n.response?'<p style="font-weight:700;margin-bottom:4px">Your reply · '+esc(when(n.respondedAt))+'</p><div class="ci-nt-note ok">'+esc(n.response)+'</div>':'');
   if(!n.response){
@@ -244,6 +244,7 @@
   if(feature==='My Submissions'){showSubmissions();return true;}
   if(feature==='Submit Availability'&&window.ciAvailabilityOpen_){window.ciAvailabilityOpen_();return true;}
   if(feature==='Mileage Submission'&&window.ciMileageOpen_){window.ciMileageOpen_();return true;}
+  if(feature==='Survey Responses'&&window.ciReflectionOpen_){window.ciReflectionOpen_();return true;}
   return false;
  };
  // Refresh after sign-in, when returning Home, and every 2 minutes while open.
@@ -450,5 +451,82 @@
   };
  }
  async function reload(){const keep={picked:S.picked,extra:S.extra};await load();S.picked=keep.picked;S.extra=keep.extra;draw();}
+})();
+</script>
+
+<style id="ci-reflection-style">
+.ci-rf-head{display:grid;grid-template-columns:150px 1fr;max-width:520px;border:1px solid #d7e5f0;border-radius:10px;overflow:hidden;margin-bottom:14px}.ci-rf-head div{padding:8px 12px;border-bottom:1px solid #e3ecf3;font-size:14px}.ci-rf-head div:nth-child(odd){background:#f3f8fc;font-weight:700;color:#214360}
+.ci-rf-sec{border:1px solid #d7e5f0;border-radius:11px;background:#fff;padding:14px 16px;margin-bottom:12px}.ci-rf-sec h3{margin:0 0 6px;font-size:15px;color:#112944}
+.ci-rf-sec .guide{font-size:13px;color:#5e7288;font-style:italic;margin:0 0 6px;white-space:pre-line}.ci-rf-sec .q{font-size:13px;color:#214360;text-decoration:underline;margin:0 0 8px}
+.ci-rf-sec textarea{width:100%;min-height:130px;border:1px solid #bcd0e2;border-radius:8px;padding:9px;font:inherit;font-size:14px;line-height:1.45}
+.ci-rf-sum{background:#f7fafc;border:1px solid #d7e5f0;border-radius:11px;padding:14px 16px;margin-bottom:14px;font-size:14px;white-space:pre-wrap}
+.ci-rf-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.ci-rf-tabs button{border:1px solid #bcd0e2;background:#fff;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}.ci-rf-tabs button.on{background:#0a63b4;color:#fff;border-color:#0a63b4}
+</style>
+<script id="ci-reflection-script">
+(function(){
+ const tok=()=>{try{return ciToken||'';}catch(e){return '';}};
+ const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const SECTIONS=[
+  ['observations','1. Observations and Insights','Reflect on student feedback related to:\n- Assistance with technique books and radiation protection practices\n- Support with positioning skills and image review\n- Patient care guidance and communication\n- Evaluation practices and feedback after testing','What stood out to you in the responses? Were there any common themes or surprises?'],
+  ['learning','2. Learning Experiences','- What this feedback taught you about your teaching style or communication\n- Any challenges or successes highlighted in student comments or scores\n- Did you try anything new this semester or make changes based on past feedback?',''],
+  ['goals','3. Goals for the future, Improvements','Outline goals for the next semester or throughout the year. These can include:\n- More structured image review\n- Clearer competency expectations\n- Strengthening student support or professional modeling','']];
+ let S={list:null,sel:'',name:''};
+ const label=s=>s==='Requested'?'To complete':s==='Returned'?'Returned to you':s==='Submitted'?'Submitted, awaiting review':s;
+ const chip=s=>'<span class="ci-nt-chip '+(s==='Accepted'?'Accepted':s==='Returned'?'Returned':'Submitted')+'">'+esc(label(s))+'</span>';
+ async function download(id,which,btn){
+  btn.disabled=true;
+  try{const r=await ciRun('ciR1ReflectionPdf',tok(),id,which);const bin=atob(r.base64);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+   const url=URL.createObjectURL(new Blob([u],{type:'application/pdf'}));const a=document.createElement('a');a.href=url;a.download=r.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+  catch(e){alert(String(e?.message||e));}btn.disabled=false;
+ }
+ window.ciReflectionOpen_=function(){
+  const items=document.getElementById('ci-workspace-items'),detail=document.getElementById('ci-workspace-detail');
+  items.hidden=true;detail.hidden=false;
+  detail.innerHTML='<div class="ci-nt-wrap" style="max-width:980px"><div class="ci-nt-bar"><button type="button" class="ci-secondary-back" aria-label="Back to My CI Workspace">‹</button><h2>Survey Responses</h2></div><div id="ci-rf-body"><div class="ci-res-status">Loading…</div></div></div>';
+  detail.querySelector('.ci-secondary-back').onclick=()=>ciSecondaryBack('workspace');
+  load();
+ };
+ async function load(){
+  const body=document.getElementById('ci-rf-body');if(!body)return;
+  try{const r=await ciRun('ciR1ReflectionList',tok());S.list=r.reflections||[];S.name=r.evaluator||'';
+   if(!S.sel||!S.list.some(x=>x.reflectionId===S.sel)){const open=S.list.find(x=>x.status==='Requested'||x.status==='Returned');S.sel=(open||S.list[0]||{}).reflectionId||'';}
+   draw();}
+  catch(e){body.innerHTML='<div class="ci-res-status">Could not load: '+esc(e?.message||e)+'</div>';}
+ }
+ function draw(){
+  const body=document.getElementById('ci-rf-body');if(!body)return;
+  if(!S.list.length){body.innerHTML='<div class="ci-res-status">No student feedback summary has been shared with you yet. When the coordinator shares your summary for a semester, it appears here with the Clinical Instructor Summary Reflection Form to complete.</div>';return;}
+  const r=S.list.find(x=>x.reflectionId===S.sel)||S.list[0];
+  const editable=r.status==='Requested'||r.status==='Returned';
+  let h='<div class="ci-rf-tabs">'+S.list.map(x=>'<button type="button" data-id="'+esc(x.reflectionId)+'" class="'+(x.reflectionId===r.reflectionId?'on':'')+'">'+esc(x.term)+' · '+esc(label(x.status))+'</button>').join('')+'</div>';
+  if(r.status==='Returned'&&r.coordinatorNote)h+='<div class="ci-ml-banner Returned"><b>Returned by the coordinator:</b> '+esc(r.coordinatorNote)+'</div>';
+  if(r.status==='Accepted')h+='<div class="ci-ml-banner Approved"><b>Accepted.</b>'+(r.coordinatorNote?' '+esc(r.coordinatorNote):' Thank you.')+'</div>';
+  if(r.status==='Submitted')h+='<div class="ci-ml-banner Submitted"><b>Submitted</b> and waiting for the coordinator’s review.</div>';
+  h+='<h3 style="margin:4px 0 8px;font-size:15px;color:#112944">Your student feedback summary — '+esc(r.term)+'</h3>'+
+   (r.summaryText?'<div class="ci-rf-sum">'+esc(r.summaryText)+'</div>':'')+(r.hasSummaryPdf?'<div style="margin:-4px 0 14px"><button type="button" class="ci-nt-btn ghost" id="ci-rf-sumpdf">Download summary (PDF)</button></div>':'');
+  h+='<div style="text-align:center;margin:10px 0 12px;color:#112944"><div style="font-size:15px">Radiologic Technology Program · SUNY Orange</div><div style="font-size:17px;font-weight:800">Clinical Instructor Summary Reflection Form</div></div>'+
+   '<div class="ci-rf-head"><div>Instructor Name:</div><div>'+esc(S.name)+'</div><div>Semester:</div><div>'+esc(r.term)+'</div></div>';
+  SECTIONS.forEach(s=>{
+   h+='<div class="ci-rf-sec"><h3>'+esc(s[1])+'</h3><p class="guide">'+esc(s[2])+'</p>'+(s[3]?'<p class="q">'+esc(s[3])+'</p>':'')+
+    (editable?'<textarea id="ci-rf-'+s[0]+'" maxlength="8000" aria-label="'+esc(s[1])+'">'+esc(r[s[0]])+'</textarea>':'<div style="white-space:pre-wrap;font-size:14px">'+esc(r[s[0]]||'—')+'</div>')+'</div>';
+  });
+  if(editable)h+='<div style="display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap"><span id="ci-rf-msg" role="status" style="font-size:13px">'+(r.savedAt?'Draft saved '+esc(new Date(r.savedAt).toLocaleString()):'')+'</span><button type="button" class="ci-nt-btn ghost" id="ci-rf-save">Save draft</button><button type="button" class="ci-nt-btn" id="ci-rf-submit">'+(r.status==='Returned'?'Resubmit reflection':'Submit reflection')+'</button></div>';
+  else if(r.hasPdf)h+='<div style="display:flex;justify-content:flex-end"><button type="button" class="ci-nt-btn ghost" id="ci-rf-mypdf">Download my reflection (PDF)</button></div>';
+  body.innerHTML=h;
+  body.querySelectorAll('.ci-rf-tabs button').forEach(b=>b.onclick=()=>{S.sel=b.dataset.id;draw();});
+  const sp=document.getElementById('ci-rf-sumpdf');if(sp)sp.onclick=()=>download(r.reflectionId,'summary',sp);
+  const mp=document.getElementById('ci-rf-mypdf');if(mp)mp.onclick=()=>download(r.reflectionId,'reflection',mp);
+  const val=()=>({reflectionId:r.reflectionId,observations:document.getElementById('ci-rf-observations').value,learning:document.getElementById('ci-rf-learning').value,goals:document.getElementById('ci-rf-goals').value});
+  const sv=document.getElementById('ci-rf-save'),sb=document.getElementById('ci-rf-submit'),msg=document.getElementById('ci-rf-msg');
+  if(sv)sv.onclick=async()=>{sv.disabled=true;msg.textContent='Saving…';try{const v=val();await ciRun('ciR1ReflectionSave',tok(),v);Object.assign(r,v,{savedAt:new Date().toISOString()});msg.textContent='✓ Draft saved';}catch(e){msg.textContent='Not saved: '+String(e?.message||e);}sv.disabled=false;};
+  if(sb)sb.onclick=async()=>{
+   const v=val();const short=SECTIONS.filter(s=>String(v[s[0]]||'').trim().length<20).map(s=>s[1].replace(/^\d\. /,''));
+   if(short.length){msg.textContent='Please complete: '+short.join(', ')+' (a few sentences each).';return;}
+   if(!confirm('Submit your '+r.term+' reflection to the coordinator?'))return;
+   sb.disabled=true;sv.disabled=true;sb.textContent='Submitting…';msg.textContent='';
+   try{const v2=Object.assign({},v,{submit:true});await ciRun('ciR1ReflectionSave',tok(),v2);await load();}
+   catch(e){msg.textContent='Not submitted: '+String(e?.message||e);sb.disabled=false;sv.disabled=false;sb.textContent='Submit reflection';}
+  };
+ }
 })();
 </script>
