@@ -6588,6 +6588,7 @@ render = function() {
   if (APP.page === 'help') return v2RenderHelp();
   if (APP.page === 'ciAvailability') return v2RenderCiHours();
   if (APP.page === 'ciMileage') return v2RenderMileage();
+  if (APP.page === 'instructors') return v2RenderInstructors();
   return v2OriginalRender();
 };
 
@@ -7291,6 +7292,115 @@ function v2SendMileageReminder() {
   v2Run('dashboardV2SendMileageReminder', [{evaluatorIds: ids, term: V2.mile.data.term, message: document.getElementById('v2mr-msg').value}], function(r) {
     v2CloseReview(); V2.mile.msg = '✓ Reminder sent · ' + r.emailed + ' e-mailed · ' + r.notified + ' notified in the Portal' + (r.failures.length ? ' · not e-mailed: ' + r.failures.join(', ') : ''); v2RenderMileage();
   }, function(e) {document.getElementById('v2mr-go').disabled = false; st.textContent = errorMessage(e);});
+}
+
+/* ---------- Clinical Instructors (cards, detail, coverage) ---------- */
+V2.ci = {term: '', data: null, loading: false, error: '', q: '', inactive: false, msg: ''};
+function v2LoadInstructors() {
+  const S = V2.ci; S.loading = true; S.error = ''; v2RenderInstructors();
+  v2Run('dashboardV2Instructors', [{term: S.term}], function(d) {S.loading = false; S.data = d; S.term = d.term; v2RenderInstructors();},
+    function(e) {S.loading = false; S.error = errorMessage(e); v2RenderInstructors();});
+}
+function v2CiDate(k) {if (!k) return '—'; const d = new Date(k + 'T12:00:00'); return isNaN(d) ? k : d.toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'});}
+function v2CiPill(text, tone) {
+  const c = {red: 'background:#ffe8ea;color:#c4262d', amber: 'background:#fff3cf;color:#8a5a00', green: 'background:#e6f5ec;color:#17733a', blue: 'background:#eaf3fc;color:#0a63b4'}[tone] || '';
+  return '<span class="status-pill" style="' + c + '">' + v2Esc(text) + '</span>';
+}
+function v2CiDosTone(s) {return /due/i.test(s) ? 'red' : /soon/i.test(s) ? 'amber' : /current|issued/i.test(s) ? 'green' : '';}
+function v2CiHoursLine(c) {
+  let t = c.assignedDays + ' day' + (c.assignedDays === 1 ? '' : 's') + ' · ' + c.assignedHours + ' h';
+  if (c.max != null && c.assignedHours > c.max) return t + ' ' + v2CiPill('over max', 'red');
+  if (c.target != null && c.assignedHours < c.target) return t + ' <span class="muted small">of ' + c.target + ' h target</span>';
+  return t;
+}
+function v2RenderInstructors() {
+  const el = document.getElementById('content'); if (!el || APP.page !== 'instructors') return;
+  const S = V2.ci, d = S.data;
+  if (!d && !S.loading && !S.error) setTimeout(v2LoadInstructors, 0);
+  let h = '<h1 class="page-title">Clinical Instructors</h1><div class="page-subtitle">One card per instructor: contact, assignments, availability, evaluations, dosimeter and mileage. Select a card for details.</div>';
+  h += '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:10px 0 14px"><div><label class="small muted" for="v2ci-term">Semester</label><br><select id="v2ci-term" onchange="V2.ci.term=this.value;v2LoadInstructors()">' +
+    ((d && d.terms) || []).map(function(t) {return '<option' + (d && t === d.term ? ' selected' : '') + '>' + v2Esc(t) + '</option>';}).join('') + '</select></div>' +
+    '<div><label class="small muted" for="v2ci-q">Find</label><br><input id="v2ci-q" placeholder="Name or ID" value="' + v2Esc(S.q) + '" oninput="V2.ci.q=this.value;v2PaintCiCards()"></div>' +
+    '<label class="small" style="display:flex;gap:6px;align-items:center;margin-bottom:6px"><input type="checkbox" ' + (S.inactive ? 'checked' : '') + ' onchange="V2.ci.inactive=this.checked;v2PaintCiCards()"> Show inactive</label>' +
+    '<span style="flex:1"></span><button class="secondary-button" onclick="showPage(\'ciAvailability\')">CI Availability &amp; Hours</button><button class="secondary-button" onclick="showPage(\'ciMileage\')">CI Mileage</button><button class="secondary-button" onclick="v2LoadInstructors()">Refresh</button></div>';
+  if (S.msg) h += '<div class="entry-message ' + (/^✓/.test(S.msg) ? 'success' : 'error') + '">' + v2Esc(S.msg) + '</div>';
+  if (S.loading) h += '<div class="section loading">Loading instructors…</div>';
+  else if (S.error) h += '<div class="entry-message error">' + v2Esc(S.error) + ' <button class="secondary-button" onclick="v2LoadInstructors()">Retry</button></div>';
+  else if (d) {
+    const act = d.instructors.filter(function(c) {return c.active;});
+    const dosDue = act.filter(function(c) {return c.dosimeter && /due/i.test(c.dosimeter.state);}).length;
+    const awaiting = act.reduce(function(s, c) {return s + c.evalAwaiting;}, 0);
+    const noMile = act.filter(function(c) {return /college ci/i.test(c.type) && c.assignedDays > 0 && (!c.mileage || c.mileage.status !== 'Approved');}).length;
+    const availPend = act.reduce(function(s, c) {return s + c.availPending;}, 0);
+    const tile = function(n, label, tone, go) {return '<button class="landing-card" style="text-align:left;cursor:pointer;padding:14px 16px" onclick="' + go + '"><div style="font-size:26px;font-weight:800;color:' + ({red: '#c4262d', amber: '#8a5a00'}[tone] || '#112944') + '">' + n + '</div><div class="small muted">' + v2Esc(label) + '</div></button>';};
+    h += '<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px">' +
+      tile(act.length, 'Active instructors', '', 'void 0') + tile(dosDue, 'Dosimeter exchanges due', dosDue ? 'red' : '', 'void 0') +
+      tile(awaiting, 'Evaluations awaiting review (' + d.term + ')', awaiting ? 'amber' : '', 'showPage(\'review\')') +
+      tile(availPend, 'Availability to review', availPend ? 'amber' : '', 'showPage(\'ciAvailability\')') +
+      tile(noMile, 'Mileage not yet approved (' + d.term + ')', '', 'showPage(\'ciMileage\')') + '</div>';
+    h += '<div id="v2ci-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;margin-bottom:22px"></div>';
+    // Coverage next two weeks (weekdays).
+    const cov = {}; (d.coverage || []).forEach(function(x) {cov[x.date] = x.items;});
+    const days = []; for (let i = 0; i < 14; i++) {const t = new Date(d.today + 'T12:00:00'); t.setDate(t.getDate() + i); if (t.getDay() % 6) days.push(t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'));}
+    h += '<div class="section"><div class="section-title">Coverage · next two weeks</div><div class="muted small" style="margin-bottom:8px">From CI Assignments (status Current). Assign instructors in CI Availability &amp; Hours.</div><table><thead><tr><th style="width:160px">Day</th><th>Instructors assigned</th></tr></thead><tbody>' +
+      days.map(function(k) {const items = cov[k] || [];
+        return '<tr><td><strong>' + v2Esc(v2CiDate(k)) + '</strong></td><td>' + (items.length ? items.map(function(x) {return '<span class="status-pill" style="margin:2px 6px 2px 0;background:#eaf3fc;color:#0a63b4">' + v2Esc(x.evaluator) + ' · ' + v2Esc(x.site) + (x.start ? ' · ' + v2Esc(x.start + '–' + x.end) : '') + '</span>';}).join('') : '<span class="muted small">No instructor assigned</span>') + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  el.innerHTML = h;
+  if (d) v2PaintCiCards();
+}
+function v2PaintCiCards() {
+  const host = document.getElementById('v2ci-cards'), S = V2.ci; if (!host || !S.data) return;
+  const q = S.q.trim().toLowerCase();
+  const list = S.data.instructors.filter(function(c) {return (S.inactive || c.active) && (!q || (c.evaluator + ' ' + c.evaluatorId + ' ' + c.email).toLowerCase().indexOf(q) >= 0);});
+  host.innerHTML = list.length ? list.map(function(c) {
+    const dos = c.dosimeter;
+    const row = function(k, v) {return '<div style="display:flex;gap:10px;padding:5px 0;border-top:1px solid #eef2f6;font-size:13px"><span class="muted" style="width:105px;flex:none">' + k + '</span><span style="flex:1">' + v + '</span></div>';};
+    return '<button class="landing-card" style="display:block;text-align:left;cursor:pointer;padding:16px;align-self:start" onclick="v2OpenCi(\'' + escapeJs(c.evaluatorId) + '\')">' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><h3 style="margin:0">' + v2Esc(c.evaluator) + '</h3><div class="muted small">' + v2Esc(c.evaluatorId) + ' · ' + v2Esc(c.type || '—') + '</div></div>' +
+      (c.active ? (c.todaySite ? v2CiPill('Today: ' + c.todaySite, 'blue') : '') : v2CiPill('Inactive', '')) + '</div>' +
+      '<div class="small" style="margin:6px 0 8px;color:#0a63b4">' + (c.email ? v2Esc(c.email) : '<span style="color:#c4262d">No e-mail on file</span>') + (c.portal ? '' : ' · <span class="muted">no Portal access</span>') + '</div>' +
+      row('Next site', c.next ? v2Esc(v2CiDate(c.next.date) + ' · ' + c.next.site) : '<span class="muted">None scheduled</span>') +
+      row('This semester', v2CiHoursLine(c)) +
+      row('Availability', c.availPending || c.availApproved ? (c.availPending ? v2CiPill(c.availPending + ' pending', 'amber') + ' ' : '') + c.availApproved + ' approved' : '<span class="muted">None submitted</span>') +
+      row('Evaluations', c.evalCount + ' this semester' + (c.pcCount ? ' · ' + c.pcCount + ' PC' : '') + (c.evalAwaiting ? ' ' + v2CiPill(c.evalAwaiting + ' to review', 'amber') : '') + (c.evalFlagged ? ' ' + v2CiPill(c.evalFlagged + ' returned', 'red') : '')) +
+      row('Dosimeter', dos ? v2Esc(dos.dosimeterId) + ' · until ' + v2Esc(v2CiDate(dos.end)) + ' ' + v2CiPill(dos.state, v2CiDosTone(dos.state)) : '<span class="muted">None recorded</span>') +
+      row('Mileage', c.mileage ? v2CiPill(c.mileage.status, c.mileage.status === 'Approved' ? 'green' : c.mileage.status === 'Returned' ? 'red' : 'amber') + ' ' + v2Esc(c.mileage.totalMiles + ' mi · $' + Number(c.mileage.totalAmount).toFixed(2)) : (/college ci/i.test(c.type) ? '<span class="muted">Not submitted</span>' : '<span class="muted">—</span>')) +
+      '</button>';
+  }).join('') : '<div class="empty">No instructors match.</div>';
+}
+function v2OpenCi(id) {
+  const d = V2.ci.data, c = d && d.instructors.filter(function(x) {return x.evaluatorId === id;})[0]; if (!c) return;
+  const sec = function(t, body) {return '<div style="margin-top:14px"><div style="font-weight:800;color:#112944;margin-bottom:6px">' + t + '</div>' + body + '</div>';};
+  const tbl = function(heads, rows, empty) {return rows.length ? '<table><thead><tr>' + heads.map(function(x) {return '<th>' + x + '</th>';}).join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table>' : '<div class="muted small">' + empty + '</div>';};
+  const dos = c.dosimeter;
+  const body =
+    '<div class="small">' + v2Esc(c.evaluatorId) + ' · ' + v2Esc(c.type || '—') + ' · ' + (c.active ? 'Active' : 'Inactive') + ' · ' + (c.portal ? 'Portal access' : 'No Portal access') + '</div>' +
+    '<div style="margin-top:6px">' + (c.email ? '<a href="mailto:' + v2Esc(c.email) + '">' + v2Esc(c.email) + '</a>' : '<span style="color:#c4262d">No e-mail on file (Evaluators sheet)</span>') + '</div>' +
+    sec('This semester (' + v2Esc(d.term) + ')', '<div class="small">' + v2CiHoursLine(c) + (c.untimed ? ' · ' + c.untimed + ' day' + (c.untimed === 1 ? '' : 's') + ' without times' : '') + (c.target != null || c.max != null ? ' · target ' + (c.target == null ? '—' : c.target) + ' h, max ' + (c.max == null ? '—' : c.max) + ' h' : '') + '</div>') +
+    sec('Upcoming site assignments', tbl(['Date', 'Site', 'Time'], c.upcoming.map(function(u) {return '<tr><td>' + v2Esc(v2CiDate(u.date)) + '</td><td>' + v2Esc(u.site) + '</td><td>' + v2Esc(u.start ? u.start + '–' + u.end : '—') + '</td></tr>';}), 'None scheduled.')) +
+    sec('Upcoming availability', tbl(['Date', 'Hours', 'Status'], c.availUpcoming.map(function(a) {return '<tr><td>' + v2Esc(v2CiDate(a.date)) + '</td><td>' + v2Esc(a.hours == null ? '—' : a.hours + ' h') + '</td><td>' + v2CiPill(a.status, a.status === 'Approved' ? 'green' : 'amber') + '</td></tr>';}), 'None submitted.')) +
+    sec('Recent evaluations', tbl(['Date', 'Student', 'Examination', 'Result', 'Status'], c.evaluations.map(function(e) {return '<tr><td>' + v2Esc(e.date) + '</td><td>' + v2Esc(e.student) + '</td><td>' + v2Esc(e.examination) + '<div class="muted small">' + v2Esc(e.type) + '</div></td><td>' + v2Esc(e.result) + '</td><td>' + v2CiPill(e.status, e.status === 'Reviewed' ? 'green' : e.status === 'Returned' ? 'red' : 'amber') + '</td></tr>';}), 'No Portal evaluations yet.')) +
+    sec('Dosimeter', (dos ? '<div class="small" style="margin-bottom:6px">Current: <b>' + v2Esc(dos.dosimeterId) + '</b> · ' + v2Esc(v2CiDate(dos.start)) + ' – ' + v2Esc(v2CiDate(dos.end)) + ' ' + v2CiPill(dos.state, v2CiDosTone(dos.state)) + '</div>' : '') +
+      tbl(['Dosimeter', 'Wear period', 'Status'], c.dosimeters.map(function(x) {return '<tr><td>' + v2Esc(x.dosimeterId) + '</td><td>' + v2Esc(x.start + ' – ' + x.end) + '</td><td>' + v2Esc(x.status || '') + '</td></tr>';}), 'None recorded.') +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:8px"><div><label class="small muted">New dosimeter ID</label><br><input id="v2ci-dos" style="width:110px" value="' + v2Esc(dos ? dos.dosimeterId : '') + '"></div>' +
+      '<div><label class="small muted">Wear start</label><br><input type="date" id="v2ci-ds" value="' + v2Esc(dos && dos.end ? dos.end : '') + '"></div><div><label class="small muted">Wear end</label><br><input type="date" id="v2ci-de"></div>' +
+      '<button class="primary-button" id="v2ci-dgo" onclick="v2CiRecordDos(\'' + escapeJs(c.evaluatorId) + '\')">Record new wear period</button></div><div id="v2ci-dmsg" class="small" style="margin-top:4px"></div>') +
+    sec('Mileage', (c.mileage ? '<div class="small">' + v2Esc(d.term) + ': ' + v2CiPill(c.mileage.status, c.mileage.status === 'Approved' ? 'green' : 'amber') + ' ' + v2Esc(c.mileage.totalMiles + ' mi · $' + Number(c.mileage.totalAmount).toFixed(2)) + '</div>' : '<div class="small muted">' + v2Esc(d.term) + ': not submitted.</div>') +
+      tbl(['Site', 'Paid per trip', 'Status'], c.distances.map(function(x) {return '<tr><td>' + v2Esc(x.site) + '</td><td>' + v2Esc(x.miles + ' mi (' + (x.basis === 'Home' ? 'home' : 'campus') + ' route)') + '</td><td>' + v2Esc(x.status) + '</td></tr>';}), 'No site distances entered yet.') +
+      '<div style="margin-top:6px"><button class="secondary-button" onclick="v2CloseReview();showPage(\'ciMileage\')">Open CI Mileage</button></div>') +
+    sec('Surveys', '<div class="muted small">Not connected yet: tell the system where instructor survey responses are kept and they will appear here.</div>');
+  v2Modal(c.evaluator, body);
+  const dlg = document.querySelector('#v2-review-modal .v2-dialog'); if (dlg) {dlg.style.maxWidth = '860px'; dlg.style.width = '92vw';}
+}
+function v2CiRecordDos(id) {
+  const g = function(x) {return document.getElementById(x);};
+  const req = {evaluatorId: id, dosimeterId: g('v2ci-dos').value, start: g('v2ci-ds').value, end: g('v2ci-de').value};
+  if (!req.dosimeterId || !req.start || !req.end) {g('v2ci-dmsg').textContent = 'Enter the dosimeter ID and the wear start and end dates.'; return;}
+  g('v2ci-dgo').disabled = true; g('v2ci-dmsg').textContent = 'Saving…';
+  v2Run('dashboardV2RecordDosimeter', [req], function() {v2CloseReview(); V2.ci.msg = '✓ Dosimeter wear period recorded'; v2LoadInstructors();},
+    function(e) {g('v2ci-dgo').disabled = false; g('v2ci-dmsg').textContent = errorMessage(e);});
 }
 
 /* ---------- System & Setup, Help ---------- */
