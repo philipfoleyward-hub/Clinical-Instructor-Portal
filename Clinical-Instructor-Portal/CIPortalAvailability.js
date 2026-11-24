@@ -35,7 +35,8 @@ function ciAvailOut_(e) {
     date: Utilities.formatDate(s, tz, 'yyyy-MM-dd'),
     start: allDay ? '' : Utilities.formatDate(s, tz, 'HH:mm'),
     end: allDay ? '' : Utilities.formatDate(en, tz, 'HH:mm'),
-    status: ciAvailStatus_(e), note: note};
+    status: ciAvailStatus_(e), note: note,
+    coordinatorNote: ((/^Coordinator note:\s*(.*)$/m.exec(String(e.getDescription() || '')) || [])[1] || '').trim()};
 }
 function ciAvailMine_(ev, from, to) {
   const tag = ciAvailTag_(ev);
@@ -62,7 +63,7 @@ function ciR1AvailabilityAdd(token, request) {
   const hm = v => {const m = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(String(v || '')); if (!m) throw new Error('Enter start and end times.'); return [Number(m[1]), Number(m[2])];};
   let st = null, en = null;
   if (!allDay) {st = hm(req.start); en = hm(req.end); if (st[0] * 60 + st[1] >= en[0] * 60 + en[1]) throw new Error('End time must be after start time.');}
-  const note = String(req.note || '').trim().slice(0, 500);
+  const note = String(req.note || '').replace(/\s+/g, ' ').trim().slice(0, 500);
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const limit = new Date(today.getTime()); limit.setDate(limit.getDate() + 366);
   const parsed = dates.map(d => {
@@ -96,6 +97,19 @@ function ciR1AvailabilityAdd(token, request) {
       created.push(ciAvailOut_(e));
     });
   } finally {lock.releaseLock();}
+  if (created.length) {
+    // Tell the coordinator (Coordinator Dashboard bell / inbox).
+    try {
+      const tz = Session.getScriptTimeZone();
+      const when = created.map(c => Utilities.formatDate(new Date(c.date + 'T12:00:00'), tz, 'EEE MMM d') + (c.allDay ? '' : ' ' + c.start + '–' + c.end)).join('; ');
+      const row = {'Notification ID': 'NT-' + Utilities.getUuid().replace(/-/g, '').slice(0, 14).toUpperCase(), 'Created At': new Date(),
+        'Recipient Type': 'Coordinator', 'Recipient': 'Clinical Coordinator', 'Type': 'Availability Submitted',
+        'Item Kind': 'availability', 'Item ID': created.map(c => c.id).join(' '),
+        'Title': 'Availability submitted — ' + ev.evaluatorName + ' (' + created.length + ' date' + (created.length === 1 ? '' : 's') + ')',
+        'Message': when + (note ? '\nNote: ' + note : ''), 'From': ev.evaluatorName + ' (' + ev.evaluatorId + ')', 'Status': 'Unread'};
+      ciNtSheet_().appendRow(CI_NT_HEADERS.map(h => row[h] == null ? '' : row[h]));
+    } catch (err) {console.warn('Coordinator availability notification failed: ' + (err.message || err));}
+  }
   return {success: true, created: created, skipped: parsed.length - created.length};
 }
 function ciR1AvailabilityRemove(token, eventId) {

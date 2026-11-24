@@ -143,7 +143,8 @@ function dashboardV2GetHome() {
     recent: tracking.concat(pcs.slice(0, 40)).sort(function(a, b) {return b.dateValue - a.dateValue;}).slice(0, 60),
     pc: {pending: pcs.filter(function(p) {return p.coordinatorReviewStatus !== 'Reviewed' && !p.flagged;}).length,
       returned: pcs.filter(function(p) {return p.flagged;}).length},
-    inbox: replies, inboxUnread: replies.filter(function(r) {return r.status === 'Unread';}).length};
+    inbox: replies, inboxUnread: replies.filter(function(r) {return r.status === 'Unread';}).length,
+    availabilityUnread: replies.filter(function(r) {return r.status === 'Unread' && r.itemKind === 'availability';}).length};
 }
 function cpLink_noteOut_(n) {
   return {id: cpLink_t_(n['Notification ID']), createdAt: cpLink_iso_(n['Created At']),
@@ -250,4 +251,98 @@ function dashboardV2SystemLinks() {
   return {workbook: url, sheets: ss.getSheets().map(function(s) {
     return {name: s.getName(), url: url + '#gid=' + s.getSheetId()};
   })};
+}
+
+/* ------------------------------------------------------------------ */
+/* CI availability (shared Google Calendar written by the CI Portal)   */
+/* ------------------------------------------------------------------ */
+const CP_AVAIL_DEFAULT_CAL = 'c_9a1de097bee716e5e56fc1fa11bcc4b13b56ed7c351a60f27766afd1c14afe25@group.calendar.google.com';
+function cpAvail_calendar_() {
+  const id = String(PropertiesService.getScriptProperties().getProperty('CI_PORTAL_AVAILABILITY_CALENDAR_ID') || CP_AVAIL_DEFAULT_CAL).trim();
+  const cal = CalendarApp.getCalendarById(id);
+  if (!cal) throw new Error('The shared availability calendar is not available to this account.');
+  return cal;
+}
+function cpAvail_status_(e) {
+  const c = String(e.getColor() || ''), d = String(e.getDescription() || '');
+  if (/Status:\s*Approved/i.test(d) || c === '2' || c === '10') return 'Approved';
+  if (/Status:\s*(Declined|Not approved)/i.test(d) || c === '4' || c === '11') return 'Declined';
+  return 'Pending';
+}
+function cpAvail_event_(cal, id) {
+  try {return cal.getEventById(id);} catch (e) {return null;}
+}
+function cpAvail_out_(e) {
+  const tz = Session.getScriptTimeZone(), all = e.isAllDayEvent();
+  const s = all ? e.getAllDayStartDate() : e.getStartTime(), t = all ? e.getAllDayEndDate() : e.getEndTime();
+  const d = String(e.getDescription() || '');
+  return {id: e.getId(), date: Utilities.formatDate(s, tz, 'yyyy-MM-dd'),
+    label: Utilities.formatDate(s, tz, 'EEE, MMM d, yyyy') + (all ? ' · all day' :
+      ' · ' + Utilities.formatDate(s, tz, 'h:mm a') + '–' + Utilities.formatDate(t, tz, 'h:mm a')),
+    status: cpAvail_status_(e), note: ((/^Note:\s*(.*)$/m.exec(d) || [])[1] || '').trim(),
+    coordinatorNote: ((/^Coordinator note:\s*(.*)$/m.exec(d) || [])[1] || '').trim()};
+}
+function cpAvail_row_(notificationId) {
+  const row = cpLink_rows_().filter(function(n) {
+    return cpLink_t_(n['Notification ID']) === cpLink_t_(notificationId) && cpLink_t_(n['Item Kind']) === 'availability' &&
+      cpLink_t_(n['Recipient Type']) === 'Coordinator';
+  })[0];
+  if (!row) throw new Error('Availability request not found.');
+  return row;
+}
+function cpAvail_evaluator_(row) {
+  const m = /\(([^()]+)\)\s*$/.exec(cpLink_t_(row['From']));
+  return {id: m ? m[1].trim() : '', name: cpLink_t_(row['From']).replace(/\s*\([^()]*\)\s*$/, '')};
+}
+function dashboardV2AvailabilityDetail(notificationId) {
+  const row = cpAvail_row_(notificationId), cal = cpAvail_calendar_(), ev = cpAvail_evaluator_(row);
+  const events = cpLink_t_(row['Item ID']).split(/\s+/).filter(Boolean).map(function(id) {
+    const e = cpAvail_event_(cal, id);
+    if (!e) return {id: id, label: 'Removed from the calendar', status: 'Removed', missing: true};
+    return cpAvail_out_(e);
+  });
+  return {notification: cpLink_noteOut_(row), evaluatorId: ev.id, evaluator: ev.name, events: events,
+    thread: cpLink_rows_().filter(function(n) {return cpLink_t_(n['Item Kind']) === 'availability' &&
+      cpLink_t_(n['Recipient Type']) === 'CI' && cpLink_t_(n['Item ID']) === cpLink_t_(row['Item ID']);}).map(cpLink_noteOut_)};
+}
+/** Approve or decline selected availability entries, with a note to the instructor. */
+function dashboardV2AvailabilityDecide(request) {
+  const r = request || {};
+  const decision = r.decision === 'Declined' ? 'Declined' : r.decision === 'Approved' ? 'Approved' : '';
+  if (!decision) throw new Error('Choose Approve or Decline.');
+  const notes = cpLink_requireText_(r.notes, 'Notes', 2000);
+  if (decision === 'Declined' && !notes) throw new Error('Add a note so the instructor knows why.');
+  const row = cpAvail_row_(r.notificationId), ev = cpAvail_evaluator_(row);
+  if (!ev.id) throw new Error('This request has no Evaluator ID.');
+  const allowed = cpLink_t_(row['Item ID']).split(/\s+/).filter(Boolean);
+  const ids = (Array.isArray(r.eventIds) ? r.eventIds : []).map(cpLink_t_).filter(function(id) {return allowed.indexOf(id) >= 0;});
+  if (!ids.length) throw new Error('Select at least one date.');
+  const cal = cpAvail_calendar_(), tag = '[CI:' + ev.id + ']', who = cpLink_user_();
+  const stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+  const done = [];
+  ids.forEach(function(id) {
+    const e = cpAvail_event_(cal, id);
+    if (!e || String(e.getDescription() || '').indexOf(tag) < 0) return;
+    let d = String(e.getDescription() || '');
+    d = /^Status:.*$/m.test(d) ? d.replace(/^Status:.*$/m, 'Status: ' + decision + ' by ' + who + ' ' + stamp) : d + '\nStatus: ' + decision + ' by ' + who + ' ' + stamp;
+    d = /^Coordinator note:.*$/m.test(d) ? d.replace(/^Coordinator note:.*$/m, 'Coordinator note: ' + notes.replace(/\n/g, ' ')) :
+      d.replace(tag, 'Coordinator note: ' + notes.replace(/\n/g, ' ') + '\n' + tag);
+    e.setDescription(d);
+    e.setColor(decision === 'Approved' ? CalendarApp.EventColor.GREEN : CalendarApp.EventColor.RED);
+    done.push(cpAvail_out_(e));
+  });
+  if (!done.length) throw new Error('None of the selected dates are still on the calendar.');
+  const sh = cpLink_sheet_();
+  if (cpLink_t_(row['Status']) === 'Unread') sh.getRange(row._row, CP_LINK.HEADERS.indexOf('Status') + 1, 1, 2).setValues([['Read', new Date()]]);
+  const id = cpLink_add_({'Recipient Type': 'CI', 'Recipient ID': ev.id, 'Recipient': ev.name,
+    'Type': 'Availability ' + decision, 'Item Kind': 'availability', 'Item ID': cpLink_t_(row['Item ID']),
+    'Title': 'Availability ' + decision.toLowerCase() + ': ' + done.map(function(x) {return x.label.replace(/, \d{4}/, '');}).join('; '),
+    'Message': notes, 'From': who});
+  return {success: true, notificationId: id, events: done};
+}
+/** Run once from the editor: grants Calendar access to CCMS and confirms the shared calendar. */
+function cpAvailAuthorize() {
+  const cal = cpAvail_calendar_();
+  console.log('Availability calendar: ' + cal.getName());
+  return cal.getName();
 }

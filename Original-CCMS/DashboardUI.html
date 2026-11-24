@@ -6660,6 +6660,7 @@ function v2OpenInbox(id) {
   v2CloseBell();
   const n = ((V2.home || {}).inbox || []).filter(function(x) {return x.id === id;})[0];
   if (!n) return;
+  if (n.itemKind === 'availability') return v2OpenAvailability(n.id);
   if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
   if (n.itemId) v2OpenReview(n.itemKind || 'evaluation', n.itemId);
 }
@@ -6731,6 +6732,7 @@ renderHome = function() {
     v2Snap('sb', 'check', Number(pc.pending || 0), 'Professional Competencies to Review', "V2.chip='professional';renderHome()") +
     v2Snap('sb', 'alert', V2.attendance ? attCount : '…', 'Attendance Concerns', "showPage('attendance')") +
     v2Snap('sy', 'flag', Number(s.failed || 0), 'Failed Evaluations', "showPage('review');loadReviewQueue('failed')") +
+    v2Snap('sg', 'calendar', Number(h.availabilityUnread || 0), 'Availability Requests to Review', 'v2ToggleBell(event)') +
   '</section>' +
   '<section class="v2-panel v2-snapshot" id="homeAttendanceActions"><div class="muted small">Loading attendance…</div></section>' +
   '</aside></div>' +
@@ -6924,6 +6926,58 @@ function v2ReviewAction(action) {
     const keep = V2.reviewMsg; v2RefreshAll();
     v2Run('dashboardV2ReviewDetail', [d.kind, d.itemId], function(x) {V2.review = x; V2.reviewMsg = keep; v2PaintReview();});
   }, function(e) {V2.reviewBusy = false; V2.reviewMsg = errorMessage(e); v2PaintReview();});
+}
+
+/* ---------- Availability requests: approve / decline with notes ---------- */
+function v2OpenAvailability(notificationId) {
+  V2.review = {availability: true, notificationId: notificationId, loading: true}; V2.reviewMsg = ''; v2PaintAvailability();
+  v2Run('dashboardV2AvailabilityDetail', [notificationId], function(d) {
+    d.availability = true; d.notificationId = notificationId; V2.review = d; v2PaintAvailability();
+  }, function(e) {V2.review = {availability: true, error: errorMessage(e)}; v2PaintAvailability();});
+}
+function v2PaintAvailability() {
+  let m = document.getElementById('v2-review-modal');
+  if (!m) {m = document.createElement('div'); m.id = 'v2-review-modal'; m.className = 'v2-modal'; document.body.appendChild(m);
+    m.addEventListener('click', function(e) {if (e.target === m) v2CloseReview();});}
+  const d = V2.review || {};
+  if (d.loading || d.error) {
+    m.innerHTML = '<div class="v2-dialog"><div class="v2-dhead"><b>Availability request</b><button onclick="v2CloseReview()">×</button></div><div class="v2-dbody">' +
+      (d.error ? '<div class="entry-message error">' + v2Esc(d.error) + '</div>' : 'Loading…') + '</div></div>';
+    return;
+  }
+  const n = d.notification || {}, note = (/Note:\s*(.*)$/m.exec(n.message || '') || [])[1] || '';
+  m.innerHTML = '<div class="v2-dialog" role="dialog" aria-modal="true"><div class="v2-dhead"><b>Availability · ' + v2Esc(d.evaluator) + '</b><button onclick="v2CloseReview()" aria-label="Close">×</button></div><div class="v2-dbody">' +
+    '<div class="v2-dgrid"><div><small>Instructor</small><b>' + v2Esc(d.evaluator) + ' · ' + v2Esc(d.evaluatorId) + '</b></div><div><small>Submitted</small><b>' +
+    v2Esc(String(n.createdAt).replace('T', ' ').slice(0, 16)) + '</b></div><div><small>Instructor note</small><b>' + v2Esc(note || '—') + '</b></div></div>' +
+    '<div class="section-title">Dates</div>' + (d.events || []).map(function(e, i) {
+      const open = !e.missing && e.status === 'Pending';
+      return '<label style="display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #eef2f6">' +
+        '<input type="checkbox" class="v2-av-pick" value="' + v2Esc(e.id) + '" ' + (open ? 'checked' : '') + (e.missing ? ' disabled' : '') + '>' +
+        '<span style="flex:1"><b>' + v2Esc(e.label) + '</b>' + (e.coordinatorNote ? '<br><span class="muted small">Your note: ' + v2Esc(e.coordinatorNote) + '</span>' : '') + '</span>' +
+        '<span class="status-pill">' + v2Esc(e.status) + '</span></label>';
+    }).join('') +
+    ((d.thread || []).length ? '<div class="v2-thread"><div class="section-title">Sent to the instructor</div>' + d.thread.map(function(t) {
+      return '<div class="v2-msg co"><small>' + v2Esc(t.type) + ' · ' + v2Esc(String(t.createdAt).replace('T', ' ').slice(0, 16)) + '</small><div>' + v2Esc(t.message || '(no note)') + '</div></div>';
+    }).join('') + '</div>' : '') +
+    '<label class="v2-dlabel" for="v2-review-notes">Note to the instructor (required to decline)</label>' +
+    '<textarea id="v2-review-notes" rows="3" maxlength="2000" placeholder="e.g. Approved for St Luke\'s · or why the dates can\'t be used"></textarea>' +
+    (V2.reviewMsg ? '<div class="entry-message ' + (/^✓/.test(V2.reviewMsg) ? 'success' : 'error') + '">' + v2Esc(V2.reviewMsg) + '</div>' : '') +
+    '<div class="v2-dactions"><button class="v2-btn-red" ' + (V2.reviewBusy ? 'disabled' : '') + ' onclick="v2AvailabilityDecide(\'Declined\')">Decline selected</button>' +
+    '<button class="primary-button" ' + (V2.reviewBusy ? 'disabled' : '') + ' onclick="v2AvailabilityDecide(\'Approved\')">Approve selected</button></div>' +
+    '<div class="muted small">The calendar entry turns green (approved) or red (declined) and the instructor gets a notification with your note.</div></div></div>';
+}
+function v2AvailabilityDecide(decision) {
+  const d = V2.review; if (!d || V2.reviewBusy) return;
+  const ids = [].map.call(document.querySelectorAll('.v2-av-pick:checked'), function(x) {return x.value;});
+  const notes = (document.getElementById('v2-review-notes') || {}).value || '';
+  if (!ids.length) {V2.reviewMsg = 'Select at least one date.'; v2PaintAvailability(); return;}
+  if (decision === 'Declined' && !notes.trim()) {V2.reviewMsg = 'Add a note so the instructor knows why.'; v2PaintAvailability(); return;}
+  V2.reviewBusy = true; V2.reviewMsg = ''; v2PaintAvailability();
+  v2Run('dashboardV2AvailabilityDecide', [{notificationId: d.notificationId, eventIds: ids, decision: decision, notes: notes}], function(r) {
+    V2.reviewBusy = false; const msg = '✓ ' + (r.events || []).length + ' date' + ((r.events || []).length === 1 ? '' : 's') + ' ' + decision.toLowerCase() + ' · instructor notified';
+    v2LoadHome(true);
+    v2Run('dashboardV2AvailabilityDetail', [d.notificationId], function(x) {x.availability = true; x.notificationId = d.notificationId; V2.review = x; V2.reviewMsg = msg; v2PaintAvailability();});
+  }, function(e) {V2.reviewBusy = false; V2.reviewMsg = errorMessage(e); v2PaintAvailability();});
 }
 
 /* ---------- System & Setup, Help ---------- */
