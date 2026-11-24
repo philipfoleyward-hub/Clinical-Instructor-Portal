@@ -104,6 +104,14 @@ const ciRun=(name,...args)=>new Promise((resolve,reject)=>{
   ciR1ReflectionList:()=>runner.ciR1ReflectionList(...args),
   ciR1ReflectionPdf:()=>runner.ciR1ReflectionPdf(...args),
   ciR1ReflectionSave:()=>runner.ciR1ReflectionSave(...args),
+  ciR1NotesInit:()=>runner.ciR1NotesInit(...args),
+  ciR1NoteSave:()=>runner.ciR1NoteSave(...args),
+  ciR1NoteDelete:()=>runner.ciR1NoteDelete(...args),
+  ciR1CiReportSubmit:()=>runner.ciR1CiReportSubmit(...args),
+  ciR1CiReportPdf:()=>runner.ciR1CiReportPdf(...args),
+  ciR1IncidentInit:()=>runner.ciR1IncidentInit(...args),
+  ciR1IncidentSubmit:()=>runner.ciR1IncidentSubmit(...args),
+  ciR1IncidentPdf:()=>runner.ciR1IncidentPdf(...args),
   ciR1PcSaveDraft:()=>runner.ciR1PcSaveDraft(...args),
   ciR1PcLoadDraft:()=>runner.ciR1PcLoadDraft(...args),
   ciR1PcPreview:()=>runner.ciR1PcPreview(...args),
@@ -649,7 +657,7 @@ async function ciInit(){
   // Bind actions within the exact approved Students v3 inner markup.
   document.querySelectorAll('#ci-v3-root .scope-tab').forEach(b=>b.addEventListener('click',()=>ciSetScope(b.dataset.scope)));
   const studentsBack=document.getElementById('ci-v3-back');if(studentsBack)studentsBack.addEventListener('click',ciBackToStudents);
-  document.querySelectorAll('#ci-v3-root [data-clinical-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.clinicalAction;if(a==='Professional Competency')ciPcStart(ciSelected);else if(a==='Start Evaluation')ciStartEvaluation(ciSelected);else ciUnavailable(a);}));
+  document.querySelectorAll('#ci-v3-root [data-clinical-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.clinicalAction;if(a==='Professional Competency')ciPcStart(ciSelected);else if(a==='Start Evaluation')ciStartEvaluation(ciSelected);else if(a==='Incident Report'&&window.ciIncidentOpen_){const id=ciSelected;ciGoWorkspace();if(ciPage==='workspace')window.ciIncidentOpen_({studentId:id});}else if(a==='CI Note / Report'&&window.ciNotesOpen_){const id=ciSelected;ciGoWorkspace();if(ciPage==='workspace')window.ciNotesOpen_({studentId:id});}else ciUnavailable(a);}));
   ciRender();
   ciRefreshInProgress_();
  }catch(e){ciError(e);}

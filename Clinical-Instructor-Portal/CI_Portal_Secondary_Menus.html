@@ -26,6 +26,8 @@
   <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Submit Availability"><span>Submit Availability</span><span class="ci-secondary-chevron">›</span></button>
   <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Mileage Submission"><span>Mileage Submission</span><span class="ci-secondary-chevron">›</span></button>
   <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Survey Responses"><span>Survey Responses</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="CI Notes & Reports"><span>CI Notes &amp; Reports</span><span class="ci-secondary-chevron">›</span></button>
+  <button type="button" class="ci-secondary-row" data-ci-group="workspace" data-ci-feature="Incident Reports"><span>Incident Reports</span><span class="ci-secondary-chevron">›</span></button>
  </div>
  <div id="ci-workspace-detail" hidden></div>
 </section>
@@ -42,7 +44,7 @@
 </section>
 <script>
 (function(){
- const allowed={workspace:['Notifications','My Submissions','Submit Availability','Mileage Submission','Survey Responses'],resources:['Program Handbook','Clinical Syllabus','Evaluation & Scoring Guide']};
+ const allowed={workspace:['Notifications','My Submissions','Submit Availability','Mileage Submission','Survey Responses','CI Notes & Reports','Incident Reports'],resources:['Program Handbook','Clinical Syllabus','Evaluation & Scoring Guide']};
  window.ciSecondaryBack=function(group){const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(items&&detail){items.hidden=false;detail.hidden=true;detail.replaceChildren();}};
  window.ciSecondaryOpen=function(group,feature){if(!allowed[group]?.includes(feature))return;if(group==='resources'&&window.ciResourceOpen_){window.ciResourceOpen_(feature);return;}if(group==='workspace'&&window.ciWorkspaceOpen_&&window.ciWorkspaceOpen_(feature))return;const items=document.getElementById('ci-'+group+'-items'),detail=document.getElementById('ci-'+group+'-detail');if(!items||!detail)return;
   items.hidden=true;detail.hidden=false;detail.replaceChildren();const back=document.createElement('button');back.className='ci-secondary-back';back.type='button';back.textContent='‹';back.setAttribute('aria-label','Back to '+group);back.onclick=()=>ciSecondaryBack(group);
@@ -170,9 +172,9 @@
  }
  function itemButton(n){
   const b=document.createElement('button');b.type='button';
-  const bad=n.type==='Returned'||n.type==='Availability Declined'||n.type==='Mileage Returned'||n.type==='Distance Declined'||n.type==='Reflection Returned';const info=n.type==='Availability Reminder'||n.type==='Site Assignment'||n.type==='Mileage Reminder'||n.type==='Reflection Requested';
+  const bad=n.type==='Returned'||n.type==='Availability Declined'||n.type==='Mileage Returned'||n.type==='Distance Declined'||n.type==='Reflection Returned'||n.type==='CI Report Returned';const info=n.type==='Availability Reminder'||n.type==='Site Assignment'||n.type==='Mileage Reminder'||n.type==='Reflection Requested';
   b.className='ci-nt-item'+(n.status==='Unread'?' unread':'')+(bad?' returned':info?'':' accepted');
-  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type==='Mileage Approved'||n.type==='Distance Approved'?'Approved':n.type==='Mileage Returned'?'Returned to you':n.type==='Distance Declined'?'Declined':n.type==='Mileage Reminder'?'Reminder':n.type==='Reflection Requested'?'To complete':n.type==='Reflection Accepted'?'Accepted':n.type==='Reflection Returned'?'Returned to you':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
+  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type==='Mileage Approved'||n.type==='Distance Approved'?'Approved':n.type==='Mileage Returned'?'Returned to you':n.type==='Distance Declined'?'Declined':n.type==='Mileage Reminder'?'Reminder':n.type==='Reflection Requested'?'To complete':n.type==='Reflection Accepted'?'Accepted':n.type==='Reflection Returned'?'Returned to you':n.type==='CI Report Accepted'?'Accepted':n.type==='CI Report Returned'?'Returned to you':n.type==='Incident Reviewed'?'Reviewed':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
   b.onclick=()=>openNotification(n.id);return b;
  }
  window.ciNtRefresh_=async function(){
@@ -245,6 +247,8 @@
   if(feature==='Submit Availability'&&window.ciAvailabilityOpen_){window.ciAvailabilityOpen_();return true;}
   if(feature==='Mileage Submission'&&window.ciMileageOpen_){window.ciMileageOpen_();return true;}
   if(feature==='Survey Responses'&&window.ciReflectionOpen_){window.ciReflectionOpen_();return true;}
+  if(feature==='CI Notes & Reports'&&window.ciNotesOpen_){window.ciNotesOpen_();return true;}
+  if(feature==='Incident Reports'&&window.ciIncidentOpen_){window.ciIncidentOpen_();return true;}
   return false;
  };
  // Refresh after sign-in, when returning Home, and every 2 minutes while open.
@@ -527,6 +531,115 @@
    try{const v2=Object.assign({},v,{submit:true});await ciRun('ciR1ReflectionSave',tok(),v2);await load();}
    catch(e){msg.textContent='Not submitted: '+String(e?.message||e);sb.disabled=false;sv.disabled=false;sb.textContent='Submit reflection';}
   };
+ }
+})();
+</script>
+
+<style id="ci-notes-style">
+.ci-cn-grid{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:16px;align-items:start}@media(max-width:920px){.ci-cn-grid{grid-template-columns:1fr}}
+.ci-cn-card{border:1px solid #d7e5f0;border-radius:11px;background:#fff;padding:16px;margin-bottom:14px}.ci-cn-card h3{margin:0 0 8px;font-size:15px;color:#112944}
+.ci-cn-card label{display:block;font-size:12px;font-weight:700;color:#426989;margin:10px 0 4px}.ci-cn-card input,.ci-cn-card select,.ci-cn-card textarea{width:100%;border:1px solid #bcd0e2;border-radius:8px;padding:8px;font:inherit;font-size:14px}
+.ci-cn-card textarea{min-height:110px;line-height:1.45}.ci-cn-kinds{display:flex;gap:6px;flex-wrap:wrap}.ci-cn-kinds button{border:1px solid #bcd0e2;background:#fff;border-radius:99px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer}.ci-cn-kinds button.on{background:#0a63b4;color:#fff;border-color:#0a63b4}
+.ci-cn-item{border-bottom:1px solid #e3ecf3;padding:9px 0;font-size:13px}.ci-cn-item .h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.ci-cn-item .t{white-space:pre-wrap;margin-top:4px;color:#21384f}
+.ci-cn-k{border-radius:99px;padding:2px 8px;font-size:11px;font-weight:800}.ci-cn-k.Student{background:#eaf3fc;color:#0a63b4}.ci-cn-k.Activity{background:#e6f5ec;color:#17733a}.ci-cn-k.Mentoring{background:#f3ecfb;color:#6a3fa0}
+.ci-cn-row{display:flex;gap:8px}.ci-cn-row>div{flex:1}.ci-cn-filter{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.ci-inc-warn{background:#fff4f4;border:1px solid #f3c4c7;color:#8b1c22;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+</style>
+<script id="ci-notes-script">
+(function(){
+ const tok=()=>{try{return ciToken||'';}catch(e){return '';}};
+ const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const nice=d=>{const p=new Date(d+'T12:00:00');return isNaN(p)?d:p.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});};
+ const KIND={Student:'Student note',Activity:'Lab / lecture activity',Mentoring:'Hospital CI communication'};
+ async function dl(fn,id,btn){btn.disabled=true;try{const r=await ciRun(fn,tok(),id);const bin=atob(r.base64);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([u],{type:'application/pdf'}));const a=document.createElement('a');a.href=url;a.download=r.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}catch(e){alert(String(e?.message||e));}btn.disabled=false;}
+ function shell(title){
+  const items=document.getElementById('ci-workspace-items'),detail=document.getElementById('ci-workspace-detail');
+  items.hidden=true;detail.hidden=false;
+  detail.innerHTML='<div class="ci-nt-wrap" style="max-width:1150px"><div class="ci-nt-bar"><button type="button" class="ci-secondary-back" aria-label="Back to My CI Workspace">‹</button><h2>'+esc(title)+'</h2><span id="ci-cn-bar" style="margin-left:auto"></span></div><div id="ci-cn-body"><div class="ci-res-status">Loading…</div></div></div>';
+  detail.querySelector('.ci-secondary-back').onclick=()=>ciSecondaryBack('workspace');
+  return document.getElementById('ci-cn-body');
+ }
+ /* ---------------- CI Notes & Reports ---------------- */
+ let N={term:'',data:null,kind:'Student',edit:null,student:'',filter:''};
+ window.ciNotesOpen_=function(opts){N.student=(opts&&opts.studentId)||N.student||'';N.kind='Student';N.edit=null;shell('CI Notes & Reports');loadN();};
+ async function loadN(){
+  const body=document.getElementById('ci-cn-body');if(!body)return;
+  try{N.data=await ciRun('ciR1NotesInit',tok(),N.term||'');N.term=N.data.term;drawN();}catch(e){body.innerHTML='<div class="ci-res-status">Could not load: '+esc(e?.message||e)+'</div>';}
+ }
+ function drawN(){
+  const d=N.data,body=document.getElementById('ci-cn-body');if(!body||!d)return;
+  document.getElementById('ci-cn-bar').innerHTML='<select id="ci-cn-term" aria-label="Semester" style="border:1px solid #bcd0e2;border-radius:8px;padding:6px 8px;font:inherit">'+d.terms.map(t=>'<option'+(t===d.term?' selected':'')+'>'+esc(t)+'</option>').join('')+'</select>';
+  document.getElementById('ci-cn-term').onchange=e=>{N.term=e.target.value;N.edit=null;loadN();};
+  const e=N.edit||{};const kind=e.kind||N.kind;
+  const stuOpts='<option value="">Choose a student…</option>'+d.students.map(s=>'<option value="'+esc(s.studentId)+'"'+((e.studentId||N.student)===s.studentId?' selected':'')+'>'+esc(s.student)+(s.site?' — '+esc(s.site):'')+(s.clinicalTerm?' · '+esc(s.clinicalTerm):'')+'</option>').join('');
+  let h='<div class="ci-cn-grid"><div><div class="ci-cn-card"><h3>'+(N.edit?'Edit note':'Add a note')+'</h3><div class="ci-cn-kinds">'+Object.keys(KIND).map(k=>'<button type="button" data-k="'+k+'" class="'+(kind===k?'on':'')+'">'+esc(KIND[k])+'</button>').join('')+'</div>'+
+   (kind==='Student'?'<label for="ci-cn-stu">Student</label><select id="ci-cn-stu">'+stuOpts+'</select>':'')+
+   '<div class="ci-cn-row"><div><label for="ci-cn-date">Date</label><input type="date" id="ci-cn-date" max="'+esc(d.today)+'" value="'+esc(e.date||d.today)+'"></div><div><label for="ci-cn-site">Site</label><input id="ci-cn-site" maxlength="120" value="'+esc(e.site||'')+'" placeholder="'+(kind==='Student'?'Student’s site':'e.g. Garnet Middletown')+'"></div></div>'+
+   '<label for="ci-cn-text">'+(kind==='Student'?'Comments on the student’s progress':kind==='Activity'?'Positioning lab / lecture activity':'Topic(s) discussed with the hospital clinical instructor')+'</label><textarea id="ci-cn-text" maxlength="6000" placeholder="'+(kind==='Student'?'Work ethic, patient care, site familiarity, technical progress, professional development and improvements needed.':kind==='Activity'?'e.g. Development of technique book, positioning lab, review book discussion.':'e.g. Competency expectations for Clinical 3 students.')+'">'+esc(e.text||'')+'</textarea>'+
+   '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">'+(N.edit?'<button type="button" class="ci-nt-btn ghost" id="ci-cn-cancel">Cancel</button>':'')+'<button type="button" class="ci-nt-btn" id="ci-cn-save">'+(N.edit?'Save changes':'Add note')+'</button></div><div id="ci-cn-msg" role="status" style="font-size:13px;margin-top:6px"></div>'+
+   '<p style="font-size:12px;color:#5e7288;margin:8px 0 0">Critical issues should still be called in and/or e-mailed to the Clinical Coordinator at the time they occur (or use Incident Report).</p></div>';
+  // Report submission
+  const counts=p=>{const f=document.getElementById('ci-cr-from')?.value,t=document.getElementById('ci-cr-to')?.value;return d.notes.filter(n=>!n.locked&&(!f||n.date>=f)&&(!t||n.date<=t));};
+  const lastTo=d.reports.filter(r=>r.status!=='Returned').map(r=>r.to).sort().pop();
+  const fromDef=lastTo?new Date(new Date(lastTo+'T12:00:00').getTime()+864e5).toISOString().slice(0,10):d.start;
+  const pracGuess=(()=>{const c={};d.notes.forEach(n=>{if(n.clinicalTerm)c[n.clinicalTerm]=(c[n.clinicalTerm]||0)+1;});return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||'Clinical 3';})();
+  h+='<div class="ci-cn-card"><h3>Submit College Clinical Instructor Report</h3><p style="font-size:12px;color:#5e7288;margin:0 0 6px">Due twice per semester (mid-semester and end of semester), on the same dates as professional competencies. All your notes in the period are placed into the approved report form.</p>'+
+   '<div class="ci-cn-row"><div><label for="ci-cr-period">Report</label><select id="ci-cr-period"><option>Mid-semester</option><option'+(d.reports.some(r=>r.period==='Mid-semester'&&r.status!=='Returned')?' selected':'')+'>End of semester</option></select></div><div><label for="ci-cr-prac">Clinical practicum</label><select id="ci-cr-prac">'+[1,2,3,4,5].map(i=>'<option'+('Clinical '+i===pracGuess?' selected':'')+'>Clinical '+i+'</option>').join('')+'</select></div></div>'+
+   '<div class="ci-cn-row"><div><label for="ci-cr-from">From</label><input type="date" id="ci-cr-from" min="'+esc(d.start)+'" max="'+esc(d.end)+'" value="'+esc(fromDef<d.start?d.start:fromDef)+'"></div><div><label for="ci-cr-to">To</label><input type="date" id="ci-cr-to" min="'+esc(d.start)+'" max="'+esc(d.today<d.end?d.today:d.end)+'" value="'+esc(d.today<d.end?d.today:d.end)+'"></div></div>'+
+   '<div id="ci-cr-count" style="font-size:13px;margin-top:8px"></div><div style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="ci-nt-btn" id="ci-cr-go">Submit report</button></div><div id="ci-cr-msg" role="status" style="font-size:13px;margin-top:6px"></div>'+
+   (d.reports.length?'<div style="margin-top:10px">'+d.reports.map(r=>'<div class="ci-cn-item"><div class="h"><b>'+esc(r.period)+'</b> · '+esc(r.practicum)+' · '+esc(r.from)+' – '+esc(r.to)+' <span class="ci-nt-chip '+(r.status==='Accepted'?'Accepted':r.status==='Returned'?'Returned':'Submitted')+'">'+esc(r.status==='Submitted'?'Awaiting review':r.status==='Returned'?'Returned to you':r.status)+'</span>'+(r.hasPdf?'<button type="button" class="ci-nt-btn ghost" style="padding:3px 9px;font-size:12px;margin-left:auto" data-pdf="'+esc(r.reportId)+'">PDF</button>':'')+'</div>'+(r.coordinatorNote?'<div class="t" style="color:'+(r.status==='Returned'?'#c4262d':'#17733a')+'">Coordinator: '+esc(r.coordinatorNote)+'</div>':'')+'</div>').join('')+'</div>':'')+'</div></div>';
+  // Notes list
+  const list=d.notes.filter(n=>!N.filter||n.kind===N.filter||(N.filter==='mine-student'&&n.studentId===N.student));
+  h+='<div><div class="ci-cn-card"><h3>My notes — '+esc(d.term)+' ('+d.notes.length+')</h3><div class="ci-cn-filter">'+[['','All'],['Student','Students'],['Activity','Activities'],['Mentoring','Hospital CI']].map(x=>'<button type="button" class="ci-nt-btn ghost'+(N.filter===x[0]?' on':'')+'" style="padding:4px 10px;font-size:12px'+(N.filter===x[0]?';background:#0a63b4;color:#fff':'')+'" data-f="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
+   (list.length?list.map(n=>'<div class="ci-cn-item"><div class="h"><b>'+esc(nice(n.date))+'</b><span class="ci-cn-k '+esc(n.kind)+'">'+esc(n.kind==='Student'?n.student:KIND[n.kind])+'</span>'+(n.site?'<span style="color:#5e7288">'+esc(n.site)+'</span>':'')+(n.locked?'<span style="color:#5e7288;margin-left:auto">in submitted report</span>':'<span style="margin-left:auto"></span><button type="button" class="ci-nt-btn ghost" style="padding:3px 9px;font-size:12px" data-edit="'+esc(n.noteId)+'">Edit</button><button type="button" class="ci-nt-btn ghost" style="padding:3px 9px;font-size:12px" data-del="'+esc(n.noteId)+'">Delete</button>')+'</div><div class="t">'+esc(n.text)+'</div></div>').join(''):'<div style="color:#5e7288;font-size:13px">No notes yet for '+esc(d.term)+'.</div>')+'</div></div></div>';
+  body.innerHTML=h;
+  const $=id=>document.getElementById(id);
+  body.querySelectorAll('.ci-cn-kinds button').forEach(b=>b.onclick=()=>{if(N.edit)N.edit.kind=b.dataset.k;else N.kind=b.dataset.k;const keep={text:$('ci-cn-text').value,date:$('ci-cn-date').value,site:$('ci-cn-site').value};drawN();$('ci-cn-text').value=keep.text;$('ci-cn-date').value=keep.date;$('ci-cn-site').value=keep.site;});
+  const stu=$('ci-cn-stu');if(stu){const sync=()=>{const s=d.students.find(x=>x.studentId===stu.value);N.student=stu.value;if(s&&!$('ci-cn-site').value)$('ci-cn-site').value=s.site||'';};stu.onchange=sync;if(!N.edit)sync();}
+  if($('ci-cn-cancel'))$('ci-cn-cancel').onclick=()=>{N.edit=null;drawN();};
+  $('ci-cn-save').onclick=async()=>{const k=N.edit?N.edit.kind:N.kind;const req={noteId:N.edit?N.edit.noteId:'',kind:k,studentId:stu?stu.value:'',date:$('ci-cn-date').value,site:$('ci-cn-site').value,text:$('ci-cn-text').value};const m=$('ci-cn-msg');
+   if(k==='Student'&&!req.studentId){m.textContent='Choose the student.';return;}if(req.text.trim().length<3){m.textContent='Write the note first.';return;}
+   $('ci-cn-save').disabled=true;m.textContent='Saving…';try{await ciRun('ciR1NoteSave',tok(),req);N.edit=null;await loadN();const m2=$('ci-cn-msg');if(m2)m2.textContent='✓ Saved';}catch(err){m.textContent='Not saved: '+String(err?.message||err);$('ci-cn-save').disabled=false;}};
+  body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{N.edit=Object.assign({},d.notes.find(n=>n.noteId===b.dataset.edit));drawN();window.scrollTo(0,0);});
+  body.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this note?'))return;b.disabled=true;try{await ciRun('ciR1NoteDelete',tok(),b.dataset.del);loadN();}catch(err){alert(String(err?.message||err));b.disabled=false;}});
+  body.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{N.filter=b.dataset.f;drawN();});
+  body.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=()=>dl('ciR1CiReportPdf',b.dataset.pdf,b));
+  const cnt=()=>{const l=counts();const s=l.filter(n=>n.kind==='Student').length,a=l.filter(n=>n.kind==='Activity').length,m=l.filter(n=>n.kind==='Mentoring').length;$('ci-cr-count').innerHTML='Will include <b>'+s+'</b> student note'+(s===1?'':'s')+', <b>'+a+'</b> activit'+(a===1?'y':'ies')+' and <b>'+m+'</b> hospital CI contact'+(m===1?'':'s')+'.';};
+  $('ci-cr-from').onchange=cnt;$('ci-cr-to').onchange=cnt;cnt();
+  $('ci-cr-go').onclick=async()=>{const req={term:d.term,period:$('ci-cr-period').value,practicum:$('ci-cr-prac').value,from:$('ci-cr-from').value,to:$('ci-cr-to').value};const m=$('ci-cr-msg');
+   if(!counts().some(n=>n.kind==='Student')){m.textContent='There are no student notes in this period.';return;}
+   if(!confirm('Submit your '+req.period.toLowerCase()+' report ('+req.from+' to '+req.to+') to the coordinator? Notes in it can no longer be edited unless it is returned.'))return;
+   $('ci-cr-go').disabled=true;$('ci-cr-go').textContent='Building report…';m.textContent='';
+   try{const r=await ciRun('ciR1CiReportSubmit',tok(),req);await loadN();const m2=$('ci-cr-msg');if(m2)m2.textContent='✓ Report submitted ('+r.studentNotes+' student notes).';}
+   catch(err){m.textContent='Not submitted: '+String(err?.message||err);$('ci-cr-go').disabled=false;$('ci-cr-go').textContent='Submit report';}};
+ }
+ /* ---------------- Incident Reports ---------------- */
+ let I={data:null,student:''};
+ window.ciIncidentOpen_=function(opts){I.student=(opts&&opts.studentId)||'';shell('Incident Reports');loadI();};
+ async function loadI(){const body=document.getElementById('ci-cn-body');if(!body)return;try{I.data=await ciRun('ciR1IncidentInit',tok());drawI();}catch(e){body.innerHTML='<div class="ci-res-status">Could not load: '+esc(e?.message||e)+'</div>';}}
+ function drawI(){
+  const d=I.data,body=document.getElementById('ci-cn-body');if(!body||!d)return;document.getElementById('ci-cn-bar').innerHTML='';
+  let h='<div class="ci-cn-grid"><div class="ci-cn-card" style="grid-column:1/-1;max-width:860px"><h3>New incident report (Form 1B — Instructor)</h3>'+
+   '<div class="ci-inc-warn">To be completed by the instructor when an incident happens at clinical or on campus. Describe the occurrence, findings and action/consequence. The student must read and sign the form; it is saved in the student’s file. Do not include patient identifiers (name, MRN, accession number). Submitting alerts the Clinical Coordinator and e-mails the coordinator and the department chair.</div>'+
+   '<label for="ci-in-stu">Student</label><select id="ci-in-stu"><option value="">Choose a student…</option>'+d.students.map(s=>'<option value="'+esc(s.studentId)+'"'+(I.student===s.studentId?' selected':'')+'>'+esc(s.student)+(s.site?' — '+esc(s.site):'')+'</option>').join('')+'</select>'+
+   '<div class="ci-cn-row"><div><label for="ci-in-date">Date of incident</label><input type="date" id="ci-in-date" max="'+esc(d.today)+'" value="'+esc(d.today)+'"></div><div><label for="ci-in-time">Time of incident</label><input type="time" id="ci-in-time"></div></div>'+
+   '<div class="ci-cn-row"><div><label for="ci-in-site">Site</label><input id="ci-in-site" maxlength="120"></div><div><label for="ci-in-loc">Specific area / location</label><input id="ci-in-loc" maxlength="300" placeholder="e.g. X-ray room 2, ED"></div></div>'+
+   '<div class="ci-cn-row"><div><label for="ci-in-per">Additional person(s) involved</label><input id="ci-in-per" maxlength="500"></div><div><label for="ci-in-wit">Witnesses</label><input id="ci-in-wit" maxlength="500"></div></div>'+
+   '<label for="ci-in-desc">Incident description</label><textarea id="ci-in-desc" maxlength="10000" style="min-height:150px" placeholder="What happened, when, who was present, and what you found."></textarea>'+
+   '<label for="ci-in-act">Resulting action executed or consequence</label><textarea id="ci-in-act" maxlength="6000"></textarea>'+
+   '<div style="display:flex;justify-content:flex-end;margin-top:10px"><button type="button" class="ci-nt-btn" id="ci-in-go" style="background:#c4262d;border-color:#c4262d">Submit incident report</button></div><div id="ci-in-msg" role="status" style="font-size:13px;margin-top:6px"></div></div>'+
+   '<div class="ci-cn-card" style="grid-column:1/-1;max-width:860px"><h3>My incident reports</h3>'+(d.incidents.length?d.incidents.map(x=>'<div class="ci-cn-item"><div class="h"><b>'+esc(nice(x.date))+'</b> '+esc(x.student)+' <span style="color:#5e7288">'+esc(x.site)+'</span><span class="ci-nt-chip '+(x.status==='Reviewed'?'Accepted':'Submitted')+'">'+esc(x.status==='Submitted'?'Awaiting review':x.status)+'</span>'+(x.hasPdf?'<button type="button" class="ci-nt-btn ghost" style="padding:3px 9px;font-size:12px;margin-left:auto" data-pdf="'+esc(x.incidentId)+'">PDF</button>':'')+'</div>'+(x.coordinatorNote?'<div class="t">Coordinator: '+esc(x.coordinatorNote)+'</div>':'')+'</div>').join(''):'<div style="color:#5e7288;font-size:13px">None.</div>')+'</div></div>';
+  body.innerHTML=h;const $=id=>document.getElementById(id);
+  const sync=()=>{const s=d.students.find(x=>x.studentId===$('ci-in-stu').value);if(s)$('ci-in-site').value=s.site||'';};$('ci-in-stu').onchange=sync;sync();
+  body.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=()=>dl('ciR1IncidentPdf',b.dataset.pdf,b));
+  $('ci-in-go').onclick=async()=>{const m=$('ci-in-msg');const t=$('ci-in-time').value;let time='';if(t){const [hh,mm]=t.split(':').map(Number);time=((hh%12)||12)+':'+String(mm).padStart(2,'0')+' '+(hh<12?'AM':'PM');}
+   const req={studentId:$('ci-in-stu').value,date:$('ci-in-date').value,time:time,site:$('ci-in-site').value,location:$('ci-in-loc').value,persons:$('ci-in-per').value,witnesses:$('ci-in-wit').value,description:$('ci-in-desc').value,action:$('ci-in-act').value};
+   if(!req.studentId){m.textContent='Choose the student.';return;}if(!req.time){m.textContent='Enter the time of the incident.';return;}if(req.description.trim().length<20){m.textContent='Describe the incident (a few sentences).';return;}
+   if(!confirm('Submit this incident report? The coordinator and the department chair will be notified.'))return;
+   $('ci-in-go').disabled=true;$('ci-in-go').textContent='Submitting…';m.textContent='';
+   try{const r=await ciRun('ciR1IncidentSubmit',tok(),req);I.student='';await loadI();const m2=$('ci-in-msg');if(m2)m2.textContent='✓ Incident report submitted'+(r.emailed?' and e-mailed':'')+'.';}
+   catch(err){m.textContent='Not submitted: '+String(err?.message||err);$('ci-in-go').disabled=false;$('ci-in-go').textContent='Submit incident report';}};
  }
 })();
 </script>

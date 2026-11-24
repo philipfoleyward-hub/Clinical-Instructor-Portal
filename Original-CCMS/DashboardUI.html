@@ -1845,6 +1845,12 @@ function renderAdministration() {
         <p>Review clinical instructors' one-way mileage, approve site distances, and build the mileage sheet and route PDFs for the voucher. Send mileage reminders.</p>
         <button class="primary-button" onclick="showPage('ciMileage')">Open CI Mileage</button>
       </div>
+      <div class="landing-card">
+        <span class="status-pill ready">Connected</span>
+        <h3>CI Notes &amp; Incidents</h3>
+        <p>College Clinical Instructor Reports compiled from instructors' notes (accept or return), the notes themselves, and incident reports (Form 1B) to review.</p>
+        <button class="primary-button" onclick="showPage('ciDocs')">Open CI Notes &amp; Incidents</button>
+      </div>
     </div>`;
 }
 
@@ -6302,14 +6308,15 @@ function v3ExportCap(a,b){return `<div class="export-capability"><strong>${escap
 function openSemesterPlanning(){
  const cohorts=[...new Set((APP.students||[]).map(s=>s.cohort).filter(Boolean))].sort(),host=document.getElementById('semesterPlanningHost'); if(!host)return;
  host.innerHTML=`<div class="section semester-launcher"><div class="section-title">Semester Clinical Planning</div><div class="muted small">Choose the cohort and clinical term you are preparing. New terms do not reset or erase prior semesters.</div><div class="schedule-toolbar"><div><label>Cohort</label><select id="plannerCohort">${cohorts.map(c=>`<option ${c===APP.scheduleCohort?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></div><div><label>Clinical Term</label><select id="plannerTerm">${['Clinical 1','Clinical 2','Clinical 3','Clinical 4','Clinical 5'].map(t=>`<option ${t===APP.scheduleClinicalTerm?'selected':''}>${t}</option>`).join('')}</select></div><button class="primary-button" onclick="loadSemesterPlanner()">Open Planner</button></div><div class="planning-explanation"><strong>Planning sequence:</strong> Overview → Site Placement → Room Rotations → CI Coverage → Review. CCMS surfaces decision-support facts as their authoritative sources are connected; the coordinator remains the decision-maker.</div></div>`;
+ host.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function loadSemesterPlanner(){APP.scheduleCohort=document.getElementById('plannerCohort').value;APP.scheduleClinicalTerm=document.getElementById('plannerTerm').value;APP.semesterPlannerTab='overview';const h=document.getElementById('semesterPlanningHost');h.innerHTML='<div class="section loading">Loading semester planning workspace...</div>';let plannerRequestFinished = false;
   const plannerTimeout = setTimeout(() => {
     if (plannerRequestFinished) return;
-    host.innerHTML = `<div class="entry-message error"><strong>Semester planning is taking longer than expected.</strong><br>The lightweight planning summary did not return within 15 seconds.<div style="margin-top:10px"><button class="secondary-button" onclick="loadSemesterPlanner()">Retry</button></div></div>`;
+    h.innerHTML = `<div class="entry-message error"><strong>Semester planning is taking longer than expected.</strong><br>The lightweight planning summary did not return within 15 seconds.<div style="margin-top:10px"><button class="secondary-button" onclick="loadSemesterPlanner()">Retry</button></div></div>`;
   }, 15000);
 
-  google.script.run.withSuccessHandler(s=>{APP.semesterPlanningSummary=s||{};renderSemesterPlanner();}).withFailureHandler(e=>h.innerHTML=`<div class="entry-message error">${escapeHtml(errorMessage(e))}</div>`).dashboardGetSemesterPlanningSummary(APP.scheduleCohort,APP.scheduleClinicalTerm);}
+  google.script.run.withSuccessHandler(s=>{plannerRequestFinished=true;clearTimeout(plannerTimeout);APP.semesterPlanningSummary=s||{};renderSemesterPlanner();}).withFailureHandler(e=>{plannerRequestFinished=true;clearTimeout(plannerTimeout);h.innerHTML=`<div class="entry-message error">${escapeHtml(errorMessage(e))}</div>`;}).dashboardGetSemesterPlanningSummary(APP.scheduleCohort,APP.scheduleClinicalTerm);}
 function renderSemesterPlanner(){const h=document.getElementById('semesterPlanningHost');if(!h)return;const s=APP.semesterPlanningSummary||{},tabs=[['overview','Overview'],['site','Site Placement'],['room','Room Rotations'],['ci','CI Coverage'],['review','Review']];h.innerHTML=`<div class="section semester-planner-shell"><div class="planner-heading"><div><div class="eyebrow">SEMESTER CLINICAL PLANNING</div><h2 style="margin:3px 0">${escapeHtml(APP.scheduleCohort)} · ${escapeHtml(APP.scheduleClinicalTerm)}</h2><div class="muted small">${s.studentCount||0} students represented · ${s.siteAssignmentCount||0} site assignments</div></div><div class="inline-actions"><button class="secondary-button" onclick="window.print()">Print Current View</button><button class="secondary-button" onclick="openSemesterPlanning()">Change Cohort / Term</button></div></div><div class="planner-tabs">${tabs.map(t=>`<button class="${APP.semesterPlannerTab===t[0]?'active':''}" onclick="setSemesterPlannerTab('${t[0]}')">${t[1]}</button>`).join('')}</div><div id="semesterPlannerTabBody">${renderSemesterPlannerTab()}</div></div>`;}
 function setSemesterPlannerTab(t){APP.semesterPlannerTab=t;if(t==='room'){v3LoadRoomRotations();return;}renderSemesterPlanner();}
 function v3Status(title,status,detail){const cls=/complete|available/i.test(status)?'ready':(/not yet|planned|not started/i.test(status)?'future':'neutral');return `<div class="planning-status-card"><span class="status-pill ${cls}">${escapeHtml(status)}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(detail)}</p></div>`;}
@@ -6574,7 +6581,7 @@ showPage = function(page) {
 };
 function v2SetActive(page) {
   const key = {administration: 'paperwork', reports: 'paperwork', newEntry: 'paperwork', clinicalReview: 'paperwork',
-    attendance: 'schedules', ciAvailability: 'schedules', ciMileage: 'paperwork', review: 'home'}[page] || page;
+    attendance: 'schedules', ciAvailability: 'schedules', ciMileage: 'paperwork', ciDocs: 'paperwork', review: 'home'}[page] || page;
   document.querySelectorAll('.v2-nav button[data-v2]').forEach(function(b) {b.classList.toggle('active', b.dataset.v2 === key);});
   const help = document.querySelector('.v2-help');
   if (help) help.classList.toggle('active', page === 'help');
@@ -6588,6 +6595,7 @@ render = function() {
   if (APP.page === 'help') return v2RenderHelp();
   if (APP.page === 'ciAvailability') return v2RenderCiHours();
   if (APP.page === 'ciMileage') return v2RenderMileage();
+  if (APP.page === 'ciDocs') return v2RenderCiDocs();
   if (APP.page === 'instructors') return v2RenderInstructors();
   return v2OriginalRender();
 };
@@ -6603,6 +6611,9 @@ function v2LoadHome(force) {
     V2.homeLoading = false; V2.homeError = errorMessage(e);
     if (APP.page === 'home') renderHome();
   });
+  v2Run('dashboardV2OpenIncidents', [], function(r) {
+    V2.openIncidents = (r && r.incidents) || []; if (APP.page === 'home') renderHome();
+  }, function() {});
   if (!V2.attendance) v2Run('dashboardGetAttendanceActionItems', [], function(r) {
     V2.attendance = r || {}; if (APP.page === 'home') renderHome();
   }, function() {V2.attendance = {error: true};});
@@ -6672,6 +6683,8 @@ function v2OpenInbox(id) {
   if (n.itemKind === 'availability') return v2OpenAvailability(n.id);
   if (n.itemKind === 'reflection') {if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
     const m = /\(([^()]+)\)\s*$/.exec(n.from || ''); V2.ci.openAfter = m ? m[1] : ''; V2.ci.data = null; return showPage('instructors');}
+  if (n.itemKind === 'ci-report' || n.itemKind === 'incident') {if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
+    V2.docs.tab = n.itemKind === 'incident' ? 'incidents' : 'reports'; V2.docs.openAfter = n.itemId || ''; V2.docs.data = null; return showPage('ciDocs');}
   if (/^mileage/.test(n.itemKind || '')) {if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {}); return showPage('ciMileage');}
   if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
   if (n.itemId) v2OpenReview(n.itemKind || 'evaluation', n.itemId);
@@ -7458,6 +7471,127 @@ function v2CiRecordDos(id) {
   v2Run('dashboardV2RecordDosimeter', [req], function() {v2CloseReview(); V2.ci.msg = '✓ Dosimeter wear period recorded'; v2LoadInstructors();},
     function(e) {g('v2ci-dgo').disabled = false; g('v2ci-dmsg').textContent = errorMessage(e);});
 }
+
+/* ---------- CI Notes & Incidents (Reports & Paperwork) ---------- */
+V2.docs = {term: '', tab: 'reports', data: null, loading: false, error: '', msg: '', openAfter: '', who: ''};
+V2.openIncidents = V2.openIncidents || [];
+function v2LoadCiDocs() {
+  const D = V2.docs; D.loading = true; D.error = ''; v2RenderCiDocs();
+  v2Run('dashboardV2CiDocs', [{term: D.term}], function(d) {
+    D.loading = false; D.data = d; D.term = d.term; v2RenderCiDocs();
+    if (D.openAfter) {const id = D.openAfter; D.openAfter = '';
+      if (D.tab === 'incidents') v2OpenIncident(id); else if ((d.reports || []).some(function(r) {return r.reportId === id;})) v2OpenCiReport(id);}
+  }, function(e) {D.loading = false; D.error = errorMessage(e); v2RenderCiDocs();});
+}
+function v2RenderCiDocs() {
+  const c = document.getElementById('content'); if (!c || APP.page !== 'ciDocs') return;
+  const D = V2.docs, d = D.data;
+  if (!d && !D.loading && !D.error) setTimeout(v2LoadCiDocs, 0);
+  const open = d ? d.incidents.filter(function(x) {return x.status !== 'Reviewed';}).length : 0;
+  const waiting = d ? d.reports.filter(function(x) {return x.status === 'Submitted';}).length : 0;
+  let h = '<h1 class="page-title">CI Notes &amp; Incidents</h1><div class="page-subtitle">College clinical instructors keep dated notes in the CI Portal; at mid- and end of semester they submit the College Clinical Instructor Report compiled from those notes. Incident reports (Form 1B) from any instructor appear here too.</div>';
+  h += '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:10px 0 16px"><div><label class="small muted" for="v2d-term">Semester</label><br><select id="v2d-term" onchange="V2.docs.term=this.value;v2LoadCiDocs()">' +
+    ((d && d.terms) || []).map(function(t) {return '<option' + (d && t === d.term ? ' selected' : '') + '>' + v2Esc(t) + '</option>';}).join('') + '</select></div>' +
+    '<div class="v2-chips" style="margin:0">' + [['reports', 'CI Reports' + (waiting ? ' (' + waiting + ' to review)' : '')], ['notes', 'Notes'], ['incidents', 'Incidents' + (open ? ' (' + open + ' open)' : '')]].map(function(x) {
+      return '<button class="v2-chip ' + (D.tab === x[0] ? 'active' : '') + '" onclick="V2.docs.tab=\'' + x[0] + '\';v2RenderCiDocs()">' + v2Esc(x[1]) + '</button>';}).join('') + '</div>' +
+    '<span style="flex:1"></span><button class="secondary-button" onclick="v2LoadCiDocs()">Refresh</button></div>';
+  if (D.msg) h += '<div class="entry-message ' + (/^✓/.test(D.msg) ? 'success' : 'error') + '">' + v2Esc(D.msg) + '</div>';
+  if (D.loading) h += '<div class="section loading">Loading…</div>';
+  else if (D.error) h += '<div class="entry-message error">' + v2Esc(D.error) + ' <button class="secondary-button" onclick="v2LoadCiDocs()">Retry</button></div>';
+  else if (d && D.tab === 'reports') {
+    h += '<div class="section"><div class="section-title">College Clinical Instructor Reports · ' + v2Esc(d.term) + '</div>' + (d.reports.length ?
+      '<table><thead><tr><th>Instructor</th><th>Report</th><th>Period</th><th>Student notes</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody>' +
+      d.reports.map(function(r) {
+        return '<tr><td><strong>' + v2Esc(r.evaluator) + '</strong><div class="muted small">' + v2Esc(r.sites) + '</div></td><td>' + v2Esc(r.practicum) + ' · ' + v2Esc(r.period) + (r.version > 1 ? '<div class="muted small">version ' + r.version + '</div>' : '') +
+          '</td><td>' + v2Esc(r.from) + ' – ' + v2Esc(r.to) + '</td><td>' + v2Esc(r.studentNotes) + '</td><td>' + v2Esc(r.submittedAt ? v2DayLabel(r.submittedAt.slice(0, 10)) : '') +
+          '</td><td><span class="status-pill">' + v2Esc(r.status) + '</span>' + (r.coordinatorNote ? '<div class="muted small">' + v2Esc(r.coordinatorNote) + '</div>' : '') + '</td><td style="white-space:nowrap">' +
+          (r.pdfUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(r.pdfUrl) + '">PDF</a> ' : '') +
+          (r.docUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(r.docUrl) + '">Doc</a> ' : '') +
+          (r.status === 'Submitted' ? '<button class="action-button primary" onclick="v2OpenCiReport(\'' + escapeJs(r.reportId) + '\')">Review</button>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table>' : '<div class="empty">No CI reports submitted for ' + v2Esc(d.term) + ' yet.</div>') + '</div>';
+  } else if (d && D.tab === 'notes') {
+    const who = Array.from(new Set(d.notes.map(function(n) {return n.evaluator;}))).sort();
+    const list = d.notes.filter(function(n) {return !D.who || n.evaluator === D.who;});
+    const kind = {Student: 'Student', Activity: 'Lab / lecture activity', Mentoring: 'Hospital CI contact'};
+    h += '<div class="section"><div class="section-title" style="display:flex;gap:10px;align-items:center">Notes · ' + v2Esc(d.term) + '<span style="flex:1"></span>' +
+      '<select onchange="V2.docs.who=this.value;v2RenderCiDocs()" aria-label="Instructor"><option value="">All instructors</option>' + who.map(function(w) {return '<option' + (w === D.who ? ' selected' : '') + '>' + v2Esc(w) + '</option>';}).join('') + '</select></div>' +
+      (list.length ? '<table><thead><tr><th>Date</th><th>Instructor</th><th>Type</th><th>Student</th><th>Site</th><th>Note</th><th>Report</th></tr></thead><tbody>' + list.map(function(n) {
+        return '<tr><td style="white-space:nowrap">' + v2Esc(n.date) + '</td><td>' + v2Esc(n.evaluator) + '</td><td>' + v2Esc(kind[n.kind] || n.kind) + '</td><td>' + v2Esc(n.student) + '</td><td>' + v2Esc(n.site) +
+          '</td><td style="white-space:pre-wrap;max-width:520px">' + v2Esc(n.text) + '</td><td class="small muted">' + v2Esc(n.reportId ? 'in report' : 'not yet reported') + '</td></tr>';
+      }).join('') + '</tbody></table>' : '<div class="empty">No notes for ' + v2Esc(d.term) + (D.who ? ' from ' + v2Esc(D.who) : '') + ' yet.</div>') + '</div>';
+  } else if (d) {
+    h += '<div class="section"><div class="section-title">Incident reports (all semesters)</div>' + (d.incidents.length ?
+      '<table><thead><tr><th>Date</th><th>Student</th><th>Site</th><th>Instructor</th><th>Status</th><th></th></tr></thead><tbody>' + d.incidents.map(function(x) {
+        const o = x.status !== 'Reviewed';
+        return '<tr' + (o ? ' style="background:#fff4f4"' : '') + '><td style="white-space:nowrap">' + v2Esc(x.date) + ' ' + v2Esc(x.time) + '</td><td><strong>' + v2Esc(x.student) + '</strong></td><td>' + v2Esc(x.site) +
+          '</td><td>' + v2Esc(x.evaluator) + '</td><td><span class="status-pill"' + (o ? ' style="background:#fde2e2;color:#b42318"' : '') + '>' + v2Esc(o ? 'Open' : 'Reviewed') + '</span></td><td style="white-space:nowrap">' +
+          (x.pdfUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(x.pdfUrl) + '">PDF</a> ' : '') +
+          '<button class="action-button' + (o ? ' primary' : '') + '" onclick="v2OpenIncident(\'' + escapeJs(x.incidentId) + '\')">' + (o ? 'Review' : 'Open') + '</button></td></tr>';
+      }).join('') + '</tbody></table>' : '<div class="empty">No incident reports.</div>') + '</div>';
+  }
+  c.innerHTML = h;
+}
+function v2OpenCiReport(id) {
+  const r = ((V2.docs.data || {}).reports || []).filter(function(x) {return x.reportId === id;})[0]; if (!r) return;
+  v2Modal('CI report — ' + r.evaluator,
+    '<div class="small">' + v2Esc(r.term) + ' · ' + v2Esc(r.practicum) + ' · ' + v2Esc(r.period) + ' · ' + v2Esc(r.from) + ' – ' + v2Esc(r.to) + ' · ' + r.studentNotes + ' student note' + (r.studentNotes === 1 ? '' : 's') + '</div>' +
+    '<div style="margin:8px 0">' + (r.pdfUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(r.pdfUrl) + '">Open PDF</a> ' : '') + (r.docUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(r.docUrl) + '">Open Doc</a>' : '') + '</div>' +
+    '<label class="v2-dlabel" for="v2d-notes">Note to the instructor (required to return)</label><textarea id="v2d-notes" rows="3" maxlength="2000" style="width:100%"></textarea>' +
+    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px"><input type="checkbox" id="v2d-email" checked> Also e-mail the instructor</label>' +
+    '<div id="v2d-dmsg" class="small" style="margin-top:6px"></div><div class="v2-dactions"><button class="v2-btn-red" id="v2d-ret" onclick="v2CiReportDecide(\'' + escapeJs(id) + '\',\'Returned\')">Return to instructor</button><button class="primary-button" id="v2d-ok" onclick="v2CiReportDecide(\'' + escapeJs(id) + '\',\'Accepted\')">Accept</button></div>' +
+    '<div class="muted small">Returning unlocks the instructor\'s notes for this period so they can correct them and resubmit.</div>');
+}
+function v2CiReportDecide(id, decision) {
+  const g = function(x) {return document.getElementById(x);};
+  const notes = g('v2d-notes').value;
+  if (decision === 'Returned' && !notes.trim()) {g('v2d-dmsg').textContent = 'Add a note so the instructor knows what to change.'; return;}
+  g('v2d-ok').disabled = true; g('v2d-ret').disabled = true; g('v2d-dmsg').textContent = 'Saving…';
+  v2Run('dashboardV2CiReportDecide', [{reportId: id, decision: decision, notes: notes, email: g('v2d-email').checked}], function(r) {
+    v2CloseReview(); V2.docs.msg = '✓ CI report ' + (decision === 'Accepted' ? 'accepted' : 'returned to the instructor') + (r.emailed ? ' · e-mailed' : ''); v2LoadCiDocs(); v2LoadHome(true);
+  }, function(e) {g('v2d-ok').disabled = false; g('v2d-ret').disabled = false; g('v2d-dmsg').textContent = errorMessage(e);});
+}
+function v2OpenIncident(id) {
+  const x = ((V2.docs.data || {}).incidents || []).filter(function(i) {return i.incidentId === id;})[0]; if (!x) return;
+  const o = x.status !== 'Reviewed';
+  const f = function(label, v) {return v ? '<div style="margin-top:8px"><div class="small muted">' + label + '</div><div style="white-space:pre-wrap">' + v2Esc(v) + '</div></div>' : '';};
+  v2Modal('Incident report — ' + x.student,
+    '<div class="small"><b>' + v2Esc(x.date) + ' ' + v2Esc(x.time) + '</b> · ' + v2Esc(x.site) + (x.location ? ' · ' + v2Esc(x.location) : '') + ' · reported by ' + v2Esc(x.evaluator) +
+      (x.emailed ? ' · e-mailed to ' + v2Esc(x.emailed) : '') + '</div>' +
+    '<div style="margin:8px 0">' + (x.pdfUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(x.pdfUrl) + '">Open Form 1B PDF</a> ' : '') + (x.docUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(x.docUrl) + '">Open Doc</a> ' : '') +
+      '<button class="action-button" onclick="v2CloseReview();v2OpenStudent(\'' + escapeJs(x.studentId) + '\')">Student record</button></div>' +
+    f('Description', x.description) + f('Resulting action / consequence', x.action) + f('Additional persons involved', x.persons) + f('Witnesses', x.witnesses) +
+    (o ? '<label class="v2-dlabel" for="v2i-notes">Follow-up note (what was done)</label><textarea id="v2i-notes" rows="3" maxlength="4000" style="width:100%"></textarea>' +
+      '<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px"><input type="checkbox" id="v2i-notify" checked> Let the instructor know it was reviewed (Portal notification)</label>' +
+      '<div id="v2i-dmsg" class="small" style="margin-top:6px"></div><div class="v2-dactions"><button class="primary-button" id="v2i-ok" onclick="v2IncidentReview(\'' + escapeJs(id) + '\')">Mark reviewed</button></div>'
+      : f('Reviewed ' + (x.reviewedAt ? v2DayLabel(x.reviewedAt.slice(0, 10)) : ''), x.coordinatorNote)));
+}
+function v2IncidentReview(id) {
+  const g = function(x) {return document.getElementById(x);};
+  const notes = g('v2i-notes').value;
+  if (!notes.trim()) {g('v2i-dmsg').textContent = 'Add a short follow-up note.'; return;}
+  g('v2i-ok').disabled = true; g('v2i-dmsg').textContent = 'Saving…';
+  v2Run('dashboardV2IncidentReview', [{incidentId: id, notes: notes, notifyCi: g('v2i-notify').checked}], function() {
+    v2CloseReview(); V2.docs.msg = '✓ Incident marked reviewed';
+    V2.openIncidents = (V2.openIncidents || []).filter(function(i) {return i.incidentId !== id;});
+    v2LoadCiDocs(); v2LoadHome(true);
+  }, function(e) {g('v2i-ok').disabled = false; g('v2i-dmsg').textContent = errorMessage(e);});
+}
+function v2OpenIncidentFromHome(id) {V2.docs.tab = 'incidents'; V2.docs.openAfter = id; V2.docs.data = null; showPage('ciDocs');}
+/* Urgent incident banner at the top of Home */
+const v2RenderHomeBase = renderHome;
+renderHome = function() {
+  v2RenderHomeBase();
+  const list = V2.openIncidents || [];
+  if (!list.length || APP.page !== 'home') return;
+  const host = document.querySelector('#content .v2-content'); if (!host) return;
+  const b = document.createElement('div');
+  b.className = 'v2-incident-banner'; b.setAttribute('role', 'alert');
+  b.style.cssText = 'margin:0 0 16px;padding:12px 16px;border-radius:12px;background:#fde2e2;border:1px solid #f2a7a7;color:#7a1414;display:flex;gap:12px;align-items:center;flex-wrap:wrap';
+  b.innerHTML = '<b style="font-size:15px">⚠ ' + list.length + ' incident report' + (list.length === 1 ? '' : 's') + ' to review</b>' +
+    list.slice(0, 3).map(function(i) {return '<button class="v2-action red" onclick="v2OpenIncidentFromHome(\'' + escapeJs(i.incidentId) + '\')">' + v2Esc(i.student) + ' · ' + v2Esc(i.site) + ' · ' + v2Esc(i.date) + '</button>';}).join('') +
+    (list.length > 3 ? '<button class="v2-link" onclick="V2.docs.tab=\'incidents\';V2.docs.data=null;showPage(\'ciDocs\')">All incidents →</button>' : '');
+  host.insertBefore(b, host.firstChild);
+};
 
 /* ---------- System & Setup, Help ---------- */
 function v2RenderSystem() {
