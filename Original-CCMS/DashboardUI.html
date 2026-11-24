@@ -1839,6 +1839,12 @@ function renderAdministration() {
         <p>Clinical assessment, evaluation review, trends, and cohort/site analysis.</p>
         <button class="primary-button" onclick="showPage('clinicalReview')">Open Assessment</button>
       </div>
+      <div class="landing-card">
+        <span class="status-pill ready">Connected</span>
+        <h3>CI Mileage</h3>
+        <p>Review clinical instructors' one-way mileage, approve site distances, and build the mileage sheet and route PDFs for the voucher. Send mileage reminders.</p>
+        <button class="primary-button" onclick="showPage('ciMileage')">Open CI Mileage</button>
+      </div>
     </div>`;
 }
 
@@ -6568,7 +6574,7 @@ showPage = function(page) {
 };
 function v2SetActive(page) {
   const key = {administration: 'paperwork', reports: 'paperwork', newEntry: 'paperwork', clinicalReview: 'paperwork',
-    attendance: 'schedules', ciAvailability: 'schedules', review: 'home'}[page] || page;
+    attendance: 'schedules', ciAvailability: 'schedules', ciMileage: 'paperwork', review: 'home'}[page] || page;
   document.querySelectorAll('.v2-nav button[data-v2]').forEach(function(b) {b.classList.toggle('active', b.dataset.v2 === key);});
   const help = document.querySelector('.v2-help');
   if (help) help.classList.toggle('active', page === 'help');
@@ -6581,6 +6587,7 @@ render = function() {
   if (APP.page === 'system') return v2RenderSystem();
   if (APP.page === 'help') return v2RenderHelp();
   if (APP.page === 'ciAvailability') return v2RenderCiHours();
+  if (APP.page === 'ciMileage') return v2RenderMileage();
   return v2OriginalRender();
 };
 
@@ -6662,6 +6669,7 @@ function v2OpenInbox(id) {
   const n = ((V2.home || {}).inbox || []).filter(function(x) {return x.id === id;})[0];
   if (!n) return;
   if (n.itemKind === 'availability') return v2OpenAvailability(n.id);
+  if (/^mileage/.test(n.itemKind || '')) {if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {}); return showPage('ciMileage');}
   if (n.status === 'Unread') v2Run('dashboardV2MarkInboxRead', [id], function() {n.status = 'Read'; v2LoadHome(true);}, function() {});
   if (n.itemId) v2OpenReview(n.itemKind || 'evaluation', n.itemId);
 }
@@ -7132,6 +7140,157 @@ function v2SendReminder() {
   v2Run('dashboardV2SendAvailabilityReminder', [{evaluatorIds: ids, period: document.getElementById('v2r-period').value, message: document.getElementById('v2r-msg').value}], function(r) {
     v2CloseReview(); V2.hours.msg = '✓ Reminder sent · ' + r.emailed + ' e-mailed · ' + r.notified + ' notified in the Portal' + (r.failures.length ? ' · not e-mailed: ' + r.failures.join(', ') : ''); v2RenderCiHours();
   }, function(e) {document.getElementById('v2r-go').disabled = false; st.textContent = errorMessage(e);});
+}
+
+/* ---------- CI Mileage (Reports & Paperwork) ---------- */
+V2.mile = {term: '', data: null, loading: false, error: '', msg: '', open: '', showAllDist: false, siteResults: null};
+function v2Money(n) {return n == null ? '—' : '$' + Number(n).toFixed(2);}
+function v2Modal(title, body) {
+  let m = document.getElementById('v2-review-modal');
+  if (!m) {m = document.createElement('div'); m.id = 'v2-review-modal'; m.className = 'v2-modal'; document.body.appendChild(m);
+    m.addEventListener('click', function(e) {if (e.target === m) v2CloseReview();});}
+  V2.review = {modal: true};
+  m.innerHTML = '<div class="v2-dialog" role="dialog" aria-modal="true"><div class="v2-dhead"><b>' + v2Esc(title) + '</b><button onclick="v2CloseReview()" aria-label="Close">×</button></div><div class="v2-dbody">' + body + '</div></div>';
+}
+function v2LoadMileage() {
+  const M = V2.mile; M.loading = true; M.error = ''; v2RenderMileage();
+  v2Run('dashboardV2Mileage', [{term: M.term}], function(d) {M.loading = false; M.data = d; M.term = d.term; v2RenderMileage();},
+    function(e) {M.loading = false; M.error = errorMessage(e); v2RenderMileage();});
+}
+function v2RenderMileage() {
+  const c = document.getElementById('content'); if (!c || APP.page !== 'ciMileage') return;
+  const M = V2.mile, d = M.data;
+  if (!d && !M.loading && !M.error) {setTimeout(v2LoadMileage, 0);}
+  let h = '<h1 class="page-title">CI Mileage</h1><div class="page-subtitle">One-way mileage for college clinical instructors: the shorter of home → site or the campus → site. Approving builds the mileage sheet and one route PDF per trip for the voucher. Tolls, parking and the voucher itself are handled separately.</div>';
+  h += '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:10px 0 16px"><div><label class="small muted" for="v2m-term">Semester</label><br><select id="v2m-term" onchange="V2.mile.term=this.value;V2.mile.open=\'\';v2LoadMileage()">' +
+    ((d && d.terms) || []).map(function(t) {return '<option' + (d && t === d.term ? ' selected' : '') + '>' + v2Esc(t) + '</option>';}).join('') + '</select></div>' +
+    '<button class="secondary-button" onclick="v2LoadMileage()">Refresh</button><span style="flex:1"></span><button class="secondary-button" onclick="v2OpenMileageReminder()" ' + (d ? '' : 'disabled') + '>✉ Email mileage reminder</button></div>';
+  if (M.msg) h += '<div class="entry-message ' + (/^✓/.test(M.msg) ? 'success' : 'error') + '">' + v2Esc(M.msg) + '</div>';
+  if (M.loading) h += '<div class="section loading">Loading mileage…</div>';
+  else if (M.error) h += '<div class="entry-message error">' + v2Esc(M.error) + ' <button class="secondary-button" onclick="v2LoadMileage()">Retry</button></div>';
+  else if (d) {
+    // Submissions
+    h += '<div class="section"><div class="section-title">Submissions · ' + v2Esc(d.term) + '</div>' + (d.submissions.length ?
+      '<table><thead><tr><th>Instructor</th><th>Trips</th><th>Miles</th><th>Amount</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody>' +
+      d.submissions.map(function(s) {
+        const open = M.open === s.mileageId, off = s.tripList.filter(function(t) {return !t.onSchedule;}).length;
+        let row = '<tr><td><strong>' + v2Esc(s.evaluator) + '</strong><div class="muted small">' + v2Esc(s.mileageId) + (s.version > 1 ? ' · version ' + s.version : '') + '</div></td><td>' + v2Esc(s.trips) + (off ? '<div class="small" style="color:#8a5a00">' + off + ' not on schedule</div>' : '') + '</td><td>' + v2Esc(s.totalMiles) + '</td><td>' + v2Money(s.totalAmount) +
+          '</td><td>' + v2Esc(s.submittedAt ? v2DayLabel(s.submittedAt.slice(0, 10)) : '') + '</td><td><span class="status-pill">' + v2Esc(s.status) + '</span>' + (s.coordinatorNote ? '<div class="muted small">' + v2Esc(s.coordinatorNote) + '</div>' : '') + '</td><td style="white-space:nowrap">' +
+          '<button class="action-button" onclick="V2.mile.open=V2.mile.open===\'' + escapeJs(s.mileageId) + '\'?\'\':\'' + escapeJs(s.mileageId) + '\';v2RenderMileage()">' + (open ? 'Hide trips' : 'Trips') + '</button> ' +
+          (s.status === 'Submitted' ? '<button class="action-button primary" onclick="v2OpenMileageDecide(\'' + escapeJs(s.mileageId) + '\')">Review</button>' : '') +
+          (s.sheetUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(s.sheetUrl) + '">Mileage sheet</a> ' : '') +
+          (s.folderUrl ? '<a class="action-button" target="_blank" rel="noopener" href="' + v2Esc(s.folderUrl) + '">Route PDFs</a>' : '') + '</td></tr>';
+        if (open) row += '<tr><td colspan="7" style="background:#f7fafc">' + (s.note ? '<div class="small" style="margin-bottom:6px"><b>Instructor note:</b> ' + v2Esc(s.note) + '</div>' : '') +
+          '<table><thead><tr><th>Date</th><th>From</th><th>To</th><th>Miles</th><th>Amount</th><th></th></tr></thead><tbody>' + s.tripList.map(function(t) {
+            return '<tr><td>' + v2Esc(t.date) + '</td><td>' + v2Esc(t.from) + '</td><td>' + v2Esc(t.site) + '</td><td>' + v2Esc(t.miles) + '</td><td>' + v2Money(t.amount) + '</td><td>' + (t.onSchedule ? '' : '<span class="status-pill" style="background:#fff3cf;color:#8a5a00">Not on CI schedule</span>') + '</td></tr>';
+          }).join('') + '</tbody></table></td></tr>';
+        return row;
+      }).join('') + '</tbody></table>' : '<div class="empty">No mileage submitted for ' + v2Esc(d.term) + ' yet.</div>') + '</div>';
+    // Distances
+    const pend = d.distances.filter(function(x) {return x.status === 'Pending';}), rest = d.distances.filter(function(x) {return x.status !== 'Pending';});
+    const distRow = function(x) {
+      return '<tr><td><strong>' + v2Esc(x.evaluator) + '</strong></td><td>' + v2Esc(x.site) + '</td><td>' + v2Esc(x.homeMiles) + '</td><td>' + v2Esc(x.collegeMiles) + '</td><td><strong>' + v2Esc(x.reimbursedMiles) + '</strong><div class="muted small">' + (x.basis === 'Home' ? 'home route' : 'campus route') + '</div></td><td>' +
+        (x.pdfUrl ? '<a target="_blank" rel="noopener" href="' + v2Esc(x.pdfUrl) + '">Route PDF</a>' : x.basis === 'Home' ? '<span style="color:#c4262d">missing</span>' : '<span class="muted small">generated on approval</span>') + '</td><td><span class="status-pill">' + v2Esc(x.status) + '</span>' + (x.note ? '<div class="muted small">' + v2Esc(x.note) + '</div>' : '') + '</td><td style="white-space:nowrap">' +
+        (x.status === 'Pending' ? '<button class="action-button primary" onclick="v2MileDistance(\'' + escapeJs(x.distanceId) + '\',\'Approved\')">Approve</button> <button class="action-button" onclick="v2MileDistance(\'' + escapeJs(x.distanceId) + '\',\'Declined\')">Decline</button>' : '') + '</td></tr>';
+    };
+    const head = '<table><thead><tr><th>Instructor</th><th>Site</th><th>Home → site</th><th>Campus → site</th><th>Paid per trip</th><th>Route</th><th>Status</th><th></th></tr></thead><tbody>';
+    h += '<div class="section"><div class="section-title">Distances to approve (' + pend.length + ')</div><div class="muted small" style="margin-bottom:8px">Each instructor enters their one-way home → site miles once per site. Check the attached Google Maps PDF when home is the shorter route. Distances used in a submission are approved together with it.</div>' +
+      (pend.length ? head + pend.map(distRow).join('') + '</tbody></table>' : '<div class="empty">Nothing waiting.</div>') +
+      (rest.length ? '<div style="margin-top:10px"><button class="secondary-button" onclick="V2.mile.showAllDist=!V2.mile.showAllDist;v2RenderMileage()">' + (M.showAllDist ? 'Hide' : 'Show') + ' approved / declined distances (' + rest.length + ')</button></div>' + (M.showAllDist ? head + rest.map(distRow).join('') + '</tbody></table>' : '') : '') + '</div>';
+    // Instructors
+    h += '<div class="section"><div class="section-title">Instructors · ' + v2Esc(d.term) + '</div><table><thead><tr><th>Instructor</th><th>Assigned days</th><th>Mileage</th></tr></thead><tbody>' +
+      d.instructors.map(function(i) {return '<tr><td>' + v2Esc(i.evaluator) + (i.email ? '' : ' <span class="muted small">(no e-mail on file)</span>') + '</td><td>' + i.assignedDays + '</td><td><span class="status-pill">' + v2Esc(i.status) + '</span></td></tr>';}).join('') + '</tbody></table></div>';
+    // Sites & settings
+    const s = d.settings, R = M.siteResults || {};
+    h += '<div class="section"><div class="section-title">Campus miles &amp; settings</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px"><div><label class="small muted">Rate per mile ($)</label><br><input id="v2m-rate" type="number" step="0.001" min="0" style="width:100px" value="' + v2Esc(s.rate) + '"></div>' +
+      '<div style="flex:1;min-width:260px"><label class="small muted">Campus address (routes start here)</label><br><input id="v2m-addr" style="width:100%" value="' + v2Esc(s.collegeAddress) + '"></div>' +
+      '<div><label class="small muted">Shown as</label><br><input id="v2m-label" style="width:240px" value="' + v2Esc(s.collegeLabel) + '"></div><button class="primary-button" onclick="v2MileSaveSettings()">Save settings</button></div>' +
+      '<div class="muted small" style="margin-bottom:8px">Campus → site miles come from Google Maps driving directions using each site\'s Address (Clinical Sites sheet). Check the addresses, then calculate. You can also type a number to override.</div>' +
+      '<table><thead><tr><th>Site</th><th>Address</th><th>Campus → site (mi)</th><th></th></tr></thead><tbody>' + d.sites.filter(function(x) {return x.active;}).map(function(x) {
+        const r = R[x.siteId];
+        return '<tr><td>' + v2Esc(x.site) + '</td><td class="small">' + (x.address ? v2Esc(x.address) : '<span style="color:#c4262d">No address — add it in Clinical Sites</span>') + '</td><td><input type="number" step="0.1" min="0" style="width:90px" id="v2m-cm-' + v2Esc(x.siteId) + '" value="' + (x.collegeMiles == null ? '' : x.collegeMiles) + '">' +
+          (r ? '<div class="small" style="color:' + (r.error ? '#c4262d' : '#17733a') + '">' + v2Esc(r.error ? r.error : 'Google Maps: ' + r.miles + ' mi' + (r.via ? ' via ' + r.via : '') + (r.previous != null && r.previous !== r.miles ? ' (was ' + r.previous + ')' : '')) + '</div>' : '') + '</td><td><button class="action-button" onclick="v2MileSetCampus(\'' + escapeJs(x.siteId) + '\')">Save</button></td></tr>';
+      }).join('') + '</tbody></table><div style="margin-top:10px"><button class="primary-button" id="v2m-calc" onclick="v2MileCalc()">Calculate campus miles with Google Maps</button></div></div>';
+  }
+  c.innerHTML = h;
+}
+function v2OpenMileageDecide(id) {
+  const s = (V2.mile.data.submissions || []).filter(function(x) {return x.mileageId === id;})[0]; if (!s) return;
+  const pendingDist = (V2.mile.data.distances || []).filter(function(x) {return x.status === 'Pending' && s.tripList.some(function(t) {return t.distanceId === x.distanceId;});});
+  v2Modal('Review mileage — ' + s.evaluator,
+    '<div class="small">' + v2Esc(V2.mile.data.term) + ' · ' + s.trips + ' trips · ' + s.totalMiles + ' mi · <b>' + v2Money(s.totalAmount) + '</b> at $' + v2Esc(s.rate) + '/mi</div>' +
+    (pendingDist.length ? '<div class="small" style="margin-top:8px;color:#8a5a00">Approving also approves ' + pendingDist.length + ' pending distance' + (pendingDist.length === 1 ? '' : 's') + ': ' + v2Esc(pendingDist.map(function(x) {return x.site + ' ' + x.reimbursedMiles + ' mi';}).join(', ')) + '</div>' : '') +
+    '<label class="v2-dlabel" for="v2m-notes">Note to the instructor (required to return)</label><textarea id="v2m-notes" rows="3" maxlength="2000" style="width:100%"></textarea>' +
+    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px"><input type="checkbox" id="v2m-email" checked> Also e-mail the instructor</label>' +
+    '<div id="v2m-dmsg" class="small" style="margin-top:6px"></div><div class="v2-dactions"><button class="v2-btn-red" id="v2m-ret" onclick="v2MileDecide(\'' + escapeJs(id) + '\',\'Returned\')">Return to instructor</button><button class="primary-button" id="v2m-ok" onclick="v2MileDecide(\'' + escapeJs(id) + '\',\'Approved\')">Approve &amp; build files</button></div>' +
+    '<div class="muted small">Approving creates the mileage sheet (address and tolls left blank for you) and one route PDF per trip in a private Drive folder.</div>');
+}
+function v2MileDecide(id, decision) {
+  const g = function(x) {return document.getElementById(x);};
+  const notes = g('v2m-notes').value;
+  if (decision === 'Returned' && !notes.trim()) {g('v2m-dmsg').textContent = 'Add a note so the instructor knows what to change.'; return;}
+  g('v2m-ok').disabled = true; g('v2m-ret').disabled = true; g('v2m-dmsg').textContent = decision === 'Approved' ? 'Building the mileage sheet and route PDFs… this can take a minute.' : 'Saving…';
+  v2Run('dashboardV2MileageDecide', [{mileageId: id, decision: decision, notes: notes, email: g('v2m-email').checked}], function(r) {
+    v2CloseReview();
+    V2.mile.msg = '✓ ' + (decision === 'Approved' ? 'Approved · ' + r.routePdfs + ' route PDF' + (r.routePdfs === 1 ? '' : 's') + ' built' + (r.warnings.length ? ' · check: ' + r.warnings.join('; ') : '') : 'Returned to the instructor') + (r.emailed ? ' · e-mailed' : '');
+    v2LoadMileage(); v2LoadHome(true);
+  }, function(e) {g('v2m-ok').disabled = false; g('v2m-ret').disabled = false; g('v2m-dmsg').textContent = errorMessage(e);});
+}
+function v2MileDistance(id, decision) {
+  const x = (V2.mile.data.distances || []).filter(function(d) {return d.distanceId === id;})[0]; if (!x) return;
+  v2Modal((decision === 'Approved' ? 'Approve' : 'Decline') + ' distance — ' + x.evaluator,
+    '<div class="small">' + v2Esc(x.site) + ' · home → site ' + v2Esc(x.homeMiles) + ' mi · campus → site ' + v2Esc(x.collegeMiles) + ' mi · paid <b>' + v2Esc(x.reimbursedMiles) + ' mi</b> per trip</div>' +
+    '<label class="v2-dlabel" for="v2md-notes">Note' + (decision === 'Declined' ? ' (required)' : ' (optional)') + '</label><textarea id="v2md-notes" rows="2" maxlength="2000" style="width:100%"></textarea>' +
+    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px"><input type="checkbox" id="v2md-email" checked> Also e-mail the instructor</label><div id="v2md-msg" class="small" style="margin-top:6px"></div>' +
+    '<div class="v2-dactions"><button class="secondary-button" onclick="v2CloseReview()">Cancel</button><button class="' + (decision === 'Approved' ? 'primary-button' : 'v2-btn-red') + '" id="v2md-go">' + (decision === 'Approved' ? 'Approve' : 'Decline') + '</button></div>');
+  document.getElementById('v2md-go').onclick = function() {
+    const n = document.getElementById('v2md-notes').value, m = document.getElementById('v2md-msg');
+    if (decision === 'Declined' && !n.trim()) {m.textContent = 'Add a note so the instructor knows what to fix.'; return;}
+    this.disabled = true; m.textContent = 'Saving…';
+    const btn = this;
+    v2Run('dashboardV2MileageDistanceDecide', [{distanceId: id, decision: decision, notes: n, email: document.getElementById('v2md-email').checked}], function(r) {
+      v2CloseReview(); V2.mile.msg = '✓ Distance ' + decision.toLowerCase() + (r.emailed ? ' · instructor e-mailed' : ''); v2LoadMileage(); v2LoadHome(true);
+    }, function(e) {btn.disabled = false; m.textContent = errorMessage(e);});
+  };
+}
+function v2MileSaveSettings() {
+  const req = {rate: document.getElementById('v2m-rate').value, collegeAddress: document.getElementById('v2m-addr').value, collegeLabel: document.getElementById('v2m-label').value};
+  v2Run('dashboardV2MileageSaveSettings', [req], function(r) {
+    V2.mile.msg = '✓ Settings saved' + (r.addressChanged ? ' · the campus address changed, so recalculate campus miles' : ''); v2LoadMileage();
+  }, function(e) {V2.mile.msg = errorMessage(e); v2RenderMileage();});
+}
+function v2MileSetCampus(siteId) {
+  v2Run('dashboardV2MileageSetCollegeMiles', [{siteId: siteId, miles: document.getElementById('v2m-cm-' + siteId).value}], function() {V2.mile.msg = '✓ Campus miles saved'; v2LoadMileage();},
+    function(e) {V2.mile.msg = errorMessage(e); v2RenderMileage();});
+}
+function v2MileCalc() {
+  if (!confirm('Calculate campus → site miles with Google Maps for every active site with an address? Existing numbers are replaced.')) return;
+  const b = document.getElementById('v2m-calc'); b.disabled = true; b.textContent = 'Calculating…';
+  v2Run('dashboardV2MileageCollegeMiles', [{}], function(r) {
+    V2.mile.siteResults = {}; r.results.forEach(function(x) {V2.mile.siteResults[x.siteId] = x;});
+    const bad = r.results.filter(function(x) {return x.error;}).length;
+    V2.mile.msg = (bad ? '' : '✓ ') + 'Calculated ' + (r.results.length - bad) + ' site' + (r.results.length - bad === 1 ? '' : 's') + (bad ? ' · ' + bad + ' could not be calculated' : ''); v2LoadMileage();
+  }, function(e) {b.disabled = false; b.textContent = 'Calculate campus miles with Google Maps'; V2.mile.msg = errorMessage(e); v2RenderMileage();});
+}
+function v2OpenMileageReminder() {
+  const d = V2.mile.data || {};
+  v2Modal('Remind instructors to submit mileage',
+    '<div class="muted small">Pre-selected: instructors with clinical days in ' + v2Esc(d.term) + ' who have not submitted. Each gets an e-mail and a Portal notification.</div>' +
+    (d.instructors || []).map(function(i) {const pre = i.status === 'Not submitted' && i.assignedDays > 0 && i.email;
+      return '<label style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #eef2f6"><input type="checkbox" class="v2mr-pick" value="' + v2Esc(i.evaluatorId) + '" ' + (pre ? 'checked' : '') + (i.email ? '' : ' disabled') + '><span style="flex:1">' + v2Esc(i.evaluator) + (i.email ? '' : ' <span class="muted small">(no e-mail on file)</span>') + '</span><span class="muted small">' + i.assignedDays + ' days · ' + v2Esc(i.status) + '</span></label>';}).join('') +
+    '<label class="v2-dlabel">Message (optional)</label><textarea id="v2mr-msg" rows="3" maxlength="2000" style="width:100%" placeholder="e.g. Please submit by December 15 so vouchers can go in before the break."></textarea>' +
+    '<div id="v2mr-status" class="small" style="margin-top:6px"></div><div class="v2-dactions"><button class="secondary-button" onclick="v2CloseReview()">Cancel</button><button class="primary-button" id="v2mr-go" onclick="v2SendMileageReminder()">Send reminder</button></div>');
+}
+function v2SendMileageReminder() {
+  const ids = [].map.call(document.querySelectorAll('.v2mr-pick:checked'), function(x) {return x.value;});
+  const st = document.getElementById('v2mr-status');
+  if (!ids.length) {st.textContent = 'Select at least one instructor.'; return;}
+  if (!confirm('Send the mileage reminder to ' + ids.length + ' instructor' + (ids.length === 1 ? '' : 's') + '?')) return;
+  document.getElementById('v2mr-go').disabled = true; st.textContent = 'Sending…';
+  v2Run('dashboardV2SendMileageReminder', [{evaluatorIds: ids, term: V2.mile.data.term, message: document.getElementById('v2mr-msg').value}], function(r) {
+    v2CloseReview(); V2.mile.msg = '✓ Reminder sent · ' + r.emailed + ' e-mailed · ' + r.notified + ' notified in the Portal' + (r.failures.length ? ' · not e-mailed: ' + r.failures.join(', ') : ''); v2RenderMileage();
+  }, function(e) {document.getElementById('v2mr-go').disabled = false; st.textContent = errorMessage(e);});
 }
 
 /* ---------- System & Setup, Help ---------- */

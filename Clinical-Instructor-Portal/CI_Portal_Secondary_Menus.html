@@ -170,9 +170,9 @@
  }
  function itemButton(n){
   const b=document.createElement('button');b.type='button';
-  const bad=n.type==='Returned'||n.type==='Availability Declined';const info=n.type==='Availability Reminder'||n.type==='Site Assignment';
+  const bad=n.type==='Returned'||n.type==='Availability Declined'||n.type==='Mileage Returned'||n.type==='Distance Declined';const info=n.type==='Availability Reminder'||n.type==='Site Assignment'||n.type==='Mileage Reminder';
   b.className='ci-nt-item'+(n.status==='Unread'?' unread':'')+(bad?' returned':info?'':' accepted');
-  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
+  b.innerHTML='<b>'+esc(n.title)+'<span class="ci-nt-chip '+(bad?'Returned':info?'Submitted':'Accepted')+'">'+esc(n.type==='Returned'?'Returned to you':n.type==='Availability Declined'?'Declined':n.type==='Availability Approved'?'Approved':n.type==='Availability Reminder'?'Reminder':n.type==='Site Assignment'?'Assignment':n.type==='Mileage Approved'||n.type==='Distance Approved'?'Approved':n.type==='Mileage Returned'?'Returned to you':n.type==='Distance Declined'?'Declined':n.type==='Mileage Reminder'?'Reminder':n.type)+'</span></b><small>'+esc(n.student)+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</small>'+(n.message?'<p>'+esc(n.message.length>220?n.message.slice(0,220)+'…':n.message)+'</p>':'');
   b.onclick=()=>openNotification(n.id);return b;
  }
  window.ciNtRefresh_=async function(){
@@ -211,7 +211,7 @@
   const {wrap}=shell('Notification');const box=document.createElement('div');box.className='ci-nt-detail';
   const back=wrap.querySelector('.ci-secondary-back');back.onclick=()=>showNotifications();
   box.innerHTML='<h3>'+esc(n.title)+'</h3><div style="color:#5e7288;font-size:13px">'+esc(n.student)+(n.studentId?' ('+esc(n.studentId)+')':'')+' · from '+esc(n.from)+' · '+esc(when(n.createdAt))+'</div>'+
-   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':n.type==='Availability Declined'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator declined this availability:</p>':n.type==='Availability Approved'?'<p style="margin:12px 0 0;font-weight:700;color:#17733a">The coordinator approved this availability.</p>':n.type==='Availability Reminder'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">Reminder from the coordinator: please submit your availability (My CI Workspace → Submit Availability).</p>':n.type==='Site Assignment'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">You have a clinical site assignment.</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
+   (n.type==='Returned'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator returned this for your review:</p>':n.type==='Availability Declined'?'<p style="margin:12px 0 0;font-weight:700;color:#c4262d">The coordinator declined this availability:</p>':n.type==='Availability Approved'?'<p style="margin:12px 0 0;font-weight:700;color:#17733a">The coordinator approved this availability.</p>':n.type==='Availability Reminder'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">Reminder from the coordinator: please submit your availability (My CI Workspace → Submit Availability).</p>':n.type==='Site Assignment'?'<p style="margin:12px 0 0;font-weight:700;color:#0a63b4">You have a clinical site assignment.</p>':/^(Mileage|Distance)/.test(n.type)?'<p style="margin:12px 0 0;font-weight:700;color:'+(/Returned|Declined/.test(n.type)?'#c4262d':n.type==='Mileage Reminder'?'#0a63b4':'#17733a')+'">'+(n.type==='Mileage Reminder'?'Reminder from the coordinator: please submit your mileage (My CI Workspace → Mileage Submission).':n.type==='Mileage Returned'?'The coordinator returned your mileage. Update it in My CI Workspace → Mileage Submission and submit again.':n.type==='Distance Declined'?'The coordinator declined this mileage distance. Update it in My CI Workspace → Mileage Submission.':n.type==='Mileage Approved'?'Your mileage was approved.':'Your mileage distance was approved.')+'</p>':'<p style="margin:12px 0 0;font-weight:700;color:#17733a">Accepted by the coordinator.</p>')+
    (n.message?'<div class="ci-nt-note'+(n.type==='Returned'||n.type==='Availability Declined'?'':' ok')+'">'+esc(n.message)+'</div>':'')+
    (n.response?'<p style="font-weight:700;margin-bottom:4px">Your reply · '+esc(when(n.respondedAt))+'</p><div class="ci-nt-note ok">'+esc(n.response)+'</div>':'');
   if(!n.response){
@@ -243,6 +243,7 @@
   if(feature==='Notifications'){showNotifications();return true;}
   if(feature==='My Submissions'){showSubmissions();return true;}
   if(feature==='Submit Availability'&&window.ciAvailabilityOpen_){window.ciAvailabilityOpen_();return true;}
+  if(feature==='Mileage Submission'&&window.ciMileageOpen_){window.ciMileageOpen_();return true;}
   return false;
  };
  // Refresh after sign-in, when returning Home, and every 2 minutes while open.
@@ -316,5 +317,138 @@
   };
   load();
  };
+})();
+</script>
+
+<style id="ci-mileage-style">
+.ci-ml-note{font-size:13px;color:#426989;background:#f3f8fc;border:1px solid #d7e5f0;border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.ci-ml-card{border:1px solid #d7e5f0;border-radius:11px;background:#fff;padding:16px;margin-bottom:14px}.ci-ml-card h3{margin:0 0 6px;font-size:15px;color:#112944}
+.ci-ml-card p.sub{margin:0 0 10px;font-size:12px;color:#5e7288}
+.ci-ml-t{width:100%;border-collapse:collapse;font-size:13px}.ci-ml-t th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5e7288;padding:6px;border-bottom:1px solid #d7e5f0}
+.ci-ml-t td{padding:8px 6px;border-bottom:1px solid #eef3f8;vertical-align:top}.ci-ml-t input[type=number]{width:90px;border:1px solid #bcd0e2;border-radius:8px;padding:6px;font:inherit}
+.ci-ml-t input[type=file]{font-size:12px;max-width:230px}.ci-ml-muted{color:#5e7288;font-size:12px}
+.ci-ml-st{border-radius:99px;padding:2px 9px;font-size:11px;font-weight:800;white-space:nowrap}.ci-ml-st.Pending,.ci-ml-st.Submitted{background:#fff3cf;color:#8a5a00}.ci-ml-st.Approved{background:#e6f5ec;color:#17733a}.ci-ml-st.Declined,.ci-ml-st.Returned{background:#ffe8ea;color:#c4262d}.ci-ml-st.None{background:#eef3f8;color:#5e7288}
+.ci-ml-tot{display:flex;gap:18px;justify-content:flex-end;font-size:14px;margin-top:10px}.ci-ml-tot b{color:#112944}
+.ci-ml-banner{border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:13px}.ci-ml-banner.Submitted{background:#fff8e1;color:#7a5200}.ci-ml-banner.Returned{background:#ffe8ea;color:#9b1c22}.ci-ml-banner.Approved{background:#e6f5ec;color:#145c2f}
+.ci-ml-add{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:10px}.ci-ml-add select,.ci-ml-add input{border:1px solid #bcd0e2;border-radius:8px;padding:6px;font:inherit;font-size:13px}
+</style>
+<script id="ci-mileage-script">
+(function(){
+ const tok=()=>{try{return ciToken||'';}catch(e){return '';}};
+ const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const nice=d=>{const p=new Date(d+'T12:00:00');return isNaN(p)?d:p.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});};
+ const money=n=>'$'+(Math.round(Number(n||0)*100)/100).toFixed(2);
+ const b64=file=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=()=>rej(new Error('Could not read the file.'));r.readAsDataURL(file);});
+ let S={term:'',data:null,picked:{},extra:[],addSites:[]};
+ window.ciMileageOpen_=function(){
+  const items=document.getElementById('ci-workspace-items'),detail=document.getElementById('ci-workspace-detail');
+  items.hidden=true;detail.hidden=false;
+  detail.innerHTML='<div class="ci-nt-wrap" style="max-width:1100px"><div class="ci-nt-bar"><button type="button" class="ci-secondary-back" aria-label="Back to My CI Workspace">‹</button><h2>Mileage Submission</h2><select id="ci-ml-term" aria-label="Semester" style="margin-left:auto;border:1px solid #bcd0e2;border-radius:8px;padding:6px 8px;font:inherit"></select></div><div id="ci-ml-body"><div class="ci-res-status">Loading your mileage…</div></div></div>';
+  detail.querySelector('.ci-secondary-back').onclick=()=>ciSecondaryBack('workspace');
+  document.getElementById('ci-ml-term').onchange=e=>{S.term=e.target.value;S.addSites=[];load();};
+  load();
+ };
+ async function load(){
+  const body=document.getElementById('ci-ml-body');if(!body)return;
+  try{
+   const d=await ciRun('ciR1MileageInit',tok(),S.term||'',S.addSites);S.data=d;S.term=d.term;
+   const sel=document.getElementById('ci-ml-term');sel.innerHTML=d.terms.map(t=>'<option'+(t===d.term?' selected':'')+'>'+esc(t)+'</option>').join('');
+   S.picked={};S.extra=[];
+   if(d.submission&&d.submission.trips.length){d.submission.trips.forEach(t=>{const a=d.assignments.find(x=>x.date===t.date&&x.siteId===t.siteId);if(a)S.picked[t.date+'|'+t.siteId]=true;else S.extra.push({date:t.date,siteId:t.siteId,site:t.site});});}
+   else d.assignments.filter(a=>a.past).forEach(a=>{S.picked[a.date+'|'+a.siteId]=true;});
+   draw();
+  }catch(e){body.innerHTML='<div class="ci-res-status">Could not load mileage: '+esc(e?.message||e)+'</div>';}
+ }
+ function siteOf(id){return (S.data.sites||[]).find(s=>s.siteId===id);}
+ function paid(id){const s=siteOf(id);return s&&s.distance&&s.distance.status!=='Declined'?s.distance.reimbursedMiles:null;}
+ function draw(){
+  const d=S.data,body=document.getElementById('ci-ml-body');if(!body||!d)return;
+  const sub=d.submission,locked=sub&&sub.status==='Approved';
+  let h='<div class="ci-ml-note">Mileage is <b>one way</b> at <b>$'+esc(String(d.rate))+'</b> a mile. For each site you are paid the <b>shorter</b> of your home → site or '+esc(d.collegeLabel)+' → site. Tolls and parking are reimbursed separately. Your home address is never asked for or stored.</div>';
+  if(sub){h+='<div class="ci-ml-banner '+esc(sub.status)+'"><b>'+esc(d.term)+' mileage: '+esc(sub.status==='Submitted'?'submitted, awaiting review':sub.status==='Returned'?'returned to you for changes':'approved')+'</b> · '+esc(sub.totalMiles)+' mi · '+money(sub.totalAmount)+(sub.version>1?' · version '+esc(sub.version):'')+(sub.coordinatorNote?'<div style="margin-top:4px;white-space:pre-wrap">Coordinator: '+esc(sub.coordinatorNote)+'</div>':'')+(sub.status==='Submitted'?'<div style="margin-top:4px">You can still change it below and submit again until it is reviewed.</div>':'')+'</div>';}
+  // Sites / distances
+  h+='<div class="ci-ml-card"><h3>1 · My miles by site</h3><p class="sub">Enter your one-way miles from home to each site (look it up in Google Maps). If home is the shorter route, attach that Google Maps route as a PDF (Print → Save as PDF). The coordinator approves each distance once.</p>';
+  if(!d.sites.length)h+='<div class="ci-ml-muted">No clinical sites yet for '+esc(d.term)+'. Sites appear here when you are assigned, or add one below.</div>';
+  else h+='<table class="ci-ml-t"><thead><tr><th>Site</th><th>Campus → site</th><th>Home → site</th><th>Paid per trip</th><th>Route PDF</th><th>Status</th><th></th></tr></thead><tbody>'+d.sites.map(s=>{
+   const dist=s.distance;const st=dist?dist.status:'None';
+   if(!s.ready)return '<tr><td><b>'+esc(s.site)+'</b></td><td colspan="6" class="ci-ml-muted">The coordinator has not set up mileage for this site yet.</td></tr>';
+   return '<tr data-site="'+esc(s.siteId)+'"><td><b>'+esc(s.site)+'</b>'+(s.address?'<div class="ci-ml-muted">'+esc(s.address)+'</div>':'')+'</td><td>'+esc(s.collegeMiles)+' mi</td>'+
+    '<td><input type="number" min="0.1" max="300" step="0.1" class="ci-ml-home" value="'+(dist&&dist.homeMiles!=null?esc(dist.homeMiles):'')+'" '+(locked?'disabled':'')+' aria-label="Home to '+esc(s.site)+' miles"> mi</td>'+
+    '<td class="ci-ml-paid">'+(dist?esc(dist.reimbursedMiles)+' mi<div class="ci-ml-muted">'+(dist.basis==='Home'?'home route':'campus route')+'</div>':'—')+'</td>'+
+    '<td class="ci-ml-pdfcell">'+(dist&&dist.hasPdf?'<span class="ci-ml-muted">✓ attached</span><br>':'')+'<input type="file" accept="application/pdf" class="ci-ml-pdf" '+(locked?'disabled':'')+' hidden></td>'+
+    '<td><span class="ci-ml-st '+esc(st)+'">'+esc(st==='None'?'Not set':st)+'</span>'+(dist&&dist.note&&st!=='Pending'?'<div class="ci-ml-muted" style="margin-top:3px">'+esc(dist.note)+'</div>':'')+'</td>'+
+    '<td>'+(locked?'':'<button type="button" class="ci-nt-btn ghost ci-ml-save" style="padding:5px 10px;font-size:12px">Save</button>')+'</td></tr>';
+  }).join('')+'</tbody></table>';
+  if(!locked&&(d.otherSites||[]).length)h+='<div class="ci-ml-add"><select id="ci-ml-othersite"><option value="">Add another site…</option>'+d.otherSites.map(s=>'<option value="'+esc(s.siteId)+'">'+esc(s.site)+'</option>').join('')+'</select><button type="button" class="ci-nt-btn ghost" id="ci-ml-addsite" style="padding:6px 10px;font-size:12px">Add site</button></div>';
+  h+='<div id="ci-ml-distmsg" role="status" style="font-size:13px;margin-top:8px"></div></div>';
+  // Trips
+  const rows=d.assignments.map(a=>({key:a.date+'|'+a.siteId,date:a.date,siteId:a.siteId,site:a.site,onSchedule:true,past:a.past})).concat(S.extra.map(x=>({key:x.date+'|'+x.siteId,date:x.date,siteId:x.siteId,site:x.site||(siteOf(x.siteId)||{}).site||x.siteId,onSchedule:false,past:true,extra:true})))
+   .sort((a,b)=>a.date.localeCompare(b.date));
+  let tm=0,ta=0,missing=0;
+  h+='<div class="ci-ml-card"><h3>2 · Trips in '+esc(d.term)+'</h3><p class="sub">Your clinical days from the CI schedule are listed. Tick the days you drove. Add a day that is missing from the schedule below; the coordinator will see it marked as not on the schedule.</p>';
+  if(!rows.length)h+='<div class="ci-ml-muted">No clinical days on the CI schedule for '+esc(d.term)+'.</div>';
+  else h+='<table class="ci-ml-t"><thead><tr><th></th><th>Date</th><th>Site</th><th>Miles</th><th>Amount</th><th></th></tr></thead><tbody>'+rows.map(r=>{
+   const m=paid(r.siteId),on=!!S.picked[r.key]||r.extra;
+   if(on&&r.past){if(m==null)missing++;else{tm+=m;ta+=Math.round(m*d.rate*100)/100;}}
+   return '<tr><td><input type="checkbox" class="ci-ml-pick" data-k="'+esc(r.key)+'" '+(on?'checked':'')+' '+(!r.past||locked||r.extra?'disabled':'')+' aria-label="Drove on '+esc(r.date)+'"></td><td>'+esc(nice(r.date))+'</td><td>'+esc(r.site)+(r.onSchedule?'':' <span class="ci-ml-st Pending">not on schedule</span>')+'</td>'+
+    '<td>'+(!r.past?'<span class="ci-ml-muted">upcoming</span>':m==null?'<span class="ci-ml-muted">set up miles above</span>':esc(m))+'</td><td>'+(r.past&&m!=null&&on?money(m*d.rate):'')+'</td><td>'+(r.extra&&!locked?'<button type="button" class="ci-nt-btn ghost ci-ml-rm" data-k="'+esc(r.key)+'" style="padding:3px 8px;font-size:12px">Remove</button>':'')+'</td></tr>';
+  }).join('')+'</tbody></table>';
+  if(!locked){
+   const allSites=(d.sites||[]).filter(s=>s.ready);
+   h+='<div class="ci-ml-add"><div><label class="ci-ml-muted" for="ci-ml-xdate">Day not on the schedule</label><br><input type="date" id="ci-ml-xdate" min="'+esc(d.start)+'" max="'+esc(d.today<d.end?d.today:d.end)+'"></div><div><label class="ci-ml-muted" for="ci-ml-xsite">Site</label><br><select id="ci-ml-xsite"><option value="">Choose…</option>'+allSites.map(s=>'<option value="'+esc(s.siteId)+'">'+esc(s.site)+'</option>').join('')+'</select></div><button type="button" class="ci-nt-btn ghost" id="ci-ml-xadd" style="padding:6px 10px;font-size:12px">Add day</button></div>';
+  }
+  h+='<div class="ci-ml-tot"><span>Total miles <b>'+esc(Math.round(tm*10)/10)+'</b></span><span>Total <b>'+money(ta)+'</b></span></div>'+(missing?'<div class="ci-ml-muted" style="text-align:right;color:#c4262d">'+missing+' ticked day'+(missing===1?' needs':'s need')+' your miles for that site first.</div>':'');
+  if(!locked)h+='<label class="ci-ml-muted" for="ci-ml-note" style="display:block;margin-top:12px;font-weight:700">Note for the coordinator (optional)</label><textarea id="ci-ml-note" rows="2" maxlength="1000" style="width:100%;border:1px solid #bcd0e2;border-radius:8px;padding:8px;font:inherit">'+esc(sub?sub.note:'')+'</textarea>'+
+   '<div style="display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:10px"><span id="ci-ml-msg" role="status" style="font-size:13px"></span><button type="button" class="ci-nt-btn" id="ci-ml-submit">'+(sub?'Submit updated mileage':'Submit mileage')+'</button></div>';
+  h+='</div>';
+  body.innerHTML=h;wire();
+ }
+ function wire(){
+  const body=document.getElementById('ci-ml-body'),d=S.data;
+  body.querySelectorAll('tr[data-site]').forEach(tr=>{
+   const s=siteOf(tr.dataset.site),inp=tr.querySelector('.ci-ml-home'),f=tr.querySelector('.ci-ml-pdf');
+   const upd=()=>{const v=Number(inp.value);const homeShorter=v>0&&v<s.collegeMiles;if(f)f.hidden=!homeShorter;
+    tr.querySelector('.ci-ml-paid').innerHTML=v>0?esc(Math.min(v,s.collegeMiles))+' mi<div class="ci-ml-muted">'+(homeShorter?'home route':'campus route')+'</div>':'—';};
+   if(inp){inp.oninput=upd;if(inp.value)upd();}
+   const btn=tr.querySelector('.ci-ml-save');if(!btn)return;
+   btn.onclick=async()=>{
+    const msg=document.getElementById('ci-ml-distmsg');const v=Number(inp.value);
+    if(!(v>0&&v<=300)){msg.textContent='Enter your one-way miles from home to '+s.site+'.';return;}
+    const file=f&&!f.hidden&&f.files[0];
+    if(v<s.collegeMiles&&!file&&!(s.distance&&s.distance.hasPdf)){msg.textContent='Home is your shorter route to '+s.site+'. Attach the Google Maps route PDF.';return;}
+    if(file&&file.size>8*1024*1024){msg.textContent='The PDF must be 8 MB or smaller.';return;}
+    btn.disabled=true;btn.textContent='Saving…';msg.textContent='';
+    try{const req={siteId:s.siteId,homeMiles:v};if(file){req.pdfBase64=await b64(file);}
+     const r=await ciRun('ciR1MileageSaveDistance',tok(),req);
+     msg.textContent=r.unchanged?'No change for '+s.site+'.':'✓ Saved '+s.site+' — '+r.distance.reimbursedMiles+' mi per trip, waiting for coordinator approval.';
+     const t=msg.textContent;await reload();const m2=document.getElementById('ci-ml-distmsg');if(m2)m2.textContent=t;}
+    catch(e){msg.textContent='Not saved: '+String(e?.message||e);btn.disabled=false;btn.textContent='Save';}
+   };
+  });
+  const add=document.getElementById('ci-ml-addsite');
+  if(add)add.onclick=()=>{const id=document.getElementById('ci-ml-othersite').value;if(!id)return;if(!S.addSites.includes(id))S.addSites.push(id);reload();};
+  body.querySelectorAll('.ci-ml-pick').forEach(c=>c.onchange=()=>{if(c.checked)S.picked[c.dataset.k]=true;else delete S.picked[c.dataset.k];draw();});
+  body.querySelectorAll('.ci-ml-rm').forEach(b=>b.onclick=()=>{S.extra=S.extra.filter(x=>x.date+'|'+x.siteId!==b.dataset.k);draw();});
+  const xa=document.getElementById('ci-ml-xadd');
+  if(xa)xa.onclick=()=>{const dt=document.getElementById('ci-ml-xdate').value,sid=document.getElementById('ci-ml-xsite').value,msg=document.getElementById('ci-ml-msg');
+   if(!dt||!sid){msg.textContent='Choose the date and the site.';return;}
+   if(dt<d.start||dt>d.end||dt>d.today){msg.textContent='That date is not a past day in '+d.term+'.';return;}
+   const k=dt+'|'+sid;if(d.assignments.some(a=>a.date+'|'+a.siteId===k)){S.picked[k]=true;draw();return;}
+   if(!S.extra.some(x=>x.date+'|'+x.siteId===k))S.extra.push({date:dt,siteId:sid});draw();};
+  const sb=document.getElementById('ci-ml-submit');
+  if(sb)sb.onclick=async()=>{
+   const msg=document.getElementById('ci-ml-msg');
+   const trips=d.assignments.filter(a=>a.past&&S.picked[a.date+'|'+a.siteId]).map(a=>({date:a.date,siteId:a.siteId})).concat(S.extra.map(x=>({date:x.date,siteId:x.siteId})));
+   if(!trips.length){msg.textContent='Tick at least one day you drove.';return;}
+   const miss=trips.filter(t=>paid(t.siteId)==null);
+   if(miss.length){msg.textContent='Set up and save your miles for '+[...new Set(miss.map(t=>(siteOf(t.siteId)||{}).site||t.siteId))].join(', ')+' first.';return;}
+   if(!confirm('Submit '+trips.length+' trip'+(trips.length===1?'':'s')+' for '+d.term+'?'))return;
+   sb.disabled=true;sb.textContent='Submitting…';msg.textContent='';
+   try{const r=await ciRun('ciR1MileageSubmit',tok(),{term:d.term,trips:trips,note:document.getElementById('ci-ml-note').value});
+    await load();const m=document.getElementById('ci-ml-msg');if(m)m.textContent='✓ Submitted '+r.trips+' trips · '+r.totalMiles+' mi · '+money(r.totalAmount);}
+   catch(e){msg.textContent='Not submitted: '+String(e?.message||e);sb.disabled=false;sb.textContent='Submit mileage';}
+  };
+ }
+ async function reload(){const keep={picked:S.picked,extra:S.extra};await load();S.picked=keep.picked;S.extra=keep.extra;draw();}
 })();
 </script>
