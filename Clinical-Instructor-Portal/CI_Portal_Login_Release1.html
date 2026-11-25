@@ -134,6 +134,7 @@ main{width:min(1180px,94%);margin:16px auto 30px}
 <div class="field"><label>Password</label><div class="input"><svg><use href="#i-lock"></use></svg><input autocomplete="current-password" id="pass" type="password"/><button class="eye" onclick="togglePass()" type="button"><svg><use href="#i-eye"></use></svg></button></div></div>
 <button class="primary" type="submit">Sign In  ›</button>
 <p class="error" id="err" role="alert"></p>
+<p id="login-help" style="margin:14px 0 0;font-size:15px;line-height:1.5;color:#3d5570">Trouble signing in? Call or e-mail the clinical coordinator.</p>
 </form>
 </div>
 <div class="login-resources">
@@ -218,6 +219,17 @@ initializeLogin();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadPortalAssets_);
   else loadPortalAssets_();
+})();
+</script>
+<script>
+(function(){
+ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+ function show(c){var el=document.getElementById('login-help');if(!el||!c)return;
+  var parts=[];if(c.phone)parts.push('call <a href="tel:'+esc(String(c.phone).replace(/[^\d+]/g,''))+'" style="color:#0659b0;font-weight:700">'+esc(c.phone)+'</a>');
+  if(c.email)parts.push('e-mail <a href="mailto:'+esc(c.email)+'" style="color:#0659b0;font-weight:700">'+esc(c.email)+'</a>');
+  el.innerHTML='<b>Trouble signing in?</b> '+(parts.length?esc(c.name)+(c.title?' ('+esc(c.title)+')':'')+': '+parts.join(' or ')+'.':'Call or e-mail the clinical coordinator.');}
+ function go(){if(window.google&&google.script&&google.script.run)google.script.run.withSuccessHandler(show).withFailureHandler(function(){}).ciR1HelpContact();}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();
 })();
 </script>
 </body>

@@ -139,3 +139,38 @@ function dashboardV2IncidentReview(request) {
   cpDocs_markRead_(cpLink_t_(row['Incident ID']));
   return {success: true};
 }
+
+/* ---------- Help & Support contact (shown in the CI Portal) ---------- */
+const CP_HELP_KEYS = {name: 'Help Contact Name', title: 'Help Contact Title', email: 'Help Contact E-mail', phone: 'Help Contact Phone', hours: 'Help Contact Hours'};
+function cpHelp_read_() {
+  const sh = cpMile_sheet_('Program Settings', ['Setting', 'Value']);
+  const out = {}, rows = {};
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(function(r, i) {
+    const k = cpLink_t_(r[0]); if (k) {out[k] = cpLink_t_(r[1]); rows[k] = i + 2;}});
+  return {sh: sh, out: out, rows: rows};
+}
+/** Contact details instructors see on the Portal Help page and sign-in page. */
+function dashboardV2HelpContact() {
+  const s = cpHelp_read_().out;
+  let email = s[CP_HELP_KEYS.email] || s['Coordinator E-mail'] || '';
+  if (!email) {try {email = Session.getEffectiveUser().getEmail();} catch (e) {}}
+  return {name: s[CP_HELP_KEYS.name] || 'Philip Foley-Ward', title: s[CP_HELP_KEYS.title] || 'Clinical Coordinator', email: email,
+    phone: s[CP_HELP_KEYS.phone] || '', hours: s[CP_HELP_KEYS.hours] || ''};
+}
+function dashboardV2HelpContactSave(request) {
+  const r = request || {};
+  const vals = {name: cpLink_requireText_(r.name, 'Name', 120), title: cpLink_requireText_(r.title, 'Title', 120), email: cpLink_requireText_(r.email, 'E-mail', 120),
+    phone: cpLink_requireText_(r.phone, 'Phone', 60), hours: cpLink_requireText_(r.hours, 'When to call', 120)};
+  if (!vals.name) throw new Error('Enter a name.');
+  if (!vals.email && !vals.phone) throw new Error('Enter an e-mail or a phone number.');
+  if (vals.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.email)) throw new Error('That e-mail address does not look right.');
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const st = cpHelp_read_();
+    Object.keys(CP_HELP_KEYS).forEach(function(k) {
+      const key = CP_HELP_KEYS[k];
+      if (st.rows[key]) st.sh.getRange(st.rows[key], 2).setValue(vals[k]); else st.sh.appendRow([key, vals[k]]);
+    });
+  } finally {lock.releaseLock();}
+  return dashboardV2HelpContact();
+}

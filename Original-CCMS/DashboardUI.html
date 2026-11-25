@@ -7603,17 +7603,237 @@ function v2RenderSystem() {
       (r.sheets || []).map(function(s) {return '<a class="landing-card" style="text-decoration:none;color:inherit" target="_blank" rel="noopener" href="' + v2Esc(s.url) + '"><h3>' + v2Esc(s.name) + '</h3><p>Open tab ›</p></a>';}).join('') + '</div>';
   }, function(e) {const el = document.getElementById('v2-system'); if (el) el.innerHTML = '<div class="entry-message error">' + v2Esc(errorMessage(e)) + '</div>';});
 }
-function v2RenderHelp() {
-  document.getElementById('content').innerHTML = '<h1 class="page-title">Help &amp; Support</h1><div class="page-subtitle">Where things are in the Coordinator Dashboard.</div><div class="landing-grid">' +
-    [['Home', 'Flagged, waiting and reviewed counts, recent submissions from the Clinical Instructor Portal and Google Forms, New Entry shortcuts and the program snapshot.'],
-     ['Review / Return', 'Open any submission to accept it or return it to the clinical instructor with notes. The instructor sees returns and acceptances on their Portal home and notifications; their replies appear under the bell.'],
-     ['Students', 'Student summary, clinical history, requirements, grades and documents.'],
-     ['Scheduling', 'Semester planning, room rotations and attendance / ETO.'],
-     ['Reports & Paperwork', 'Records & documents, New Entry, and Assessment (clinical review analysis).'],
-     ['System & Setup', 'Links to the CCMS workbook tabs that hold reference data.']].map(function(x) {
-      return '<div class="landing-card"><h3>' + x[0] + '</h3><p>' + x[1] + '</p></div>';
-    }).join('') + '</div>';
+/* ---------- Help & Support (plain-language guide for the coordinator) ---------- */
+const V2_HELP = [
+ {title: 'Getting started', sub: 'Opening the system and finding your way around.', items: [
+  {q: 'How do I open the Coordinator Dashboard?', k: 'open sign in login link bookmark start', steps: [
+   'Open the Coordinator Dashboard link (save it as a bookmark the first time).',
+   'If Google asks, sign in with your <b>SUNY Orange</b> Google account.',
+   'Wait a few seconds. Home opens with a greeting at the top.'],
+   tip: 'If you see “Authorization required”, click <b>Review permissions</b>, choose your college account and click <b>Allow</b>. This happens only when something new is added.'},
+  {q: 'Where is everything? (a map of the screen)', k: 'menu find where lost navigate screen map', map: true, steps: [
+   'The <b>dark blue bar on the left</b> is the main menu. Click a word to go there.',
+   '<b>Home</b> is the starting page. Click it any time you feel lost.',
+   'The <b>search box</b> at the top finds a student by name or ID.',
+   'The <b>bell</b> at the top-right lists everything waiting for you: new submissions, replies from instructors, mileage, reports and incidents.']},
+  {q: 'The writing is too small (or too big)', k: 'zoom bigger smaller text size font read tv projector', steps: [
+   'Hold <b>Ctrl</b> (on a Mac, <b>⌘ Command</b>) and press <b>+</b> to make everything bigger.',
+   'Hold <b>Ctrl</b> and press <b>–</b> to make it smaller.',
+   'Hold <b>Ctrl</b> and press <b>0</b> (zero) to go back to normal.']}]},
+ {title: 'Every day', sub: 'What needs your attention, and reviewing submissions.', items: [
+  {q: 'What needs my attention today?', k: 'today attention waiting flagged new bell to do', go: 'home', steps: [
+   'Click <b>Home</b>.',
+   'Look at the coloured boxes at the top: <b>Flagged</b> (returned or problem items), <b>Waiting for Review</b> (new from instructors) and <b>Reviewed</b> (done today).',
+   'Click a box to see the list behind it.',
+   'Check the <b>bell</b> at the top-right. A red number means something new.'],
+   tip: 'A red banner at the top of Home means an incident report is waiting. Click it first.'},
+  {q: 'Review an evaluation and accept it', k: 'review accept approve evaluation competency submission check', go: 'home', steps: [
+   'On <b>Home</b>, under <b>Recent Activity</b>, click <b>Review</b> next to the submission. (Or click it in the bell.)',
+   'The Review window opens. Click <b>Open evaluation document</b> to read the full evaluation.',
+   'If everything is right, click <b>Accept</b>.'],
+   done: 'You see “✓ Accepted” and the instructor sees it as accepted in the Portal.'},
+  {q: 'Send an evaluation back to the instructor to fix', k: 'return send back fix correct mistake flagged', go: 'home', steps: [
+   'Open the submission with <b>Review</b>.',
+   'Type a note that says exactly what to check or change.',
+   'Click <b>Return to CI with notes</b>.'],
+   done: 'You see “✓ Returned to the instructor”. They get a message in the Portal, and their reply shows up in your bell.',
+   tip: 'The back-and-forth with the instructor is kept under <b>Conversation with the instructor</b> in the same Review window.'},
+  {q: 'Find a student', k: 'student search find look up record grades history', steps: [
+   'Click in the <b>search box</b> at the top of the screen.',
+   'Type part of the student’s name or ID.',
+   'Click the student. Their page shows clinical history, requirements, grades and documents.']},
+  {q: 'Enter a record by hand (quiz, clinical test, attendance and more)', k: 'new entry add record quiz test attendance case presentation grade reduction manual', go: 'home', steps: [
+   'On <b>Home</b>, find <b>New Entry</b> on the right.',
+   'Click the kind of record: Competency Evaluation, Quiz, Clinical Test, Case Presentation, Professional Competency, Grade Points Reduction or Attendance Event.',
+   'Choose the <b>Record Term</b>, the student and the date, fill in the rest, and save.']}]},
+ {title: 'Clinical instructors', sub: 'Availability, site assignments, dosimeters and reflections.', items: [
+  {q: 'Approve or decline the days an instructor can work', k: 'availability approve decline days hours calendar', go: 'ciHours', steps: [
+   'Click <b>Scheduling</b>, then <b>Open CI Availability &amp; Hours</b>.',
+   'Under <b>Availability</b>, tick the days you want to answer.',
+   'Click <b>Approve selected</b>. To say no, type a note to the instructor and click <b>Decline selected</b>.'],
+   done: 'The instructor gets a message, and approved days show on the shared calendar.'},
+  {q: 'Assign an instructor to a site for a day', k: 'assign site assignment schedule instructor coverage', go: 'ciHours', steps: [
+   'Click <b>Scheduling</b>, then <b>Open CI Availability &amp; Hours</b>.',
+   'Tick an approved day for that instructor.',
+   'Click <b>Assign to site</b>, choose the site and time, and save.'],
+   tip: 'The table at the top shows each instructor’s hours against their target and maximum, so you can see who is close to the limit.'},
+  {q: 'Remind instructors to send in their availability', k: 'reminder availability email remind', go: 'ciHours', steps: [
+   'Click <b>Scheduling</b>, then <b>Open CI Availability &amp; Hours</b>.',
+   'Click <b>✉ Email availability reminder</b> and confirm who it goes to.']},
+  {q: 'Look up an instructor', k: 'instructor ci details contact profile evaluations', go: 'instructors', steps: [
+   'Click <b>Clinical Instructors</b> on the left.',
+   'Type a name in <b>Find</b>, or scroll the cards.',
+   'Click a card to see their upcoming sites, availability, recent evaluations, dosimeter, mileage and reflection.']},
+  {q: 'Record a new dosimeter wear period', k: 'dosimeter badge radiation wear period exchange', go: 'instructors', steps: [
+   'Click <b>Clinical Instructors</b> and open the instructor’s card.',
+   'Under <b>Dosimeter</b>, type the <b>New dosimeter ID</b>, the <b>Wear start</b> and the <b>Wear end</b> dates.',
+   'Click <b>Record new wear period</b>.']},
+  {q: 'Share student feedback and ask for the instructor’s reflection', k: 'survey reflection feedback summary share request', go: 'instructors', steps: [
+   'Click <b>Clinical Instructors</b> and open the instructor’s card.',
+   'Under <b>Student feedback &amp; reflection</b>, paste the summary or attach it as a PDF. You can add a <b>Complete by</b> date.',
+   'Click <b>Share &amp; request reflection</b>.',
+   'When they send it back, open the card again and click <b>Accept</b>, or type a note and click <b>Return</b>.']}]},
+ {title: 'Reports & paperwork', sub: 'Mileage, CI reports, incidents and student records.', items: [
+  {q: 'Approve instructor mileage', k: 'mileage miles reimbursement approve route pdf voucher sheet', go: 'ciMileage', steps: [
+   'Click <b>Reports &amp; Paperwork</b>, then <b>Open CI Mileage</b>.',
+   'First, check <b>Distances to approve</b>. Click <b>Approve</b> (or <b>Decline</b>) for each new home-to-site distance.',
+   'In the list of submissions, click <b>Review</b>, check the trips, then approve.'],
+   done: 'A <b>Mileage sheet</b> and the <b>Route PDFs</b> are made for you to attach to the voucher.',
+   tip: 'Instructors are paid the shorter of their home → site or the Middletown campus → site. Under <b>Campus miles &amp; settings</b>, click <b>Calculate campus miles with Google Maps</b> once each time a site is added.'},
+  {q: 'Remind instructors to send in their mileage', k: 'mileage reminder email', go: 'ciMileage', steps: [
+   'Click <b>Reports &amp; Paperwork</b>, then <b>Open CI Mileage</b>.',
+   'Click <b>✉ Email mileage reminder</b> and confirm.']},
+  {q: 'Review a mid-semester or end-of-semester CI report', k: 'ci report college clinical instructor report notes accept return', go: 'ciDocs', steps: [
+   'Click <b>Reports &amp; Paperwork</b>, then <b>Open CI Notes &amp; Incidents</b>.',
+   'On <b>CI Reports</b>, click <b>PDF</b> to read it, then <b>Review</b>.',
+   'Click <b>Accept</b>, or type a note and click <b>Return to instructor</b>.'],
+   tip: 'Returning it unlocks the instructor’s notes so they can fix them and send it again. The <b>Notes</b> tab shows every note as they write it.'},
+  {q: 'An incident was reported — what do I do?', k: 'incident accident injury urgent form 1b chair', go: 'ciDocsIncidents', steps: [
+   'You get an e-mail (the department chair does too), a red banner on Home and an alert in the bell.',
+   'Click the banner (or <b>Reports &amp; Paperwork → Open CI Notes &amp; Incidents → Incidents</b>).',
+   'Read it and click <b>Open Form 1B PDF</b> for the signed copy.',
+   'After you follow up, type what was done in <b>Follow-up note</b> and click <b>Mark reviewed</b>.'],
+   done: 'The red banner goes away, and the instructor is told it was reviewed.'},
+  {q: 'Make a student report or find a student’s documents', k: 'records documents report file pdf student folder', go: 'paperwork', steps: [
+   'Click <b>Reports &amp; Paperwork</b>, then <b>Open Records &amp; Documents</b>.',
+   'Choose the student and the report or document you need.']}]},
+ {title: 'Planning the semester', sub: 'Placements, rotations and attendance.', items: [
+  {q: 'Plan next semester’s placements', k: 'semester planning placement rotation planner', go: 'schedules', steps: [
+   'Click <b>Scheduling</b>, then <b>Open Semester Planning</b>.',
+   'The planner appears further down the page. Choose the <b>Cohort</b> and the <b>Clinical Term</b>.',
+   'Click <b>Open Planner</b> and work through the steps: overview, site placement, room rotations, CI coverage, review.']},
+  {q: 'Check attendance and ETO', k: 'attendance eto absence late make up hours', go: 'schedules', steps: [
+   'Click <b>Scheduling</b>, then <b>Open Attendance</b>.']},
+  {q: 'The current clinical schedule and printing schedules', k: 'schedule print export distribution current', steps: [
+   'These are still being built. For now, use Semester Planning and Room Rotations under <b>Scheduling</b>.']}]},
+ {title: 'Setup', sub: 'Lists the system uses, and your contact details.', items: [
+  {q: 'Change a list (sites, instructors, terms and so on)', k: 'setup settings workbook sites evaluators terms reference data', go: 'system', steps: [
+   'Click <b>System &amp; Setup</b> on the left.',
+   'Click <b>Open tab ›</b> next to the list you need. It opens in the CCMS workbook.',
+   'Make the change in the sheet. It is saved automatically.'],
+   tip: 'Change one thing at a time, and never delete a row that has an ID — set it to inactive instead.'},
+  {q: 'Change the contact details instructors see', k: 'contact phone email help person support', steps: [
+   'Scroll to the top of this Help page.',
+   'Fill in the boxes under <b>Contact details shown to instructors</b>.',
+   'Click <b>Save contact details</b>.'],
+   done: 'The Portal’s Help page and sign-in page show the new details the next time they are opened.'}]},
+ {title: 'Something went wrong', sub: 'Common worries, and what to do.', items: [
+  {q: 'A page just says “Loading…” or nothing happens', k: 'loading stuck frozen blank slow error not working', steps: [
+   'Wait about 20 seconds.',
+   'Press <b>F5</b> (or the round arrow at the top of the browser) to refresh.',
+   'Still stuck? Call or e-mail the contact in the blue box, and say which page and what you clicked.']},
+  {q: 'An instructor says they don’t see a change I made', k: 'instructor cannot see change refresh portal', steps: [
+   'Ask them to refresh the Portal (<b>F5</b>) or sign out and sign in again.']},
+  {q: 'I clicked Accept or Return by mistake', k: 'mistake undo wrong accept return', steps: [
+   'Open the same submission again with <b>Review</b>.',
+   'If you returned it by mistake, click <b>Accept again</b>. If you accepted it by mistake, type a note and click <b>Return to CI with notes</b>.']}]}
+];
+const V2_HELP_MAP = '<svg viewBox="0 0 900 330" role="img" aria-label="Drawing of the dashboard screen with numbered parts" style="font-family:inherit">' +
+ '<rect x="1" y="1" width="898" height="328" rx="14" fill="#f4f7fb" stroke="#b9cde0"/><rect x="1" y="1" width="160" height="328" rx="14" fill="#0d2a4a"/>' +
+ ['Home', 'Students', 'Clinical Instructors', 'Clinical Sites', 'Scheduling', 'Reports & Paperwork', 'System & Setup'].map(function(t, i) {return '<text x="16" y="' + (40 + i * 34) + '" fill="#fff" font-size="13">' + t + '</text>';}).join('') +
+ '<text x="16" y="312" fill="#fff" font-size="13">Help &amp; Support</text>' +
+ '<rect x="330" y="14" width="260" height="30" rx="15" fill="#fff" stroke="#cfdeec"/><text x="350" y="34" fill="#7b8da2" font-size="13">Search students by name or ID…</text>' +
+ '<text x="760" y="36" font-size="18">🔔</text><rect x="790" y="16" width="92" height="30" rx="15" fill="#fff" stroke="#cfdeec"/><text x="810" y="36" fill="#0d2a4a" font-size="13" font-weight="700">Your name</text>' +
+ '<text x="180" y="78" fill="#0d2a4a" font-size="18" font-weight="700">Good afternoon</text>' +
+ [['Flagged', '#c4262d'], ['Waiting for Review', '#b86b00'], ['Reviewed', '#1f7a45']].map(function(x, i) {return '<rect x="' + (180 + i * 150) + '" y="94" width="138" height="56" rx="10" fill="#fff" stroke="#cfdeec"/><text x="' + (192 + i * 150) + '" y="128" fill="' + x[1] + '" font-size="13" font-weight="700">' + x[0] + '</text>';}).join('') +
+ '<rect x="180" y="166" width="440" height="150" rx="10" fill="#fff" stroke="#cfdeec"/><text x="196" y="190" fill="#0d2a4a" font-size="14" font-weight="700">Recent Activity</text>' +
+ [0, 1, 2].map(function(i) {return '<rect x="196" y="' + (204 + i * 34) + '" width="408" height="26" rx="6" fill="#f4f7fb"/><rect x="548" y="' + (207 + i * 34) + '" width="50" height="20" rx="6" fill="#fde2e2"/><text x="556" y="' + (221 + i * 34) + '" fill="#c4262d" font-size="11" font-weight="700">Review</text>';}).join('') +
+ '<rect x="636" y="94" width="246" height="120" rx="10" fill="#2f6fe0"/><text x="652" y="124" fill="#fff" font-size="15" font-weight="700">+ New Entry</text>' +
+ '<rect x="636" y="226" width="246" height="90" rx="10" fill="#fff" stroke="#cfdeec"/><text x="652" y="250" fill="#0d2a4a" font-size="14" font-weight="700">Program Snapshot</text>' +
+ [[150, 26, 1], [340, 14, 2], [752, 14, 3], [178, 94, 4], [186, 168, 5], [596, 205, 6], [638, 96, 7]].map(function(p) {return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="12" fill="#e0a100" stroke="#fff" stroke-width="2"/><text x="' + p[0] + '" y="' + (p[1] + 5) + '" text-anchor="middle" font-size="13" font-weight="800" fill="#10213c">' + p[2] + '</text>';}).join('') + '</svg>';
+const V2_HELP_KEY = ['<b>Main menu</b> — click a word to go there', '<b>Search</b> — find a student', '<b>Bell</b> — everything waiting for you', '<b>Flagged · Waiting for Review · Reviewed</b> — today’s counts; click one to see the list',
+  '<b>Recent Activity</b> — the newest submissions', '<b>Review</b> — open one to accept or return it', '<b>New Entry</b> — add a record by hand'];
+V2.help = V2.help || {q: '', contact: null, msg: ''};
+function v2HelpGo(where) {
+  if (where === 'ciDocsIncidents') {V2.docs.tab = 'incidents'; V2.docs.data = null; return showPage('ciDocs');}
+  if (where === 'ciDocs') {V2.docs.tab = 'reports'; V2.docs.data = null; return showPage('ciDocs');}
+  if (where === 'ciHours') return showPage('ciAvailability');
+  if (where === 'ciMileage' || where === 'instructors') return showPage(where);
+  if (where === 'home' || where === 'schedules' || where === 'paperwork' || where === 'system') return v2Go(where);
 }
+function v2HelpList() {
+  const host = document.getElementById('v2hp-list'); if (!host) return;
+  const words = (V2.help.q || '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let shown = 0, h = '';
+  V2_HELP.forEach(function(g, gi) {
+    const items = g.items.map(function(it, ii) {return [it, ii];}).filter(function(x) {
+      return !words.length || words.every(function(w) {return (x[0].q + ' ' + x[0].k + ' ' + x[0].steps.join(' ')).toLowerCase().indexOf(w) >= 0;});});
+    if (!items.length) return;
+    h += '<div class="v2hp-group"><h2>' + v2Esc(g.title) + '</h2><p class="gsub">' + v2Esc(g.sub) + '</p>';
+    items.forEach(function(x) {
+      const it = x[0]; shown++;
+      h += '<div class="v2hp-item' + (words.length ? ' open' : '') + '"><button type="button" aria-expanded="' + (words.length ? 'true' : 'false') + '" onclick="v2HelpToggle(this)"><span>' + v2Esc(it.q) + '</span><span class="chev" aria-hidden="true">›</span></button><div class="v2hp-body"><ol>' +
+        it.steps.map(function(s) {return '<li>' + s + '</li>';}).join('') + '</ol>' +
+        (it.map ? '<div class="v2hp-map">' + V2_HELP_MAP + '<ol>' + V2_HELP_KEY.map(function(k) {return '<li>' + k + '</li>';}).join('') + '</ol></div>' : '') +
+        (it.done ? '<div class="v2hp-done"><strong>You’ll know it worked when:</strong> ' + it.done + '</div>' : '') +
+        (it.tip ? '<div class="v2hp-tip"><strong>Good to know:</strong> ' + it.tip + '</div>' : '') +
+        (it.go ? '<button type="button" class="v2hp-go" onclick="v2HelpGo(\'' + it.go + '\')">Take me there →</button>' : '') + '</div></div>';
+    });
+    h += '</div>';
+  });
+  host.innerHTML = h || '<div class="v2hp-none">Nothing matched that word. Try a shorter word, or call or e-mail the contact above.</div>';
+}
+function v2HelpToggle(b) {const box = b.parentNode; const o = box.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false');}
+function v2HelpContactHtml() {
+  const c = V2.help.contact;
+  if (!c) return '<b>Contact details shown to instructors</b><br>Loading…';
+  const f = function(id, label, v, ph) {return '<label class="v2hp-f"><span>' + label + '</span><input id="' + id + '" value="' + v2Esc(v || '') + '" placeholder="' + v2Esc(ph || '') + '" maxlength="120"></label>';};
+  return '<b>Contact details shown to instructors</b><div class="small" style="margin:2px 0 10px;color:#3d5570">These show on the Portal’s Help page and on its sign-in page, so instructors know who to call.</div>' +
+    '<div class="v2hp-grid">' + f('v2hp-name', 'Name', c.name) + f('v2hp-title', 'Title', c.title, 'Clinical Coordinator') + f('v2hp-email', 'E-mail', c.email) + f('v2hp-phone', 'Phone', c.phone, '(845) 555-0123') + f('v2hp-hours', 'When to call (optional)', c.hours, 'Weekdays 8:00–4:00') + '</div>' +
+    '<button type="button" class="primary-button" id="v2hp-save" onclick="v2HelpSaveContact()" style="margin-top:10px">Save contact details</button> <span id="v2hp-msg" class="small">' + v2Esc(V2.help.msg || '') + '</span>';
+}
+function v2HelpSaveContact() {
+  const g = function(id) {return document.getElementById(id).value;};
+  const req = {name: g('v2hp-name'), title: g('v2hp-title'), email: g('v2hp-email'), phone: g('v2hp-phone'), hours: g('v2hp-hours')};
+  document.getElementById('v2hp-save').disabled = true; document.getElementById('v2hp-msg').textContent = 'Saving…';
+  v2Run('dashboardV2HelpContactSave', [req], function(c) {
+    V2.help.contact = c; V2.help.msg = '✓ Saved'; const box = document.getElementById('v2hp-contact'); if (box) box.innerHTML = v2HelpContactHtml();
+  }, function(e) {document.getElementById('v2hp-save').disabled = false; document.getElementById('v2hp-msg').textContent = 'Not saved: ' + errorMessage(e);});
+}
+function v2RenderHelp() {
+  V2.help.msg = '';
+  document.getElementById('content').innerHTML = '<div id="v2-help" class="v2hp">' +
+    '<div class="v2hp-top"><div><h1 class="page-title">Help &amp; Support</h1><div class="page-subtitle" style="font-size:17px">Pick what you want to do. Each answer walks you through it one step at a time, using the same words you see on the screen.</div></div>' +
+    '<button type="button" class="v2hp-print" onclick="v2HelpPrint()">🖨 Print this guide</button></div>' +
+    '<label class="v2hp-ql" for="v2hp-q">What do you want to do?</label><input id="v2hp-q" class="v2hp-q" type="search" autocomplete="off" placeholder="Type a word, like “mileage”, “return” or “incident”" value="' + v2Esc(V2.help.q) + '" oninput="V2.help.q=this.value;v2HelpList()">' +
+    '<div id="v2hp-contact" class="v2hp-contact">' + v2HelpContactHtml() + '</div><div id="v2hp-list"></div></div>';
+  v2HelpList();
+  if (!V2.help.contact) v2Run('dashboardV2HelpContact', [], function(c) {V2.help.contact = c || {}; const box = document.getElementById('v2hp-contact'); if (box) box.innerHTML = v2HelpContactHtml();},
+    function() {V2.help.contact = {}; const box = document.getElementById('v2hp-contact'); if (box) box.innerHTML = v2HelpContactHtml();});
+}
+function v2HelpPrint() {
+  const q = V2.help.q; V2.help.q = ''; const i = document.getElementById('v2hp-q'); if (i) i.value = ''; v2HelpList();
+  const old = document.getElementById('v2hp-printroot'); if (old) old.remove();
+  const root = document.createElement('div'); root.id = 'v2hp-printroot';
+  const copy = document.getElementById('v2-help').cloneNode(true); copy.id = 'v2-help-print';
+  copy.querySelectorAll('.v2hp-item').forEach(function(b) {b.classList.add('open');});
+  copy.querySelectorAll('.v2hp-print,.v2hp-ql,.v2hp-q,.v2hp-go,#v2hp-save,#v2hp-msg').forEach(function(x) {x.remove();});
+  const c = V2.help.contact || {}; const cb = copy.querySelector('.v2hp-contact');
+  if (cb) cb.innerHTML = '<b>Need help?</b> ' + v2Esc(c.name || '') + (c.title ? ', ' + v2Esc(c.title) : '') + (c.phone ? ' · ' + v2Esc(c.phone) : '') + (c.email ? ' · ' + v2Esc(c.email) : '');
+  root.appendChild(copy); document.body.appendChild(root);
+  const done = function() {root.remove(); window.removeEventListener('afterprint', done);};
+  window.addEventListener('afterprint', done);
+  window.print(); setTimeout(function() {if (document.body.contains(root)) done();}, 60000); V2.help.q = q;
+}
+(function() {
+  const css = document.createElement('style'); css.id = 'v2hp-style';
+  css.textContent = '.v2hp{max-width:1000px;font-size:17px;line-height:1.55;color:#10213c}.v2hp-top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}' +
+   '.v2hp-print{font-size:16px;padding:10px 16px;border:2px solid #2f6fe0;color:#2f6fe0;background:#fff;border-radius:10px;cursor:pointer;font-weight:700}' +
+   '.v2hp-ql{display:block;font-weight:800;font-size:18px;margin:4px 0 6px}.v2hp-q{width:100%;font-size:18px;padding:13px 15px;border:2px solid #b9cde0;border-radius:12px;box-sizing:border-box}' +
+   '.v2hp-contact{margin:18px 0;padding:16px 18px;border-radius:14px;background:#eaf4ff;border:2px solid #9cc8f5}.v2hp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}' +
+   '.v2hp-f span{display:block;font-size:14px;font-weight:700;margin-bottom:3px}.v2hp-f input{width:100%;box-sizing:border-box;font-size:16px;padding:9px 11px;border:1px solid #b9cde0;border-radius:8px}' +
+   '.v2hp-group{margin-top:24px}.v2hp-group h2{font-size:22px;margin:0 0 4px}.v2hp-group .gsub{color:#4b6580;margin:0 0 10px;font-size:16px}' +
+   '.v2hp-item{border:1px solid #cfdeec;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}.v2hp-item>button{width:100%;text-align:left;background:#fff;border:0;padding:15px 18px;font-size:18px;font-weight:700;color:#10213c;cursor:pointer;display:flex;gap:12px;align-items:center;font-family:inherit}' +
+   '.v2hp-item>button:hover{background:#f3f8fd}.v2hp-item>button .chev{margin-left:auto;font-size:20px;color:#2f6fe0;transition:transform .15s}.v2hp-item.open>button .chev{transform:rotate(90deg)}' +
+   '.v2hp-body{display:none;padding:2px 22px 18px;border-top:1px solid #e3ecf4}.v2hp-item.open .v2hp-body{display:block}.v2hp-body ol{padding-left:26px;margin:12px 0}.v2hp-body li{margin:8px 0;padding-left:4px}' +
+   '.v2hp-body b{background:#eef5fc;border:1px solid #cfe0f1;border-radius:6px;padding:0 6px}' +
+   '.v2hp-done{margin:12px 0 0;padding:10px 14px;background:#ecf8f0;border-left:5px solid #1f9254;border-radius:6px}.v2hp-tip{margin:10px 0 0;padding:10px 14px;background:#fff8e6;border-left:5px solid #e0a100;border-radius:6px}' +
+   '.v2hp-go{margin-top:12px;font-size:16px;padding:10px 16px;border:0;border-radius:10px;background:#2f6fe0;color:#fff;font-weight:700;cursor:pointer}.v2hp-none{margin-top:18px;padding:16px;border-radius:12px;background:#fff4e5}' +
+   '.v2hp-map{margin-top:8px;border:1px solid #cfdeec;border-radius:14px;background:#fff;padding:14px 16px}.v2hp-map svg{width:100%;height:auto;max-width:900px;display:block;margin:6px 0}.v2hp-map ol{columns:2;column-gap:28px}.v2hp-map li{break-inside:avoid}' +
+   '#v2hp-printroot{display:none}@media print{body>*:not(#v2hp-printroot){display:none!important}html,body{height:auto!important;overflow:visible!important;background:#fff!important}#v2hp-printroot{display:block!important}#v2-help-print{max-width:none;font-size:13pt}' +
+   '.v2hp-print,.v2hp-ql,.v2hp-q,.v2hp-go,.v2hp-contact input,#v2hp-save,#v2hp-msg,.v2hp-item>button .chev{display:none!important}.v2hp-body{display:block!important}.v2hp-item{break-inside:avoid}.v2hp-group h2{break-after:avoid}}';
+  document.head.appendChild(css);
+})();
 
 /* ---------- start ---------- */
 (function() {

@@ -643,3 +643,303 @@
  }
 })();
 </script>
+<!-- ===== Help & Support (plain-language guide for clinical instructors) ===== -->
+<section id="ci-help-view" hidden aria-label="Help and Support">
+<div class="ci-hp">
+  <div class="ci-hp-top">
+    <div>
+      <h1>Help &amp; Support</h1>
+      <p class="ci-hp-lead">Pick what you want to do. Each answer walks you through it one step at a time, using the same words you see on the screen.</p>
+    </div>
+    <button type="button" class="ci-hp-print" id="ci-hp-print">🖨 Print this guide</button>
+  </div>
+  <div class="ci-hp-search"><label for="ci-hp-q">What do you want to do?</label>
+    <input id="ci-hp-q" type="search" placeholder="Type a word, like “mileage”, “evaluation” or “password”" autocomplete="off"></div>
+  <div id="ci-hp-contact" class="ci-hp-contact" aria-live="polite"></div>
+  <div id="ci-hp-map"></div>
+  <div id="ci-hp-list"></div>
+  <div id="ci-hp-none" class="ci-hp-none" hidden>Nothing matched that word. Try a shorter word, or call or e-mail for help (see the blue box above).</div>
+</div>
+</section>
+<style id="ci-help-style">
+.ci-hp{max-width:980px;margin:0 auto;padding:26px 26px 60px;font-size:17px;line-height:1.55;color:#10213c}
+.ci-hp h1{font-size:30px;margin:0 0 6px}.ci-hp-lead{margin:0;color:#3d5570;font-size:17px}
+.ci-hp-top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+.ci-hp-print{font-size:16px;padding:10px 16px;border:2px solid #0878e5;color:#0878e5;background:#fff;border-radius:10px;cursor:pointer;font-weight:700}
+.ci-hp-search label{display:block;font-weight:800;font-size:18px;margin-bottom:6px}
+.ci-hp-search input{width:100%;font-size:18px;padding:13px 15px;border:2px solid #b9cde0;border-radius:12px}
+.ci-hp-search input:focus{outline:3px solid #9cc8f5;border-color:#0878e5}
+.ci-hp-contact{margin:18px 0;padding:16px 18px;border-radius:14px;background:#eaf4ff;border:2px solid #9cc8f5}
+.ci-hp-contact b{font-size:18px}.ci-hp-contact a{color:#0659b0;font-weight:700}
+.ci-hp-group{margin-top:26px}.ci-hp-group h2{font-size:22px;margin:0 0 4px}.ci-hp-group .gsub{color:#4b6580;margin:0 0 10px;font-size:16px}
+.ci-hp-item{border:1px solid #cfdeec;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.ci-hp-item>button{width:100%;text-align:left;background:#fff;border:0;padding:15px 18px;font-size:18px;font-weight:700;color:#10213c;cursor:pointer;display:flex;gap:12px;align-items:center}
+.ci-hp-item>button:hover{background:#f3f8fd}.ci-hp-item>button .chev{margin-left:auto;font-size:20px;color:#0878e5;transition:transform .15s}
+.ci-hp-item.open>button .chev{transform:rotate(90deg)}
+.ci-hp-body{display:none;padding:2px 22px 18px;border-top:1px solid #e3ecf4}.ci-hp-item.open .ci-hp-body{display:block}
+.ci-hp-body ol{padding-left:26px;margin:12px 0}.ci-hp-body li{margin:8px 0;padding-left:4px}
+.ci-hp-body b{background:#eef5fc;border:1px solid #cfe0f1;border-radius:6px;padding:0 6px;white-space:nowrap}
+.ci-hp-done{margin:12px 0 0;padding:10px 14px;background:#ecf8f0;border-left:5px solid #1f9254;border-radius:6px}
+.ci-hp-tip{margin:10px 0 0;padding:10px 14px;background:#fff8e6;border-left:5px solid #e0a100;border-radius:6px}
+.ci-hp-go{margin-top:12px;font-size:16px;padding:10px 16px;border:0;border-radius:10px;background:#0878e5;color:#fff;font-weight:700;cursor:pointer}
+#ci-hp-printroot{display:none}
+.ci-hp-none{margin-top:18px;padding:16px;border-radius:12px;background:#fff4e5;font-size:17px}
+.ci-hp-map{margin-top:8px;border:1px solid #cfdeec;border-radius:14px;background:#fff;padding:16px 18px}
+.ci-hp-map h2{font-size:22px;margin:0 0 4px}.ci-hp-map svg{width:100%;height:auto;max-width:900px;display:block;margin:8px 0}
+.ci-hp-map ol{columns:2;column-gap:28px;padding-left:24px;margin:6px 0 0}.ci-hp-map li{break-inside:avoid;margin-bottom:6px}
+@media (max-width:760px){.ci-hp{padding:16px}.ci-hp-map ol{columns:1}}
+@media print{
+  body>*:not(#ci-hp-printroot){display:none!important}
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+  #ci-hp-printroot{display:block!important}
+  .ci-hp{font-size:13pt;padding:0;max-width:none}
+  .ci-hp-print,.ci-hp-search,.ci-hp-go,.ci-hp-item>button .chev,.ci-hp-none{display:none!important}
+  .ci-hp-body{display:block!important}.ci-hp-item{break-inside:avoid;border-color:#999}
+  .ci-hp-group h2{break-after:avoid}
+}
+</style>
+<script>
+(function(){
+'use strict';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isCollege=()=>{try{return String((typeof ciHome!=='undefined'&&ciHome?.evaluator?.evaluatorType)||'').trim().toLowerCase()==='college ci';}catch(e){return false;}};
+// who: 'all' = every instructor · 'college' = college clinical instructors (My CI Workspace)
+const GROUPS=[
+ {title:'Getting started',sub:'Signing in and finding your way around.',items:[
+  {q:'How do I sign in?',k:'login log in password name sign in',steps:[
+   'Open the Clinical Instructor Portal link. (Tip: save it as a bookmark or ask the coordinator to e-mail it to you again.)',
+   'Under <b>Clinical Instructor</b>, click the box and choose <b>your name</b> from the list.',
+   'Click in the <b>Password</b> box and type the password the clinical coordinator gave you. Click the little eye to see what you typed.',
+   'Click <b>Sign In ›</b>.'],
+   done:'You see “Today’s Clinical Site” and “Students With You Today” at the top of the screen.',
+   tip:'Your name is not in the list, or the password does not work? Call or e-mail the coordinator — the details are in the blue box at the top of this page.'},
+  {q:'Where is everything? (a map of the screen)',k:'menu find where lost navigate screen map',map:true,steps:[
+   'The <b>dark blue bar on the left</b> is the main menu. Click a word to go there. If you only see small pictures, click the <b>☰</b> (three lines) at the top-left to show the words.',
+   '<b>Home</b> is your starting page. You can always click Home to get back to the beginning.',
+   'The <b>bell</b> at the top-right shows messages from the coordinator. A red number means you have new ones.',
+   'Your <b>name</b> at the top-right opens a small menu with <b>Sign out</b>.'],
+   done:'If you ever feel lost, click Home on the left. Nothing you were working on is lost when you save first.'},
+  {q:'The writing is too small (or too big)',k:'zoom bigger smaller text size font read tv screen projector',steps:[
+   'Hold down the <b>Ctrl</b> key (on a Mac, the <b>⌘ Command</b> key) and press <b>+</b> to make everything bigger. Press it again for even bigger.',
+   'Hold <b>Ctrl</b> and press <b>–</b> to make everything smaller.',
+   'Hold <b>Ctrl</b> and press <b>0</b> (zero) to go back to normal size.'],
+   tip:'On a big TV or projector, the form stays in the middle of the screen. Use Ctrl and + so people at the back can read it.'},
+  {q:'How do I sign out?',k:'logout log out sign out leave shared computer',steps:[
+   'Click <b>your name</b> at the top-right of the screen.',
+   'Click <b>Sign out</b>.'],
+   tip:'On a shared hospital computer, always sign out when you finish so the next person cannot see student information.'}]},
+ {title:'On a clinical day',sub:'Your site, your students and evaluations.',items:[
+  {q:'Check or change today’s clinical site',k:'site hospital change wrong location assignment today',go:'home',steps:[
+   'Click <b>Home</b> on the left.',
+   'Look at the top banner where it says <b>Today’s Clinical Site</b>.',
+   'If it is the wrong site, click <b>Change Site</b> and click the right one. The site you are on has a ✓ next to it.'],
+   done:'The banner shows the right site and the student list changes to the students at that site.'},
+  {q:'My student is not on the list',k:'missing student add student not showing find student',go:'home',steps:[
+   'On <b>Home</b>, find <b>Students With You Today</b>.',
+   'Click <b>+ Add Student</b>.',
+   'Type part of the student’s first or last name in the search box.',
+   'Click the student’s name.'],
+   done:'The student now shows under Students With You Today.',
+   tip:'A student you add this way stays on your list until you sign out. If a student is missing every week, let the coordinator know so the schedule can be fixed.'},
+  {q:'Evaluate a student on an exam (competency evaluation)',k:'competency evaluation exam start evaluate grade score form comp',go:'home',steps:[
+   'On <b>Home</b>, click the student’s card under <b>Students With You Today</b>. (You can also click <b>Students</b> on the left and then the student.)',
+   'Under <b>Clinical Actions</b>, click <b>Start Evaluation</b>.',
+   'Type part of the exam name in the search box (for example “chest” or “elbow”) and click the exam.',
+   'The form opens. Work through it one part at a time. For each line, click the score that matches what you saw. If a whole part does not apply to this exam, click <b>Apply N/A to All</b>.',
+   'You may type a comment for each part in the comment box, or click <b>🎙 Dictate</b> and speak.',
+   'Click <b>Next Section →</b> to go on. Click <b>← Previous Section</b> to go back and change something.',
+   'Score at least one image view in the image part.',
+   'On the last screen, add any <b>Final Evaluator Comments</b>, then click <b>Finalize &amp; Submit Competency</b>.'],
+   done:'You see a message that it was submitted, and it appears on Home under Recently Completed.',
+   tip:'Not sure what a score means? Click <b>View Scoring Guide</b> on the right side of the form at any time. Nothing is lost when you open it.'},
+  {q:'I need to stop and finish an evaluation later',k:'save draft finish later continue resume pause interrupted',go:'home',steps:[
+   'While you are in the form, look at <b>Quick Actions</b> on the right side.',
+   'Click <b>Save Progress</b>. Wait until it says it is saved.',
+   'To leave the form, click <b>Save &amp; Return</b>.',
+   'Later: on <b>Home</b>, look at <b>In Progress Evaluations</b> and click the one you want. (Or click <b>Evaluations</b> on the left and click <b>Resume →</b>.)'],
+   done:'The form opens where you left off.',
+   tip:'If the form says <b>● Not yet saved</b>, click Save Progress before you close the window.'},
+  {q:'The student must stop the exam (automatic failure)',k:'auto fail automatic failure stop terminate unsafe',steps:[
+   'In the evaluation form, click the red <b>⚠ AUTO FAIL THIS EXAM</b> button.',
+   'Choose the official reason from the list.',
+   'Type a short explanation of what happened.',
+   'Click <b>Record Auto-Fail</b>.'],
+   tip:'An automatic failure makes the competency grade 0, whatever the other scores are. If anyone was hurt or put at risk, also fill in an Incident Report (see below) and call the coordinator.'},
+  {q:'Do a Professional Competency evaluation (mid-semester / end of semester)',k:'professional competency behavior mid semester end semester attitude',go:'home',steps:[
+   'Click the student’s card on <b>Home</b> (or find them under <b>Students</b>).',
+   'Under <b>Clinical Actions</b>, click <b>Professional Competency</b>.',
+   'For each line, click the score that fits. Click <b>Next →</b> to go to the next part.',
+   'Talk it over with the student. Click <b>Student Review &amp; Feedback</b> on the right to type strengths, areas to improve and what you discussed.',
+   'On the <b>Review &amp; Submit</b> screen, check everything and click <b>Finalize &amp; Submit Professional Competency</b>.'],
+   done:'It appears on Home under Recently Completed.'},
+  {q:'Print a copy to go over with the student',k:'print pdf copy paper show student',steps:[
+   'In the evaluation form, click <b>Print / Save PDF</b> on the right side.',
+   'Use your printer, or choose “Save as PDF”.'],
+   tip:'This copy is marked as an unsubmitted draft. The official record is made when you click Finalize &amp; Submit.'},
+  {q:'Record Repeat or Remediation Report says it is not ready',k:'repeat remediation not available not ready',steps:[
+   'These two buttons are not connected yet.',
+   'For now, call or e-mail the coordinator about a repeat or remediation.'],}]},
+ {title:'Messages from the coordinator',sub:'Returned work, approvals and reminders.',items:[
+  {q:'Read my messages',k:'messages bell notifications updates coordinator',steps:[
+   'Click the <b>bell</b> at the top-right. A red number shows how many are new.',
+   'Click a message to read all of it.',
+   'On Home you will also see the newest ones under <b>Coordinator Updates</b>. Click <b>View All</b> to see every message.'],
+   done:'Messages you have opened are no longer counted as new.'},
+  {q:'The coordinator returned something to me — what do I do?',k:'returned sent back fix correct reply',steps:[
+   'Open the message (bell, or Coordinator Updates on Home).',
+   'Read the coordinator’s note. It says what needs to change.',
+   'Make the change the note asks for. If you are not sure how, call or e-mail — that is completely fine.',
+   'In the box <b>Reply to the coordinator</b>, type what you checked or changed, then click <b>Send reply</b>.'],
+   done:'You see “✓ Reply sent to the coordinator.”'},
+  {q:'See everything I have sent in',k:'my submissions history sent submitted list recently completed',steps:[
+   'On <b>Home</b>, look at <b>Recently Completed</b>. Click <b>View All</b> to see the full list.',
+   'Each item shows whether it is waiting for review, accepted or returned to you.']}]},
+ {title:'My CI Workspace (college clinical instructors)',sub:'Click My CI Workspace on the left. Then click the item you need.',who:'college',items:[
+  {q:'Tell the coordinator which days I can work (availability)',k:'availability days available hours calendar schedule work',go:'Submit Availability',steps:[
+   'Click <b>My CI Workspace</b> on the left, then <b>Submit Availability</b>.',
+   'Choose a date in the date box and click <b>Add date</b>. Do this for each day you can work.',
+   'In <b>Hours available each day</b>, type the number of hours (for example 6).',
+   'Only if you need to: tick <b>Add a time window (optional)</b> and enter the times.',
+   'Click <b>Submit availability</b>.'],
+   done:'Your days appear in the list with the word Pending. When the coordinator approves them, they turn to Approved and you get a message.',
+   tip:'Made a mistake? Click <b>Remove</b> next to that day (only days that are not yet approved).'},
+  {q:'Send in my mileage',k:'mileage miles reimbursement travel driving gas map',go:'Mileage Submission',steps:[
+   'Click <b>My CI Workspace</b>, then <b>Mileage Submission</b>.',
+   'The first time for each site: type your one-way miles from home to that site, attach the Google Maps route as a PDF, and click <b>Save</b>. The coordinator approves the distance once.',
+   'Tick each day you drove to clinical.',
+   'Click <b>Submit mileage</b>.'],
+   done:'You see “✓ Submitted”. You get a message when the coordinator approves it.',
+   tip:'Your home address is never stored — only the number of miles. You are paid the shorter of your drive or the drive from the Middletown campus.'},
+  {q:'Write a note about a student (CI Notes)',k:'note notes comment student progress observation',go:'CI Notes & Reports',steps:[
+   'Click <b>My CI Workspace</b>, then <b>CI Notes &amp; Reports</b>.',
+   'Under <b>Add a note</b>, leave <b>Student note</b> chosen.',
+   'Choose the student, check the date, and type your comments in the big box.',
+   'Click <b>Add note</b>.'],
+   done:'You see “✓ Saved” and the note appears under My notes on the right.',
+   tip:'You can also write notes about a lab or lecture activity, or about talking with a hospital clinical instructor — click those buttons at the top of Add a note.'},
+  {q:'Send my mid-semester or end-of-semester CI report',k:'ci report college clinical instructor report mid end semester',go:'CI Notes & Reports',steps:[
+   'Click <b>My CI Workspace</b>, then <b>CI Notes &amp; Reports</b>.',
+   'Scroll down to <b>Submit College Clinical Instructor Report</b>.',
+   'Choose <b>Mid-semester</b> or <b>End of semester</b>, and the clinical practicum.',
+   'Check the <b>From</b> and <b>To</b> dates. It tells you how many notes will go in.',
+   'Click <b>Submit report</b>.'],
+   done:'Your notes are placed into the official report form and sent to the coordinator. You get a message when it is accepted.',
+   tip:'All your notes for those dates go in automatically — you do not need to type them again.'},
+  {q:'Report an incident',k:'incident accident injury problem unsafe report form 1b',go:'Incident Reports',steps:[
+   'Something serious or urgent? <b>Call the coordinator first.</b>',
+   'Click <b>My CI Workspace</b>, then <b>Incident Reports</b>. (Or open the student and click <b>Incident Report</b> under Clinical Actions.)',
+   'Choose the student, the date and the time.',
+   'Fill in where it happened, who else was there, what happened, and what action was taken.',
+   'Click <b>Submit incident report</b>, then click OK to confirm.'],
+   done:'The coordinator and the department chair get an e-mail right away with the report attached.'},
+  {q:'Answer the end-of-semester survey reflection',k:'survey reflection responses feedback summary',go:'Survey Responses',steps:[
+   'Click <b>My CI Workspace</b>, then <b>Survey Responses</b>.',
+   'Click <b>Download summary (PDF)</b> to read the students’ feedback.',
+   'Answer the three questions. Click <b>Save draft</b> if you want to finish later.',
+   'Click <b>Submit reflection</b> when you are done.'],
+   done:'You get a message when the coordinator accepts it.'}]},
+ {title:'Program resources',sub:'Handbook, syllabus and the scoring guide.',items:[
+  {q:'Find the Program Handbook, Clinical Syllabus or Scoring Guide',k:'handbook syllabus scoring guide policy rules resources documents',go:'resources',steps:[
+   'Click <b>Resources</b> on the left.',
+   'Click <b>Program Handbook</b>, <b>Clinical Syllabus</b> or <b>Evaluation &amp; Scoring Guide</b>.',
+   'To keep a copy, click <b>Download PDF</b>.']}]},
+ {title:'Something went wrong',sub:'Common worries, and what to do.',items:[
+  {q:'Did my work save?',k:'saved not saved lost worry',steps:[
+   'In an evaluation, <b>● Not yet saved</b> means there are changes that are not saved yet. Click <b>Save Progress</b>.',
+   'After you click Finalize &amp; Submit, it is saved for good and shows on Home under Recently Completed.']},
+  {q:'I closed the window by accident',k:'closed window lost work crashed',steps:[
+   'Open the Portal again and sign in.',
+   'On Home, look under <b>In Progress Evaluations</b>. Anything you saved is there — click it to keep going.',
+   'If it is not there, it was not saved, and you will need to start that evaluation again.']},
+  {q:'The page just says “Loading…” or nothing happens',k:'loading stuck frozen blank slow not working error',steps:[
+   'Wait about 20 seconds — sometimes it is just slow.',
+   'Press the <b>F5</b> key (or click the round arrow at the top of the browser) to refresh the page.',
+   'Sign in again if it asks you to.',
+   'Still not working? Call or e-mail the coordinator and say what you were trying to do.']},
+  {q:'I clicked the wrong student or the wrong exam',k:'wrong student wrong exam mistake undo',steps:[
+   'If you have not submitted it yet, click <b>Save &amp; Return</b> and start the right one.',
+   'If you already submitted it, call or e-mail the coordinator. They can return it or fix it — you did not break anything.']}]}
+];
+let contact=null;
+function el(h){const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild;}
+function goTo(go){
+  if(go==='home')return window.ciGoHome&&window.ciGoHome();
+  if(go==='resources')return window.ciGoResources&&window.ciGoResources();
+  if(window.ciOpenWorkspaceFeature_)window.ciOpenWorkspaceFeature_(go);
+}
+const MAP='<svg viewBox="0 0 900 330" role="img" aria-label="Drawing of the Portal screen with numbered parts" style="font-family:inherit">'+
+ '<rect x="1" y="1" width="898" height="328" rx="14" fill="#f8fbfe" stroke="#b9cde0"/>'+
+ '<rect x="1" y="1" width="150" height="328" rx="14" fill="#062b4a"/>'+
+ ['Home','Students','Evaluations','My CI Workspace','Resources','Help & Support'].map((t,i)=>'<text x="18" y="'+(58+i*40)+'" fill="#fff" font-size="14">'+t+'</text>').join('')+
+ '<rect x="151" y="1" width="748" height="96" fill="#0b3a63"/>'+
+ '<text x="175" y="38" fill="#fff" font-size="18" font-weight="700">Clinical Instructor Portal</text>'+
+ '<text x="175" y="78" fill="#cfe4f8" font-size="15">Today’s Clinical Site: Castle Point</text>'+
+ '<rect x="470" y="60" width="108" height="28" rx="8" fill="#fff"/><text x="483" y="79" fill="#0b3a63" font-size="14" font-weight="700">Change Site</text>'+
+ '<circle cx="760" cy="34" r="14" fill="#fff"/><text x="753" y="40" font-size="16">🔔</text>'+
+ '<rect x="790" y="18" width="92" height="32" rx="16" fill="#fff"/><text x="806" y="39" fill="#0b3a63" font-size="14" font-weight="700">Your name</text>'+
+ '<text x="175" y="132" fill="#10213c" font-size="16" font-weight="700">Students With You Today</text>'+
+ '<rect x="640" y="114" width="110" height="28" rx="8" fill="#fff" stroke="#0878e5"/><text x="652" y="133" fill="#0878e5" font-size="14" font-weight="700">+ Add Student</text>'+
+ [0,1,2].map(i=>'<rect x="'+(175+i*170)+'" y="150" width="155" height="70" rx="10" fill="#fff" stroke="#cfdeec"/><circle cx="'+(200+i*170)+'" cy="185" r="14" fill="#dbe9f7"/><text x="'+(222+i*170)+'" y="190" font-size="14" fill="#10213c">Student</text>').join('')+
+ '<rect x="175" y="238" width="220" height="70" rx="10" fill="#fff" stroke="#f0b35a"/><text x="190" y="262" font-size="14" font-weight="700" fill="#b86b00">In Progress Evaluations</text>'+
+ '<rect x="410" y="238" width="220" height="70" rx="10" fill="#fff" stroke="#7cc79a"/><text x="425" y="262" font-size="14" font-weight="700" fill="#1f7a45">Recently Completed</text>'+
+ '<rect x="645" y="238" width="235" height="70" rx="10" fill="#fff" stroke="#f0a3a8"/><text x="660" y="262" font-size="14" font-weight="700" fill="#c4262d">Coordinator Updates</text>'+
+ [[138,26,1],[455,72,2],[750,12,3],[868,12,4],[402,127,5],[765,128,6],[180,236,7],[415,236,8],[650,236,9]].map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="12" fill="#e0a100" stroke="#fff" stroke-width="2"/><text x="'+p[0]+'" y="'+(p[1]+5)+'" text-anchor="middle" font-size="13" font-weight="800" fill="#10213c">'+p[2]+'</text>').join('')+
+ '</svg>';
+const MAP_KEY=['<b>Main menu</b> — click a word to go there','<b>Change Site</b> — if today’s site is wrong','<b>Bell</b> — messages from the coordinator','<b>Your name</b> — Sign out','<b>Students With You Today</b> — click a student to evaluate them','<b>+ Add Student</b> — if a student is missing','<b>In Progress Evaluations</b> — saved work to finish','<b>Recently Completed</b> — what you have sent in','<b>Coordinator Updates</b> — newest messages'];
+function render(){
+  const list=document.getElementById('ci-hp-list');if(!list)return;
+  const q=(document.getElementById('ci-hp-q').value||'').trim().toLowerCase();
+  const words=q.split(/\s+/).filter(Boolean);
+  list.replaceChildren();let shown=0;
+  GROUPS.forEach(g=>{
+    if(g.who==='college'&&!isCollege())return;
+    const items=g.items.filter(it=>!words.length||words.every(w=>(it.q+' '+it.k+' '+it.steps.join(' ')).toLowerCase().includes(w)));
+    if(!items.length)return;
+    const sec=el('<div class="ci-hp-group"><h2>'+esc(g.title)+'</h2><p class="gsub">'+esc(g.sub)+'</p></div>');
+    items.forEach(it=>{
+      shown++;
+      const box=el('<div class="ci-hp-item'+(words.length?' open':'')+'"><button type="button" aria-expanded="'+(words.length?'true':'false')+'"><span>'+esc(it.q)+'</span><span class="chev" aria-hidden="true">›</span></button><div class="ci-hp-body">'+
+        '<ol>'+it.steps.map(s=>'<li>'+s+'</li>').join('')+'</ol>'+(it.map?'<div class="ci-hp-map">'+MAP+'<ol>'+MAP_KEY.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>':'')+
+        (it.done?'<div class="ci-hp-done"><strong>You’ll know it worked when:</strong> '+it.done+'</div>':'')+
+        (it.tip?'<div class="ci-hp-tip"><strong>Good to know:</strong> '+it.tip+'</div>':'')+
+        (it.go&&(it.go==='home'||it.go==='resources'||isCollege())?'<button type="button" class="ci-hp-go">Take me there →</button>':'')+'</div></div>');
+      const head=box.querySelector('button');head.onclick=()=>{const o=box.classList.toggle('open');head.setAttribute('aria-expanded',o?'true':'false');};
+      const go=box.querySelector('.ci-hp-go');if(go)go.onclick=()=>goTo(it.go);
+      sec.append(box);
+    });
+    list.append(sec);
+  });
+  document.getElementById('ci-hp-none').hidden=shown>0;
+}
+function renderContact(){
+  const box=document.getElementById('ci-hp-contact');if(!box)return;
+  if(!contact){box.innerHTML='<b>Need a person?</b> Loading contact details…';return;}
+  const tel=String(contact.phone||'').replace(/[^\d+]/g,'');
+  box.innerHTML='<b>Need a person? Call or e-mail — you are never bothering anyone.</b><br>'+esc(contact.name)+(contact.title?', '+esc(contact.title):'')+
+    (contact.phone?'<br>📞 <a href="tel:'+esc(tel)+'">'+esc(contact.phone)+'</a>':'')+
+    (contact.email?'<br>✉️ <a href="mailto:'+esc(contact.email)+'">'+esc(contact.email)+'</a>':'')+
+    (contact.hours?'<br><span style="color:#3d5570">'+esc(contact.hours)+'</span>':'')+
+    '<br><span style="color:#3d5570;font-size:15px">Tell them what you were trying to do and what the screen says.</span>';
+}
+window.ciHelpRender_=function(){
+  render();renderContact();
+  if(!contact&&window.ciRun)window.ciRun('ciR1HelpContact').then(c=>{contact=c||{};renderContact();}).catch(()=>{contact={name:'the clinical coordinator'};renderContact();});
+};
+document.addEventListener('DOMContentLoaded',init);if(document.readyState!=='loading')init();
+function init(){
+  const q=document.getElementById('ci-hp-q');if(!q||q.dataset.ready)return;q.dataset.ready='1';
+  q.addEventListener('input',render);
+  document.getElementById('ci-hp-print').onclick=()=>{
+    const q=document.getElementById('ci-hp-q');const keep=q.value;q.value='';render();
+    document.getElementById('ci-hp-printroot')?.remove();
+    const root=document.createElement('div');root.id='ci-hp-printroot';
+    const copy=document.querySelector('#ci-help-view .ci-hp').cloneNode(true);
+    copy.querySelectorAll('.ci-hp-item').forEach(b=>b.classList.add('open'));
+    copy.querySelectorAll('.ci-hp-print,.ci-hp-search,.ci-hp-go,.ci-hp-none').forEach(x=>x.remove());
+    root.append(copy);document.body.append(root);
+    const done=()=>{root.remove();window.removeEventListener('afterprint',done);};
+    window.addEventListener('afterprint',done);window.print();setTimeout(()=>{if(document.body.contains(root))done();},60000);
+    q.value=keep;render();};
+}
+})();
+</script>

@@ -406,3 +406,22 @@ function ciNotesIncidentsAuthorize() {
   console.log('Samples: report PDF ' + r + ' · incident PDF ' + i + ' · chair e-mail ' + (s['Chair E-mail'] ? 'found' : 'missing') + ' · e-mail quota ' + MailApp.getRemainingDailyQuota());
   return [r, i];
 }
+
+/**
+ * Help & Support contact shown on the Portal Help page and the sign-in page.
+ * Read from the shared "Program Settings" sheet so the coordinator can change
+ * it (CCMS → Help & Support) without editing code. No sign-in required: it
+ * only returns the program's own work contact details.
+ */
+function ciR1HelpContact() {
+  const sh = ciMileSheet_(CI_DOCS.SETTINGS, ['Setting', 'Value']);
+  const out = {};
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(r => {if (ciDocT_(r[0])) out[ciDocT_(r[0])] = ciDocT_(r[1]);});
+  const defaults = {'Help Contact Name': 'Philip Foley-Ward', 'Help Contact Title': 'Clinical Coordinator', 'Help Contact E-mail': out['Coordinator E-mail'] || '',
+    'Help Contact Phone': '', 'Help Contact Hours': ''};
+  Object.keys(defaults).forEach(k => {if (!(k in out)) {sh.appendRow([k, defaults[k]]); out[k] = defaults[k];}});
+  let email = out['Help Contact E-mail'];
+  if (!email) {try {email = Session.getEffectiveUser().getEmail();} catch (e) {}}
+  return {name: out['Help Contact Name'] || 'the clinical coordinator', title: out['Help Contact Title'], email: email || '',
+    phone: out['Help Contact Phone'], hours: out['Help Contact Hours']};
+}
